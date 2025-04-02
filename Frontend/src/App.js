@@ -4,9 +4,9 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SignIn from './Login/Sign-in';
 import Dashboard from './Dashboard/Dashboard';
-import Departamentos from './Components/table/Departamentos';
-import Municipios from './Components/table/Municipios';
-import Aldeas from './Components/table/Aldeas';
+import Departamentos from './Mantenimientos/Departamentos';
+import Municipios from './Mantenimientos/Municipios';
+import Aldeas from './Mantenimientos/Aldeas';
 import Usuarios from './Seguridad/Usuarios';
 import { UserProvider } from './Components/UserContext';
 

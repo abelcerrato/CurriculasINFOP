@@ -27,11 +27,11 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 const ProjectDrawer = ({ open }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Estados separados para cada menú
   const [openMantenimiento, setOpenMantenimiento] = useState(false);
   const [openSeguridad, setOpenSeguridad] = useState(false);
-  
+
   // Refs y estados para los menús flotantes
   const mantenimientoAnchorRef = useRef(null);
   const seguridadAnchorRef = useRef(null);
@@ -65,7 +65,7 @@ const ProjectDrawer = ({ open }) => {
     isActive("/Departamentos") ||
     isActive("/Municipios") ||
     isActive("/Aldeas");
-  
+
   const isSeguridadActive = isActive("/Usuarios");
 
   const getMenuItemStyles = (path, isParent = false, parentActive = false) => {
@@ -166,7 +166,7 @@ const ProjectDrawer = ({ open }) => {
       </List>
 
       {open && <Divider />}
-      
+
       {/* Mantenimiento con menú flotante */}
       <List>
         <MenuItem
@@ -182,7 +182,7 @@ const ProjectDrawer = ({ open }) => {
         />
 
         {open && (
-          <Collapse in={openMantenimiento} timeout="auto" unmountOnExit>
+          <Collapse in={openMantenimiento} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
             <List component="div" disablePadding>
               <MenuItem
                 path="/Departamentos"
@@ -304,7 +304,7 @@ const ProjectDrawer = ({ open }) => {
       </List>
 
       {open && <Divider />}
-      
+
       {/* Seguridad con menú flotante */}
       <List>
         <MenuItem
@@ -320,7 +320,7 @@ const ProjectDrawer = ({ open }) => {
         />
 
         {open && (
-          <Collapse in={openSeguridad} timeout="auto" unmountOnExit>
+          <Collapse in={openSeguridad} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
             <List component="div" disablePadding>
               <MenuItem
                 path="/Usuarios"
@@ -380,7 +380,7 @@ const ProjectDrawer = ({ open }) => {
           </MuiMenuItem>
         </Menu>
       </List>
-      
+
       {open && <Divider />}
     </Drawer>
   );

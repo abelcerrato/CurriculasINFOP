@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid } from '@mui/x-data-grid';
-import Dashboard from '../../Dashboard/Dashboard';
+import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
@@ -13,7 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
-import { color } from '../style/Color';
+import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
 
 
