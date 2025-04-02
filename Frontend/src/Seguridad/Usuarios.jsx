@@ -103,16 +103,7 @@ const DataTable = () => {
                     }
                 );
 
-                // Obtener el departamento seleccionado
-                const deptoSeleccionado = departamentos.find(dep => dep.id === editRowData.idmunicipio);
 
-                // Agregar el nuevo registro a la tabla
-                setRows([...rows, {
-                    id: response.data.id,
-                    aldea: editRowData.aldea,
-                    idmunicipio: editRowData.idmunicipio,
-                    departamento: deptoSeleccionado?.departamento || ''
-                }]);
                 Swal.fire({
                     title: "Registro Creado",
                     text: "El aldea ha sido creado exitosamente.",
@@ -131,18 +122,7 @@ const DataTable = () => {
                     payload
                 );
 
-                // Obtener el departamento seleccionado
-                const deptoSeleccionado = departamentos.find(dep => dep.id === editRowData.idmunicipio);
 
-                // Actualizar el registro existente
-                setRows(rows.map(row =>
-                    row.id === editRowId ? {
-                        ...row,
-                        aldea: editRowData.aldea,
-                        idmunicipio: editRowData.idmunicipio,
-                        departamento: deptoSeleccionado?.departamento || ''
-                    } : row
-                ));
 
                 Swal.fire({
                     title: "Registro Actualizado",

@@ -41,26 +41,28 @@ const DataTable = () => {
     }, []);
 
     // Obtener lista de aldeas
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/aldeas`);
-                const data = Array.isArray(response.data) ? response.data : [];
 
-                // Mapear los datos para incluir el nombre del departamento
-                const formattedData = data.map(item => ({
-                    id: item.id,
-                    aldea: item.aldea,
-                    municipio: item.municipio,
-                    idmunicipio: item.idmunicipio
-                }));
-                setRows(formattedData);
-            } catch (error) {
-                console.error("Hubo un error al obtener los datos:", error);
-            }
-        };
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/aldeas`);
+            const data = Array.isArray(response.data) ? response.data : [];
+
+
+            const formattedData = data.map(item => ({
+                id: item.id,
+                aldea: item.aldea,
+                municipio: item.municipio,
+                idmunicipio: item.idmunicipio
+            }));
+            setRows(formattedData);
+        } catch (error) {
+            console.error("Hubo un error al obtener los datos:", error);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
-    }, [municipio]); // Se ejecuta cuando cambian los municipio
+    }, [municipio]);
 
     const handleAddClick = () => {
         setEditRowData({ aldea: '', idmunicipio: '' });
@@ -73,7 +75,7 @@ const DataTable = () => {
         setEditRowData({
             id: rowToEdit.id,
             aldea: rowToEdit.aldea,
-            municipio: rowToEdit.idmunicipio
+            idmunicipio: rowToEdit.idmunicipio
         });
         setEditRowId(id);
         setIsAdding(false);
@@ -95,16 +97,7 @@ const DataTable = () => {
                         idmunicipio: editRowData.idmunicipio
                     }
                 );
-
-
-
-                // Agregar el nuevo registro a la tabla
-                setRows([...rows, {
-                    id: response.data.id,
-                    aldea: editRowData.aldea,
-                    idmunicipio: editRowData.idmunicipio,
-
-                }]);
+                fetchData();
                 Swal.fire({
                     title: "Registro Creado",
                     text: "El aldea ha sido creado exitosamente.",
@@ -112,7 +105,7 @@ const DataTable = () => {
                     timer: 6000,
                 });
             } else {
-                // Lógica para UPDATE
+
                 const payload = {
                     aldea: editRowData.aldea,
                     idmunicipio: editRowData.idmunicipio
@@ -134,7 +127,7 @@ const DataTable = () => {
                         idmunicipio: muniseleccionado?.municipio || ''
                     } : row
                 ));
-
+                fetchData();
                 Swal.fire({
                     title: "Registro Actualizado",
                     text: "El aldea ha sido actualizado exitosamente.",
@@ -253,7 +246,7 @@ const DataTable = () => {
     ];
 
     // Filas para el DataGrid (incluyendo la temporal si está en modo añadir)
-    const gridRows = isAdding ? [{ id: 'temp', aldea: '', municipio: '' }, ...rows] : rows;
+    const gridRows = isAdding ? [...rows, { id: 'temp', aldea: '', municipio: '' }] : rows;
 
     return (
         <Dashboard>

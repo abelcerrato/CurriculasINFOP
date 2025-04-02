@@ -25,22 +25,23 @@ const DataTable = () => {
   const [editRowData, setEditRowData] = useState({});
   const [isAdding, setIsAdding] = useState(false);
 
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/departamentos`);
+      // Asegurarse de que los datos tengan el formato correcto
+      const data = Array.isArray(response.data) ? response.data :
+        response.data.updatedDepto ? response.data.updatedDepto :
+          response.data.newDepto ? response.data.newDepto : [];
+      setRows(data.map(item => ({
+        id: item.id,
+        departamento: item.departamento
+      })));
+    } catch (error) {
+      console.error("Hubo un error al obtener los datos:", error);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/departamentos`);
-        // Asegurarse de que los datos tengan el formato correcto
-        const data = Array.isArray(response.data) ? response.data :
-          response.data.updatedDepto ? response.data.updatedDepto :
-            response.data.newDepto ? response.data.newDepto : [];
-        setRows(data.map(item => ({
-          id: item.id,
-          departamento: item.departamento
-        })));
-      } catch (error) {
-        console.error("Hubo un error al obtener los datos:", error);
-      }
-    };
     fetchData();
   }, []);
 
@@ -70,17 +71,7 @@ const DataTable = () => {
           `${process.env.REACT_APP_API_URL}/departamentos`,
           { departamento: editRowData.departamento }
         );
-
-        // Extraer el nuevo departamento de la respuesta
-        const newDepto = response.data.newDepto ? response.data.newDepto[0] : response.data;
-
-        // Agregar el nuevo registro a la tabla
-        setRows([...rows, {
-          id: newDepto.id,
-          departamento: newDepto.departamento
-        }]);
-
-
+        fetchData();
         Swal.fire({
           title: "Registro Creado",
           text: "El departamento ha sido creado exitosamente.",
@@ -98,12 +89,7 @@ const DataTable = () => {
           `${process.env.REACT_APP_API_URL}/departamentos/${editRowId}`,
           payload
         );
-
-        // Actualizar el registro existente
-        setRows(rows.map(row =>
-          row.id === editRowId ? payload : row
-        ));
-        
+        fetchData();
         Swal.fire({
           title: "Registro Actualizado",
           text: "El departamento ha sido actualizado exitosamente.",

@@ -5,6 +5,7 @@ export const getUserM = async () => {
     try {
         const { rows } = await pool.query(` 
         SELECT 
+        u.id,
         u.nombre,
         u.cecap,
         u.correo,
@@ -13,8 +14,8 @@ export const getUserM = async () => {
         u.idmunicipio,
         u.usuario,
         m.municipio,
-        d.departamento
-        r.rol,
+        d.departamento,
+        r.rol
             FROM usuarios u  
             INNER JOIN municipios m ON u.idmunicipio = m.id
             INNER JOIN departamentos d  ON u.iddepartamento = d.id

@@ -97,16 +97,7 @@ const DataTable = () => {
                     }
                 );
 
-                // Obtener el departamento seleccionado
-                const deptoSeleccionado = departamentos.find(dep => dep.id === editRowData.iddepartamento);
 
-                // Agregar el nuevo registro a la tabla
-                setRows([...rows, {
-                    id: response.data.id,
-                    municipio: editRowData.municipio,
-                    iddepartamento: editRowData.iddepartamento,
-                    departamento: deptoSeleccionado?.departamento || ''
-                }]);
                 Swal.fire({
                     title: "Registro Creado",
                     text: "El municipio ha sido creado exitosamente.",
