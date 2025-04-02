@@ -1,15 +1,15 @@
-import { getEstudianteIdM, getEstudiantesM, postEstudianteM, putEstudianteM } from "../models/estudiantes.models.js";
+import { deleteEducacionNoFormalM, getEstudianteIdM, getEstudiantesM, postEducacionNoFormalM, postEstudianteM, putEstudianteM } from "../models/estudiantes.models.js";
 
 
 export const getEstudiantesC = async (req, res) => {
     try {
-        const estudiantes= await getEstudiantesM();
+        const estudiantes = await getEstudiantesM();
         res.json(estudiantes);
 
     } catch (error) {
         console.log('Error al obtener estudiantes:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
-        
+
     }
 }
 
@@ -24,7 +24,7 @@ export const getEstudianteIdC = async (req, res) => {
         }
 
         // Retornar el ID del estudiante 
-        res.json(estudiante );
+        res.json(estudiante);
     } catch (error) {
         console.error('Error al obtener el estudiante:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -34,18 +34,43 @@ export const getEstudianteIdC = async (req, res) => {
 
 export const postEstudianteC = async (req, res) => {
     try {
-        const { identificacion, nombre, fechanacimiento, nacionalidad, idednia, genero, telefono, estadocivil, 
-            idniveleducativo, idgradoacademico, educacionformal, trabajaactualmente, iddiscapacidad, detallediscapacidad, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, creadopor
+        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+            estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
+            iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
+            direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
+            estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
+            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, creadopor,
+            educacionNoFormal
         } = req.body
         console.log(req.body);
 
 
-        const Estudiantes = await postEstudianteM(identificacion, nombre, fechanacimiento, nacionalidad, idednia, genero, 
-            telefono, estadocivil, idniveleducativo, idgradoacademico, educacionformal, trabajaactualmente, iddiscapacidad, 
-            detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio, direccion, creadopor)
+        const Estudiantes = await postEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+            estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
+            iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
+            direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
+            estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
+            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, creadopor)
 
-        res.json({ message: "Estudiante agregado", Estudiante: Estudiantes });
+
+        const idestudiante = Estudiantes[0].id;
+        //console.log("id del estudiante: ", idestudiante);
+
+        let cursosInsertados = [];
+        if (Array.isArray(educacionNoFormal)) {
+            for (const curso of educacionNoFormal) {
+                const result = await postEducacionNoFormalM(curso, idestudiante);
+                cursosInsertados.push(result);
+            }
+        }
+
+
+        res.json({
+            message: "Estudiante agregado exitosamente",
+            Estudiantes,
+            EducacionNoFormal: cursosInsertados
+        });
+
     } catch (error) {
         console.error('Error al insertar', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -57,20 +82,43 @@ export const postEstudianteC = async (req, res) => {
 export const putEstudianteC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { identificacion, nombre, fechanacimiento, nacionalidad, idednia, genero, telefono, estadocivil, 
-            idniveleducativo, idgradoacademico, educacionformal, trabajaactualmente, iddiscapacidad, detallediscapacidad, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, creadopor
+        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+            estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
+            iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
+            direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
+            estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
+            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, modificadopor, educacionNoFormal
         } = req.body
         console.log(req.body);
 
 
-        const Estudiantes = await putEstudianteM(identificacion, nombre, fechanacimiento, nacionalidad, idednia, genero, 
-            telefono, estadocivil, idniveleducativo, idgradoacademico, educacionformal, trabajaactualmente, iddiscapacidad, 
-            detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio, direccion, creadopor, id)
+        const Estudiantes = await putEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+            estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
+            iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
+            direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
+            estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
+            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, modificadopor, id)
 
-        res.json({ message: "Estudiante actualizado", Estudiante: Estudiantes });
+        //elimina la educacion no formal existente del estudiante
+        await deleteEducacionNoFormalM(id);
+
+        //registra la nueva educacion no formal
+        let cursosActualizados = [];
+        if (Array.isArray(educacionNoFormal)) {
+            for (const curso of educacionNoFormal) {
+                const result = await postEducacionNoFormalM(curso, id);
+                cursosActualizados.push(result);
+            }
+        }
+
+
+        res.json({
+            message: "Estudiante actualizado exitosamente",
+            Estudiantes,
+            EducacionNoFormal: cursosActualizados
+        });
     } catch (error) {
-        console.error('Error al insertar', error);
+        console.error('Error al actualizar', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
