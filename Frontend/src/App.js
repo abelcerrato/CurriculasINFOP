@@ -8,6 +8,7 @@ import Departamentos from './Mantenimientos/Departamentos';
 import Municipios from './Mantenimientos/Municipios';
 import Aldeas from './Mantenimientos/Aldeas';
 import Etnias from './Mantenimientos/Etnias'
+import TipoEducador from './Mantenimientos/TipoEducador'
 import Usuarios from './Seguridad/Usuarios';
 import { UserProvider } from './Components/UserContext';
 
@@ -45,9 +46,8 @@ function App() {
           <Route path="/Mantenimiento/Departamentos" element={<ProtectedRoute><Departamentos /></ProtectedRoute>} />
           <Route path="/Mantenimiento/Municipios" element={<ProtectedRoute><Municipios /></ProtectedRoute>} />
           <Route path="/Mantenimiento/Aldeas" element={<ProtectedRoute><Aldeas /></ProtectedRoute>} />
-
           <Route path="/Mantenimiento/Etnias" element={<ProtectedRoute><Etnias /></ProtectedRoute>} />
-
+          <Route path="/Mantenimiento/Tipo-Educador" element={<ProtectedRoute><TipoEducador /></ProtectedRoute>} />
 
           <Route path="/Usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
         </Routes>
