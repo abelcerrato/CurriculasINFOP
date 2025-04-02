@@ -22,7 +22,7 @@ export const getMunicipiosM = async () => {
 export const getMunicipioIdM = async (id) => {
     console.log('Municipio enviado:', id);
     try {
-        const { rows } = await pool.query('SELECT municipio, iddepartamento FROM municipios WHERE id=$1', [id]);
+        const { rows } = await pool.query('SELECT municipio,id, iddepartamento FROM municipios WHERE iddepartamento =$1', [id]);
         console.log('Resultado de la consulta del Municipio:', rows); 
         return rows;
     } catch (error) {

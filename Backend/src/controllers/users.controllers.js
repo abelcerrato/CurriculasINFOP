@@ -75,8 +75,7 @@ export const verificarUsuarioC = async (req, res) => {
             return res.status(401).json({ message: "Credenciales incorrectas" });
         }
 
-        console.log("Usuario autenticado. Su usuario es:", user.nombre);
-
+ 
         return res.json({
             message: `Usuario autenticado. Su usuario es: ${user.nombre}`,
             user: user

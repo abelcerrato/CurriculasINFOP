@@ -4,7 +4,7 @@ import { pool } from '../db.js'
 export const getDepartamentosM = async () => {
     try {
         const { rows } = await pool.query('SELECT * FROM departamentos ORDER BY id ASC');
-        console.log(rows);
+
         return rows;
     } catch (error) {
         throw error;

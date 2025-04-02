@@ -13,6 +13,7 @@ export const getUserM = async () => {
         u.iddepartamento,
         u.idmunicipio,
         u.usuario,
+        u.estado,
         m.municipio,
         d.departamento,
         r.rol
@@ -70,7 +71,7 @@ export const getUserIdM = async (id) => {
 export const verificarUsuarioM = async (usuario) => {
     try {
 
-        const { rows, rowCount } = await pool.query('SELECT usuario, nombre, contraseña, correo FROM usuarios WHERE usuario = $1', 
+        const { rows, rowCount } = await pool.query('SELECT id,usuario, nombre, contraseña, correo FROM usuarios WHERE usuario = $1', 
             [usuario]);
 
 

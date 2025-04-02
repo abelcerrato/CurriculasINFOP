@@ -38,11 +38,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SignIn />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/Departamentos" element={<Departamentos />} />
-          <Route path="/Municipios" element={<Municipios />} />
-          <Route path="/Aldeas" element={<Aldeas />} />
-          <Route path="/Usuarios" element={<Usuarios />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/Departamentos" element={<ProtectedRoute><Departamentos /></ProtectedRoute>} />
+          <Route path="/Municipios" element={<ProtectedRoute><Municipios /></ProtectedRoute>} />
+          <Route path="/Aldeas" element={<ProtectedRoute><Aldeas /></ProtectedRoute>} />
+          <Route path="/Usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
 

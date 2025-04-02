@@ -1,3 +1,6 @@
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -8,17 +11,94 @@ import {
   IconButton,
   Container,
 } from "@mui/material";
-import { Visibility, VisibilityOff, Email } from "@mui/icons-material";
-import { useState } from "react";
+import { Visibility, VisibilityOff, Person } from "@mui/icons-material";
 import LogoCONED from "../Components/img/logos_CONED.png";
 import LogoDGDP from "../Components/img/LogoINFOP.png";
-import Dashboard from "../Dashboard/Dashboard";
-export default function Login() {
-  const [showPassword, setShowPassword] = useState(false);
+import Swal from "sweetalert2";
+import { useUser } from "../Components/UserContext"
 
+
+export default function Login() {
+  const { setUser } = useUser();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({ usuario: "", contraseña: "" });
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{5,}$/;
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "contraseña") {
+      if (!passwordRegex.test(value)) {
+        setError("La contraseña debe tener al menos 5 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
+      } else {
+        setError(""); // Elimina el error si la contraseña es válida
+      }
+    }
+  };
+
+
+
+
+  const handleSubmit = async (event) => {
+      event.preventDefault();
+  
+      try {
+          const response = await axios.post(
+              `${process.env.REACT_APP_API_URL}/verificarUsuario`,
+              formData
+          );
+  
+          if (response.status === 200) {
+              // Si la autenticación es exitosa
+              const { id, usuario } = response.data.user;
+              
+              // Guarda el usuario en el contexto global
+              setUser({ id, usuario });
+  
+              // Guarda en localStorage
+              localStorage.setItem("user", JSON.stringify({ id, usuario }));
+  
+              // Indica que la sesión está activa
+              sessionStorage.setItem("isAuthenticated", "true");
+  
+              // Redirige al dashboard
+              navigate("/dashboard");
+          } else {
+              Swal.fire({
+                  title: "Error",
+                  text: "Error en la autenticación. Verifique sus credenciales.",
+                  icon: "error",
+                  timer: 6000,
+              });
+          }
+      } catch (error) {
+          console.error("Error en la autenticación:", error);
+  
+          if (error.response) {
+              if (error.response.status === 401) {
+                  Swal.fire({
+                      title: "Error",
+                      text: error.response.data.message,
+                      icon: "error",
+                      timer: 6000,
+                  });
+              } else {
+                  alert("Error en la autenticación. Inténtelo de nuevo.");
+              }
+          } else if (error.request) {
+              alert("Error en la conexión con el servidor.");
+          } else {
+              alert("Hubo un problema con la solicitud. Inténtelo de nuevo.");
+          }
+      }
+  };
+  
 
   return (
 
@@ -55,6 +135,8 @@ export default function Login() {
           }}
         >
           <Card
+            component="form"
+            onSubmit={handleSubmit}
             sx={{
               p: 3,
               width: "70%",
@@ -74,14 +156,20 @@ export default function Login() {
 
             {/* Campo de email */}
             <TextField
-              fullWidth
-              placeholder="Correo Electrónico"
-              variant="outlined"
               margin="normal"
+              required
+              fullWidth
+              id="usuario"
+              placeholder="Usuario"
+              name="usuario"
+              autoComplete="usuario"
+              autoFocus
+              value={formData.usuario}
+              onChange={handleChange}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <Email />
+                    <Person />
                   </InputAdornment>
                 ),
               }}
@@ -90,11 +178,17 @@ export default function Login() {
 
             {/* Campo de contraseña */}
             <TextField
+              required
               fullWidth
               placeholder="Contraseña"
               variant="outlined"
               margin="normal"
+              name="contraseña"
+              value={formData.contraseña}
+              onChange={handleChange}
               type={showPassword ? "text" : "password"}
+              error={!!error}
+              helperText={error}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -119,6 +213,7 @@ export default function Login() {
 
             {/* Botón de inicio de sesión */}
             <Button
+              type="submit"
               variant="contained"
               fullWidth
               sx={{

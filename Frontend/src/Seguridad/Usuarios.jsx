@@ -18,15 +18,27 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
+import { useUser } from "../Components/UserContext";
 
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
-    const [editRowData, setEditRowData] = useState({ aldea: '', idmunicipio: '' });
+    const [editRowData, setEditRowData] = useState({
+        nombre: '',
+        cecap: '',
+        correo: '',
+        iddepartamento: '',
+        idmunicipio: '',
+        contraseña: '',
+        estado: '',
+        usuario: '',
+        idrol: '',
+    });
     const [isAdding, setIsAdding] = useState(false);
     const [departamentos, setDepartamentos] = useState([]);
-
+    const [municipios, setMunicipios] = useState([]);
     // Obtener lista de departamentos para el Select
     useEffect(() => {
         const obtenerDepartamentos = async () => {
@@ -40,7 +52,26 @@ const DataTable = () => {
         obtenerDepartamentos();
     }, []);
 
-    // Obtener lista de aldeas
+    // Obtener lista de municipios segun el departamento selecionado para el Select
+    useEffect(() => {
+        const obtenerMunicipios = async () => {
+            if (!editRowData.iddepartamento) return; // Evita hacer la petición si no hay un departamento seleccionado.
+
+            try {
+                console.log("departamento", editRowData.iddepartamento);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/municipios/${editRowData.iddepartamento}`);
+                setMunicipios(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Municipios", error);
+            }
+        };
+
+        obtenerMunicipios();
+    }, [editRowData.iddepartamento]); // Se ejecuta cuando cambia el iddepartamento
+
+
+
+    // Obtener lista de usuarios
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -56,7 +87,10 @@ const DataTable = () => {
                     rol: item.rol,
                     iddepartamento: item.iddepartamento,
                     idmunicipio: item.idmunicipio,
+                    departamento: item.departamento,
+                    municipio: item.municipio,
                     estado: item.estado,
+                    usuario: item.usuario,
                     idestudiante: item.idestudiante,
                     idmaestros: item.idmaestros,
                 }));
@@ -96,10 +130,18 @@ const DataTable = () => {
             if (isAdding) {
                 // Lógica para INSERT
                 const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/aldeas`,
+                    `${process.env.REACT_APP_API_URL}/postUsers`,
                     {
-                        aldea: editRowData.aldea,
-                        idmunicipio: editRowData.idmunicipio
+                        nombre: editRowData.nombre,
+                        cecap: editRowData.cecap,
+                        correo: editRowData.correo,
+                        idrol: editRowData.idrol,
+                        iddepartamento: editRowData.iddepartamento,
+                        idmunicipio: editRowData.idmunicipio,
+                        contraseña: editRowData.contraseña,
+                        estado: editRowData.estado,
+                        usuario: editRowData.usuario,
+                        creadopor: user?.id,
                     }
                 );
 
@@ -113,8 +155,16 @@ const DataTable = () => {
             } else {
                 // Lógica para UPDATE
                 const payload = {
-                    aldea: editRowData.aldea,
-                    idmunicipio: editRowData.idmunicipio
+                    nombre: editRowData.nombre,
+                    cecap: editRowData.cecap,
+                    correo: editRowData.correo,
+                    idrol: editRowData.idrol,
+                    iddepartamento: editRowData.iddepartamento,
+                    idmunicipio: editRowData.idmunicipio,
+                    contraseña: editRowData.contraseña,
+                    estado: editRowData.estado,
+                    usuario: editRowData.usuario,
+                    modificadopor: user?.id,
                 };
 
                 await axios.put(
@@ -148,7 +198,7 @@ const DataTable = () => {
         {
             field: 'actions',
             headerName: 'Acción',
-            width: 150,
+
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
@@ -177,7 +227,8 @@ const DataTable = () => {
         {
             field: 'id',
             headerName: 'ID',
-            width: 90,
+
+
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
@@ -187,6 +238,31 @@ const DataTable = () => {
                             value={params.id === 'temp' ? 'Nuevo' : editRowData.id}
                             disabled
                             fullWidth
+                        />
+                    );
+                }
+                return params.value;
+            }
+        },
+        {
+            field: 'cecap',
+            headerName: 'CECAP',
+            width: 300,
+            renderCell: (params) => {
+                if (editRowId === params.id) {
+                    return (
+                        <TextField
+                            variant="standard"
+                            name="cecap"
+                            value={editRowData.cecap || ''}
+                            onChange={handleEditRowChange}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ') {
+                                    e.stopPropagation(); // Evita que el DataGrid maneje el espacio
+                                }
+                            }}
+                            fullWidth
+                            autoFocus
                         />
                     );
                 }
@@ -234,26 +310,41 @@ const DataTable = () => {
             }
         },
         {
-            field: 'rol',
-            headerName: 'Rol',
-            width: 250,
+            field: 'usuario',
+            headerName: 'Usuario',
+
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
-                        <FormControl fullWidth variant="standard">
-                            <Select
-                                name="idrol"
-                                value={editRowData.idrol || ''}
-                                onChange={handleEditRowChange}
-                            >
-                                <MenuItem value="">Seleccionar departamento</MenuItem>
-                                {departamentos.map(dep => (
-                                    <MenuItem key={dep.id} value={dep.id}>
-                                        {dep.rol}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        <TextField
+                            variant="standard"
+                            name="usuario"
+                            value={editRowData.usuario || ''}
+                            onChange={handleEditRowChange}
+                            fullWidth
+                            autoFocus
+                        />
+                    );
+                }
+                return params.value;
+            }
+        },
+        {
+            field: 'contraseña',
+            headerName: 'Contraseña',
+
+
+            renderCell: (params) => {
+                if (editRowId === params.id) {
+                    return (
+                        <TextField
+                            variant="standard"
+                            name="contraseña"
+                            value={editRowData.contraseña || ''}
+                            onChange={handleEditRowChange}
+                            fullWidth
+                            autoFocus
+                        />
                     );
                 }
                 return params.value;
@@ -297,11 +388,12 @@ const DataTable = () => {
                                 name="idmunicipio"
                                 value={editRowData.idmunicipio || ''}
                                 onChange={handleEditRowChange}
+                                disabled={!municipios.length}
                             >
                                 <MenuItem value="">Seleccionar municipio</MenuItem>
-                                {departamentos.map(dep => (
-                                    <MenuItem key={dep.id} value={dep.id}>
-                                        {dep.departamento}
+                                {municipios.map(muni => (
+                                    <MenuItem key={muni.id} value={muni.id}>
+                                        {muni.municipio}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -312,30 +404,9 @@ const DataTable = () => {
             }
         },
         {
-            field: 'contraseña',
-            headerName: 'Contraseña',
-
-            width: 250,
-            renderCell: (params) => {
-                if (editRowId === params.id) {
-                    return (
-                        <TextField
-                            variant="standard"
-                            name="contraseña"
-                            value={editRowData.contraseña || ''}
-                            onChange={handleEditRowChange}
-                            fullWidth
-                            autoFocus
-                        />
-                    );
-                }
-                return params.value;
-            }
-        },
-        {
             field: 'estado',
             headerName: 'Estado',
-            width: 250,
+
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
@@ -346,8 +417,8 @@ const DataTable = () => {
                                 onChange={handleEditRowChange}
                             >
                                 <MenuItem value="">Seleccionar estado</MenuItem>
-                                <MenuItem value="activo">Activo</MenuItem>
-                                <MenuItem value="inactivo">Inactivo</MenuItem>
+                                <MenuItem value="Activo">Activo</MenuItem>
+                                <MenuItem value="Inactivo">Inactivo</MenuItem>
                             </Select>
                         </FormControl>
                     );
@@ -359,7 +430,18 @@ const DataTable = () => {
     ];
 
     // Filas para el DataGrid (incluyendo la temporal si está en modo añadir)
-    const gridRows = isAdding ? [{ id: 'temp', aldea: '', departamento: '' }, ...rows] : rows;
+    const gridRows = isAdding ? [{
+        id: 'temp',
+        nombre: '',
+        cecap: '',
+        correo: '',
+        iddepartamento: '',
+        idmunicipio: '',
+        contraseña: '',
+        estado: '',
+        usuario: '',
+        idrol: '',
+    }, ...rows] : rows;
 
     return (
         <Dashboard>
@@ -392,6 +474,7 @@ const DataTable = () => {
                     disableSelectionOnClick
                     getRowId={(row) => row.id}
                     autoHeight
+
                 />
             </Box>
         </Dashboard>
