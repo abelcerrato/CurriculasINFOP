@@ -111,7 +111,7 @@ export const updateUserC = async (req, res) => {
         const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, modificadopor, usuario } = req.body
 
         const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, modificadopor, usuario, id)
-        //res.json(users)
+    
         res.json({ message: "Usuario Actualizado Exitosamente", user: users });
     } catch (error) {
         console.error('Error al actualizar el usuario: ', error);

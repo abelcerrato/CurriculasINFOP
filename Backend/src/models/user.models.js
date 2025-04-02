@@ -13,6 +13,7 @@ export const getUserM = async () => {
         u.iddepartamento,
         u.idmunicipio,
         u.usuario,
+        u.contraseña,
         u.estado,
         m.municipio,
         d.departamento,
@@ -111,7 +112,7 @@ export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento,
         const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
 
         const { rows } = await pool.query(`UPDATE usuarios SET 
-                                                nombre=$1, cecap=$2, correo=$3, rol=$4, iddepartamento=$5, idmunicipio=$6, contraseña=$7, 
+                                                nombre=$1, cecap=$2, correo=$3, idrol=$4, iddepartamento=$5, idmunicipio=$6, contraseña=$7, 
                                                 estado=$8, modificadopor=$9, usuario=$10,
                                                 fechamodificacion=CURRENT_TIMESTAMP, fechacreacion=null
                                             WHERE id=$11 RETURNING *`,
