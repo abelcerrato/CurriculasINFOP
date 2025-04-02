@@ -91,10 +91,10 @@ export const verificarUsuarioC = async (req, res) => {
 
 export const postUserC = async (req, res) => {
     try {
-        const { nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, creadopor } = req.body
+        const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, creadopor } = req.body
         console.log(req.body);
 
-        const users = await postUserM(nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, creadopor)
+        const users = await postUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, creadopor)
         //res.json(users)
         res.json({ message: "Usuario Agregado Exitosamente", user: users });
     } catch (error) {
@@ -109,9 +109,9 @@ export const updateUserC = async (req, res) => {
 
     try {
         const { id } = req.params;
-        const { nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, modificadopor, usuario } = req.body
+        const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, modificadopor, usuario } = req.body
 
-        const users = await updateUserM(nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, modificadopor, usuario, id)
+        const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,  estado, modificadopor, usuario, id)
         //res.json(users)
         res.json({ message: "Usuario Actualizado Exitosamente", user: users });
     } catch (error) {

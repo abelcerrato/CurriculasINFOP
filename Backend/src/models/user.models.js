@@ -32,8 +32,7 @@ export const getUsuarioIdM = async (usuario) => {
     console.log('Usuario enviado:', usuario);
     try {
         const { rows } = await pool.query(`
-            SELECT id, nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, 
-                    idmaestros, estado, fechacreacion, creadopor, fechamodificacion, modificadopor 
+            SELECT id, nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, estado, fechacreacion, creadopor, fechamodificacion, modificadopor 
             FROM usuarios 
             WHERE usuario=$1`, 
             [usuario]);
@@ -50,8 +49,8 @@ export const getUsuarioIdM = async (usuario) => {
 export const getUserIdM = async (id) => {
     try {
         const { rows } = await pool.query(`
-            SELECT nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, 
-                    idmaestros, estado, fechacreacion, creadopor, fechamodificacion, modificadopor, usuario
+            SELECT nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, 
+            estado, fechacreacion, creadopor, fechamodificacion, modificadopor, usuario
             FROM usuarios WHERE id=$1`, [id])
 
         if (rows.length === 0) {
@@ -86,15 +85,15 @@ export const verificarUsuarioM = async (usuario) => {
 
 
 
-export const postUserM = async (nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, creadopor) => {
+export const postUserM = async (nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor) => {
     try {
 
         const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
         const { rows } = await pool.query(`INSERT INTO usuarios
-                                                (nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, 
+                                                (nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
-                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, null) RETURNING *`,
-            [nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseñaCifrada , idestudiante, idmaestros, estado, creadopor])
+                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, null) RETURNING *`,
+            [nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
 
         console.log(rows);
         return rows[0]
@@ -104,17 +103,17 @@ export const postUserM = async (nombre, cecap, correo, rol, iddepartamento, idmu
 }
 
 
-export const updateUserM = async ( nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, modificadopor, usuario, id) => {
+export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, modificadopor, usuario, id) => {
     try {
 
         const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
 
         const { rows } = await pool.query(`UPDATE usuarios SET 
                                                 nombre=$1, cecap=$2, correo=$3, rol=$4, iddepartamento=$5, idmunicipio=$6, contraseña=$7, 
-                                                idestudiante=$8, idmaestros=$9, estado=$10, modificadopor=$11, usuario=$12,
+                                                estado=$8, modificadopor=$9, usuario=$10,
                                                 fechamodificacion=CURRENT_TIMESTAMP, fechacreacion=null
-                                            WHERE id=$13 RETURNING *`,
-            [nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseñaCifrada, idestudiante, idmaestros, estado, modificadopor, usuario, id])
+                                            WHERE id=$11 RETURNING *`,
+            [nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada, estado, modificadopor, usuario, id])
 
         return rows[0]
     } catch (error) {
