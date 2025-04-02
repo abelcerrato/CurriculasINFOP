@@ -87,15 +87,15 @@ export const verificarUsuarioM = async (usuario) => {
 
 
 
-export const postUserM = async (nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor) => {
+export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor) => {
     try {
 
         const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
         const { rows } = await pool.query(`INSERT INTO usuarios
-                                                (nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
+                                                (nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
-                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_TIMESTAMP, null) RETURNING *`,
-            [nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
+                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 CURRENT_TIMESTAMP, null) RETURNING *`,
+            [nombre, cecap,usuario, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
 
         console.log(rows);
         return rows[0]
