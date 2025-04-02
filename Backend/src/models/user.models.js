@@ -3,7 +3,24 @@ import bcrypt from 'bcrypt'; // Para cifrar contraseñas
 
 export const getUserM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from usuarios')
+        const { rows } = await pool.query(` 
+        SELECT 
+        u.nombre,
+        u.cecap,
+        u.correo,
+        u.idrol,
+        u.iddepartamento,
+        u.idmunicipio,
+        u.usuario,
+        m.municipio,
+        d.departamento
+        r.rol,
+            FROM usuarios u  
+            INNER JOIN municipios m ON u.idmunicipio = m.id
+            INNER JOIN departamentos d  ON u.iddepartamento = d.id
+            left  JOIN roles r   ON u.idrol = r.id
+            ORDER BY u.id ASC;
+        `)
         console.log(rows);
         return rows;
     } catch (error) {

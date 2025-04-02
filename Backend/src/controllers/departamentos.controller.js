@@ -31,7 +31,6 @@ export const getDepartamentoIdC = async (req, res) => {
 export const postDepartamentosC = async (req, res) => {
     try {
         const { departamento } = req.body;
-        console.log(req.body);
 
         if (!departamento) {
             console.log("Faltan datos en la solicitud");

@@ -21,7 +21,7 @@ export default function Login() {
   };
 
   return (
-    
+
     <Container
       fixed
       sx={{
@@ -75,7 +75,7 @@ export default function Login() {
             {/* Campo de email */}
             <TextField
               fullWidth
-              label="Correo Electrónico"
+              placeholder="Correo Electrónico"
               variant="outlined"
               margin="normal"
               InputProps={{
@@ -91,7 +91,7 @@ export default function Login() {
             {/* Campo de contraseña */}
             <TextField
               fullWidth
-              label="Contraseña"
+              placeholder="Contraseña"
               variant="outlined"
               margin="normal"
               type={showPassword ? "text" : "password"}
@@ -171,7 +171,7 @@ export default function Login() {
           />
         </Grid>
       </Grid>
-      </Container>
-   
+    </Container>
+
   );
 }
