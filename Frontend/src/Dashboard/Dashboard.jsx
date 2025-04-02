@@ -3,6 +3,7 @@ import { useState } from "react";
 import AppBarComponent from "./AppBar";
 import ProjectDrawer from "./Drawer";
 import React from "react";
+import BreadcrumbsDinamico from "./BreadcrumbsDinamico";
 
 const Dashboard = ({ children }) => {
   const [openDrawer, setOpenDrawer] = useState(true);
@@ -38,6 +39,7 @@ const Dashboard = ({ children }) => {
           backgroundColor: "#f2f2f2",
         }}
       >
+        <BreadcrumbsDinamico />
         {children}
 
         <Typography

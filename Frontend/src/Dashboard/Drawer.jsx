@@ -62,9 +62,9 @@ const ProjectDrawer = ({ open }) => {
 
   const isActive = (path) => location.pathname === path;
   const isMantenimientoActive =
-    isActive("/Departamentos") ||
-    isActive("/Municipios") ||
-    isActive("/Aldeas");
+    isActive("/Mantenimiento/Departamentos") ||
+    isActive("/Mantenimiento/Municipios") ||
+    isActive("/Mantenimiento/Aldeas");
 
   const isSeguridadActive = isActive("/Usuarios");
 
@@ -185,22 +185,28 @@ const ProjectDrawer = ({ open }) => {
           <Collapse in={openMantenimiento} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
             <List component="div" disablePadding>
               <MenuItem
-                path="/Departamentos"
+                path="/Mantenimiento/Departamentos"
                 icon={<PublicOutlinedIcon />}
                 text="Departamentos"
-                onClick={() => navigate("/Departamentos")}
+                onClick={() => navigate("/Mantenimiento/Departamentos")}
               />
               <MenuItem
-                path="/Municipios"
+                path="/Mantenimiento/Municipios"
                 icon={<RoomOutlinedIcon />}
                 text="Municipios"
-                onClick={() => navigate("/Municipios")}
+                onClick={() => navigate("/Mantenimiento/Municipios")}
               />
               <MenuItem
-                path="/Aldeas"
+                path="/Mantenimiento/Mantenimiento/Aldeas"
                 icon={<SignpostOutlinedIcon />}
                 text="Aldeas"
-                onClick={() => navigate("/Aldeas")}
+                onClick={() => navigate("/Mantenimiento/Aldeas")}
+              />
+              <MenuItem
+                path="/Etnias"
+                icon={<SignpostOutlinedIcon />}
+                text="Etnias"
+                onClick={() => navigate("/Mantenimiento/Etnias")}
               />
             </List>
           </Collapse>
@@ -230,10 +236,10 @@ const ProjectDrawer = ({ open }) => {
           disableAutoFocusItem
         >
           <MuiMenuItem
-            onClick={() => handleItemClick("/Departamentos")}
+            onClick={() => handleItemClick("/Mantenimiento/Departamentos")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Departamentos")
+                backgroundColor: isActive("/Mantenimiento/Departamentos")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
@@ -242,22 +248,22 @@ const ProjectDrawer = ({ open }) => {
             <ListItemIcon>
               <PublicOutlinedIcon
                 fontSize="small"
-                color={isActive("/Departamentos") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Departamentos"
               primaryTypographyProps={{
-                color: isActive("/Departamentos") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
-            onClick={() => handleItemClick("/Municipios")}
+            onClick={() => handleItemClick("/Mantenimiento/Municipios")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Municipios")
+                backgroundColor: isActive("/Mantenimiento/Municipios")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
@@ -266,22 +272,22 @@ const ProjectDrawer = ({ open }) => {
             <ListItemIcon>
               <RoomOutlinedIcon
                 fontSize="small"
-                color={isActive("/Municipios") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Municipios") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Municipios"
               primaryTypographyProps={{
-                color: isActive("/Municipios") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Municipios") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
-            onClick={() => handleItemClick("/Aldeas")}
+            onClick={() => handleItemClick("/Mantenimiento/Aldeas")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Aldeas")
+                backgroundColor: isActive("/Mantenimiento/Aldeas")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
@@ -290,13 +296,13 @@ const ProjectDrawer = ({ open }) => {
             <ListItemIcon>
               <SignpostOutlinedIcon
                 fontSize="small"
-                color={isActive("/Aldeas") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Etnias") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Aldeas"
               primaryTypographyProps={{
-                color: isActive("/Aldeas") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Etnias") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>

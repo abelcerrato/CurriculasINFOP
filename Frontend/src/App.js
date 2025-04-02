@@ -7,6 +7,7 @@ import Dashboard from './Dashboard/Dashboard';
 import Departamentos from './Mantenimientos/Departamentos';
 import Municipios from './Mantenimientos/Municipios';
 import Aldeas from './Mantenimientos/Aldeas';
+import Etnias from './Mantenimientos/Etnias'
 import Usuarios from './Seguridad/Usuarios';
 import { UserProvider } from './Components/UserContext';
 
@@ -39,9 +40,15 @@ function App() {
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/Departamentos" element={<ProtectedRoute><Departamentos /></ProtectedRoute>} />
-          <Route path="/Municipios" element={<ProtectedRoute><Municipios /></ProtectedRoute>} />
-          <Route path="/Aldeas" element={<ProtectedRoute><Aldeas /></ProtectedRoute>} />
+
+          {/*Mantenimientos */}
+          <Route path="/Mantenimiento/Departamentos" element={<ProtectedRoute><Departamentos /></ProtectedRoute>} />
+          <Route path="/Mantenimiento/Municipios" element={<ProtectedRoute><Municipios /></ProtectedRoute>} />
+          <Route path="/Mantenimiento/Aldeas" element={<ProtectedRoute><Aldeas /></ProtectedRoute>} />
+
+          <Route path="/Mantenimiento/Etnias" element={<ProtectedRoute><Etnias /></ProtectedRoute>} />
+
+
           <Route path="/Usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>

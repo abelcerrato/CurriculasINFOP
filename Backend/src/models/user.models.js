@@ -95,7 +95,7 @@ export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddeparta
         const { rows } = await pool.query(`INSERT INTO usuarios
                                                 (nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
-                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 CURRENT_TIMESTAMP, null) RETURNING *`,
+                                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, null) RETURNING *`,
             [nombre, cecap,usuario, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
 
         console.log(rows);

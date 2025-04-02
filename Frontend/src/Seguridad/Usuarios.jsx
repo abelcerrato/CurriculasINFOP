@@ -66,7 +66,7 @@ const DataTable = () => {
     }, [editRowData.iddepartamento]);
 
 
-    
+
     // Obtener lista de roles para el Select
     useEffect(() => {
         const obtenerRoles = async () => {
@@ -237,7 +237,7 @@ const DataTable = () => {
             renderCell: (params) => (
                 <IconButton
                     onClick={() => handleEditClick(params.id)}
-                    sx={{ color: color.primary.azul }}
+                    sx={{ color: color.azul }}
                 >
                     <EditIcon />
                 </IconButton>
@@ -258,7 +258,7 @@ const DataTable = () => {
         <Dashboard>
             <Box component={Paper} sx={{ p: 5 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                    <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.primary.azul }}>
+                    <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.azul }}>
                         Usuarios
                     </Typography>
                     <Button
@@ -266,10 +266,10 @@ const DataTable = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddClick}
                         sx={{
-                            color: color.primary.contrastText,
-                            backgroundColor: color.primary.azul,
+                            color: color.contrastText,
+                            backgroundColor: color.azul,
                             '&:hover': {
-                                backgroundColor: color.primary.dark
+                                backgroundColor: color.dark
                             }
                         }}
                     >
@@ -335,7 +335,7 @@ const DataTable = () => {
                                 fullWidth
                                 variant="standard"
                             />
-                             <FormControl fullWidth variant="standard">
+                            <FormControl fullWidth variant="standard">
                                 <InputLabel id="demo-simple-select-label">Rol</InputLabel>
                                 <Select
                                     name="idrol"

@@ -119,10 +119,10 @@ const DataTable = () => {
         if (editRowId === params.id) {
           return (
             <>
-              <IconButton onClick={handleSaveClick} sx={{ color: color.primary.azul }}>
+              <IconButton onClick={handleSaveClick} sx={{ color: color.azul }}>
                 <CheckIcon />
               </IconButton>
-              <IconButton onClick={handleCancelClick} sx={{ color: color.primary.rojo }}>
+              <IconButton onClick={handleCancelClick} sx={{ color: color.rojo }}>
                 <CloseIcon />
               </IconButton>
             </>
@@ -131,7 +131,7 @@ const DataTable = () => {
           return (
             <IconButton
               onClick={() => handleEditClick(params.id)}
-              sx={{ color: color.primary.azul }}
+              sx={{ color: color.azul }}
             >
               <EditIcon />
             </IconButton>
@@ -188,7 +188,7 @@ const DataTable = () => {
     <Dashboard>
       <Box component={Paper} sx={{ p: 5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-          <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.primary.azul }}>
+          <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.azul }}>
             Departamentos
           </Typography>
           <Button
@@ -196,7 +196,7 @@ const DataTable = () => {
             startIcon={<AddIcon />}
             onClick={handleAddClick}
             disabled={editRowId !== null}
-            sx={{ color: color.primary.contrastText, backgroundColor: color.primary.azul }}
+            sx={{ color: color.contrastText, backgroundColor: color.azul }}
           >
             Nuevo
           </Button>

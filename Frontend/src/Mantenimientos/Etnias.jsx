@@ -13,70 +13,47 @@ import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
+
+
 
 
 const DataTable = () => {
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
-    const [editRowData, setEditRowData] = useState({ aldea: '', idmunicipio: '' });
+    const [editRowData, setEditRowData] = useState({});
     const [isAdding, setIsAdding] = useState(false);
-    const [municipio, setmunicipio] = useState([]);
 
-    // Obtener lista de municipio para el Select
-    useEffect(() => {
-        const obtenermunicipio = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/municipios`);
-                setmunicipio(response.data);
-            } catch (error) {
-                console.error("Error al obtener los municipio", error);
-            }
-        };
-        obtenermunicipio();
-    }, []);
-
-    // Obtener lista de aldeas
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/aldeas`);
-            const data = Array.isArray(response.data) ? response.data : [];
-
-
-            const formattedData = data.map(item => ({
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/Etnias`);
+            // Asegurarse de que los datos tengan el formato correcto
+            const data = Array.isArray(response.data) ? response.data :
+                response.data.updatedDepto ? response.data.updatedDepto :
+                    response.data.newDepto ? response.data.newDepto : [];
+            setRows(data.map(item => ({
                 id: item.id,
-                aldea: item.aldea,
-                municipio: item.municipio,
-                idmunicipio: item.idmunicipio
-            }));
-            setRows(formattedData);
+                etnia: item.etnia
+            })));
         } catch (error) {
             console.error("Hubo un error al obtener los datos:", error);
         }
     };
-
     useEffect(() => {
         fetchData();
-    }, [municipio]);
+    }, []);
 
     const handleAddClick = () => {
-        setEditRowData({ aldea: '', idmunicipio: '' });
+        setEditRowData({ id: 'temp', etnia: '' });
         setEditRowId('temp');
         setIsAdding(true);
     };
 
     const handleEditClick = (id) => {
         const rowToEdit = rows.find((row) => row.id === id);
-        setEditRowData({
-            id: rowToEdit.id,
-            aldea: rowToEdit.aldea,
-            idmunicipio: rowToEdit.idmunicipio
-        });
+        setEditRowData(rowToEdit);
         setEditRowId(id);
         setIsAdding(false);
     };
@@ -91,46 +68,31 @@ const DataTable = () => {
             if (isAdding) {
                 // Lógica para INSERT
                 const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/aldeas`,
-                    {
-                        aldea: editRowData.aldea,
-                        idmunicipio: editRowData.idmunicipio
-                    }
+                    `${process.env.REACT_APP_API_URL}/etnias`,
+                    { etnia: editRowData.etnia }
                 );
                 fetchData();
                 Swal.fire({
                     title: "Registro Creado",
-                    text: "El aldea ha sido creado exitosamente.",
+                    text: "La etnia ha sido rigistrada exitosamente.",
                     icon: "success",
                     timer: 6000,
                 });
             } else {
-
+                // Lógica para UPDATE
                 const payload = {
-                    aldea: editRowData.aldea,
-                    idmunicipio: editRowData.idmunicipio
+                    id: editRowData.id,
+                    etnia: editRowData.etnia
                 };
 
                 await axios.put(
-                    `${process.env.REACT_APP_API_URL}/aldeas/${editRowId}`,
+                    `${process.env.REACT_APP_API_URL}/etnias/${editRowId}`,
                     payload
                 );
-
-                // Obtener el departamento seleccionado
-                const muniseleccionado = municipio.find(dep => dep.id === editRowData.idmunicipio);
-
-                // Actualizar el registro existente
-                setRows(rows.map(row =>
-                    row.id === editRowId ? {
-                        ...row,
-                        aldea: editRowData.aldea,
-                        idmunicipio: muniseleccionado?.municipio || ''
-                    } : row
-                ));
                 fetchData();
                 Swal.fire({
                     title: "Registro Actualizado",
-                    text: "El aldea ha sido actualizado exitosamente.",
+                    text: "La etnia ha sido actualizada exitosamente.",
                     icon: "success",
                     timer: 6000,
                 });
@@ -139,13 +101,13 @@ const DataTable = () => {
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el aldea:", error);
+            console.error("Error al guardar el etnia:", error);
         }
     };
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;
-        setEditRowData(prev => ({ ...prev, [name]: value }));
+        setEditRowData({ ...editRowData, [name]: value });
     };
 
     const columns = [
@@ -157,10 +119,16 @@ const DataTable = () => {
                 if (editRowId === params.id) {
                     return (
                         <>
-                            <IconButton onClick={handleSaveClick} sx={{ color: color.azul }}>
+                            <IconButton onClick={handleSaveClick} sx={{
+                                color: color
+                                    .azul
+                            }}>
                                 <CheckIcon />
                             </IconButton>
-                            <IconButton onClick={handleCancelClick} sx={{ color: color.rojo }}>
+                            <IconButton onClick={handleCancelClick} sx={{
+                                color: color
+                                    .rojo
+                            }}>
                                 <CloseIcon />
                             </IconButton>
                         </>
@@ -169,7 +137,10 @@ const DataTable = () => {
                     return (
                         <IconButton
                             onClick={() => handleEditClick(params.id)}
-                            sx={{ color: color.azul }}
+                            sx={{
+                                color: color
+                                    .azul
+                            }}
                         >
                             <EditIcon />
                         </IconButton>
@@ -189,8 +160,8 @@ const DataTable = () => {
                             variant="standard"
                             name="id"
                             value={params.id === 'temp' ? 'Nuevo' : editRowData.id}
+                            onChange={handleEditRowChange}
                             disabled
-                            fullWidth
                         />
                     );
                 }
@@ -198,46 +169,25 @@ const DataTable = () => {
             }
         },
         {
-            field: 'aldea',
-            headerName: 'Aldea',
+            field: 'etnia',
+            headerName: 'Etnia',
             width: 250,
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
                         <TextField
                             variant="standard"
-                            name="aldea"
-                            value={editRowData.aldea || ''}
+                            name="etnia"
+                            value={editRowData.etnia || ''}
                             onChange={handleEditRowChange}
                             fullWidth
                             autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === ' ') {
+                                    e.stopPropagation(); // Evita que el DataGrid maneje el espacio
+                                }
+                            }}
                         />
-                    );
-                }
-                return params.value;
-            }
-        },
-        {
-            field: 'municipio',
-            headerName: 'Municipio',
-            width: 250,
-            renderCell: (params) => {
-                if (editRowId === params.id) {
-                    return (
-                        <FormControl fullWidth variant="standard">
-                            <Select
-                                name="idmunicipio"
-                                value={editRowData.idmunicipio || ''}
-                                onChange={handleEditRowChange}
-                            >
-                                <MenuItem value="">Seleccionar municipio</MenuItem>
-                                {municipio.map(dep => (
-                                    <MenuItem key={dep.id} value={dep.id}>
-                                        {dep.municipio}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
                     );
                 }
                 return params.value;
@@ -246,14 +196,17 @@ const DataTable = () => {
     ];
 
     // Filas para el DataGrid (incluyendo la temporal si está en modo añadir)
-    const gridRows = isAdding ? [...rows, { id: 'temp', aldea: '', municipio: '' }] : rows;
+    const gridRows = isAdding ? [{ id: 'temp', etnia: '' }, ...rows] : rows;
 
     return (
         <Dashboard>
             <Box component={Paper} sx={{ p: 5 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                    <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.azul }}>
-                        Aldeas
+                    <Typography variant="h3" component="h2" sx={{
+                        fontWeight: 'bold', color: color
+                            .azul
+                    }}>
+                        Etnias
                     </Typography>
                     <Button
                         variant="contained"
@@ -261,11 +214,9 @@ const DataTable = () => {
                         onClick={handleAddClick}
                         disabled={editRowId !== null}
                         sx={{
-                            color: color.contrastText,
-                            backgroundColor: color.azul,
-                            '&:hover': {
-                                backgroundColor: color.dark
-                            }
+                            color: color
+                                .contrastText, backgroundColor: color
+                                    .azul
                         }}
                     >
                         Nuevo
@@ -278,7 +229,6 @@ const DataTable = () => {
                     pageSize={5}
                     disableSelectionOnClick
                     getRowId={(row) => row.id}
-                    autoHeight
                 />
             </Box>
         </Dashboard>
