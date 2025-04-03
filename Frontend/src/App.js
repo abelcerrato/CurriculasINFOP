@@ -1,64 +1,58 @@
-
 import './App.css';
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import SignIn from './Login/Sign-in';
 import Dashboard from './Dashboard/Dashboard';
 import Departamentos from './Mantenimientos/Departamentos';
 import Municipios from './Mantenimientos/Municipios';
 import Aldeas from './Mantenimientos/Aldeas';
-import Etnias from './Mantenimientos/Etnias'
-import TipoEducador from './Mantenimientos/TipoEducador'
-import AreasFormacion from './Mantenimientos/AreasFormacion'
-import Disacapacidad from './Mantenimientos/Discapacidades'
+import Etnias from './Mantenimientos/Etnias';
+import TipoEducador from './Mantenimientos/TipoEducador';
+import AreasFormacion from './Mantenimientos/AreasFormacion';
+import Disacapacidad from './Mantenimientos/Discapacidades';
 import Usuarios from './Seguridad/Usuarios';
 import { UserProvider } from './Components/UserContext';
 
-
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { useState } from 'react';
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
   const navigate = useNavigate();
-  const isAuthenticated = sessionStorage.getItem("isAuthenticated"); // Ahora verificamos sessionStorage
+  const isAuthenticated = sessionStorage.getItem("isAuthenticated");
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isAuthenticated) {
-      localStorage.removeItem("user"); // Borra datos si la sesión es inválida
+      localStorage.removeItem("user");
       navigate("/", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
-  return isAuthenticated ? children : null;
+  return isAuthenticated ? <Outlet /> : null;
 };
 
-
-
 function App() {
-
   return (
     <UserProvider>
       <BrowserRouter>
         <Routes>
+          {/* Ruta pública */}
           <Route path="/" element={<SignIn />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-
-          {/*Mantenimientos */}
-          <Route path="/Mantenimiento/Departamentos" element={<ProtectedRoute><Departamentos /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Municipios" element={<ProtectedRoute><Municipios /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Aldeas" element={<ProtectedRoute><Aldeas /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Etnias" element={<ProtectedRoute><Etnias /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Tipo-Educador" element={<ProtectedRoute><TipoEducador /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Área-Formación" element={<ProtectedRoute><AreasFormacion /></ProtectedRoute>} />
-          <Route path="/Mantenimiento/Discapacidades" element={<ProtectedRoute><Disacapacidad /></ProtectedRoute>} />
-
-          <Route path="/Usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
+          
+          {/* Rutas protegidas */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Mantenimientos */}
+            <Route path="/Mantenimiento/Departamentos" element={<Departamentos />} />
+            <Route path="/Mantenimiento/Municipios" element={<Municipios />} />
+            <Route path="/Mantenimiento/Aldeas" element={<Aldeas />} />
+            <Route path="/Mantenimiento/Etnias" element={<Etnias />} />
+            <Route path="/Mantenimiento/Tipo-Educador" element={<TipoEducador />} />
+            <Route path="/Mantenimiento/Área-Formación" element={<AreasFormacion />} />
+            <Route path="/Mantenimiento/Discapacidades" element={<Disacapacidad />} />
+            
+            <Route path="/Usuarios" element={<Usuarios />} />
+          </Route>
         </Routes>
       </BrowserRouter>
-
     </UserProvider>
-
   );
 }
 

@@ -188,7 +188,7 @@ const DataTable = () => {
                     idrol: editRowData.idrol || null,
                     iddepartamento: editRowData.iddepartamento || null,
                     idmunicipio: editRowData.idmunicipio || null,
-                    //contraseña: editRowData.contraseña || null,
+                    contraseña: editRowData.contraseña || null,
                     estado: editRowData.estado || null,
                     usuario: editRowData.usuario || null,
                     modificadopor: user?.id,
