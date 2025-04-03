@@ -145,7 +145,7 @@ export const resetContraseñaUserC = async (req, res) => {
         
         const usuarioActualizado = await resetContraseñaM(usuario);
 
-        res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1'.", user: usuarioActualizado });
+        res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1*'.", user: usuarioActualizado });
     } catch (error) {
         console.error("Error al resetear la contraseña del usuario: ", error);
         res.status(500).json({ error: "Error interno del servidor" });
@@ -186,7 +186,7 @@ export const loginC = async (req, res) => {
 
 
         // Verificar si la contraseña es la temporal
-        const contraseñaTemporal = await bcrypt.compare("Temporal1", user.contraseña);
+        const contraseñaTemporal = await bcrypt.compare("Temporal1*", user.contraseña);
         if (contraseñaTemporal) {
             return res.status(401).json({ 
                 message: "Debe cambiar su contraseña", 
