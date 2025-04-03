@@ -72,7 +72,7 @@ export const getUserIdM = async (id) => {
 export const verificarUsuarioM = async (usuario) => {
     try {
 
-        const { rows, rowCount } = await pool.query('SELECT id,usuario, nombre, contraseña, correo FROM usuarios WHERE usuario = $1', 
+        const { rows, rowCount } = await pool.query('SELECT id, usuario, nombre, contraseña, correo, sesionactiva FROM usuarios WHERE usuario = $1', 
             [usuario]);
 
 
@@ -84,14 +84,18 @@ export const verificarUsuarioM = async (usuario) => {
     } catch (error) {
         throw error; // Si ocurre algún error en la consulta, se lanza el error.
     }
+    usuariusuarioz
 };
 
 
 
-export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor) => {
+export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor) => {
     try {
+        // Definir la nueva contraseña temporal
+        const ContraseñaUsuarioNuevo = "NuevoUsuario1*";
 
-        const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
+
+        const contraseñaCifrada  = await bcrypt.hash(ContraseñaUsuarioNuevo, 10);
         const { rows } = await pool.query(`INSERT INTO usuarios
                                                 (nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
@@ -127,7 +131,7 @@ export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento,
 
 
 
-export const updateContraseñaM = async (nuevaContraseña, id ) => {
+export const updateContraseñaM = async (nuevaContraseña, usuario ) => {
     try {
         // Encriptar la nueva contraseña
         const contraseñaCifrada = await bcrypt.hash(nuevaContraseña, 10);
@@ -136,9 +140,9 @@ export const updateContraseñaM = async (nuevaContraseña, id ) => {
         const { rows } = await pool.query(
             `UPDATE usuarios 
                 SET contraseña = $1
-                WHERE id = $2
-                RETURNING id, usuario, correo`,
-            [contraseñaCifrada, id]
+                WHERE usuario = $2
+                RETURNING usuario, nombre, correo`,
+            [contraseñaCifrada, usuario]
         );
 
         if (rows.length === 0) {
@@ -153,18 +157,30 @@ export const updateContraseñaM = async (nuevaContraseña, id ) => {
 
 
 
-export const deleteUserM = async (id) => {
+export const resetContraseñaM = async (usuario) => {
     try {
-        const { rows, rowCount } = await pool.query('DELETE FROM usuarios WHERE id=$1 RETURNING *', [id])
-        console.log(rows);
+        // Definir la nueva contraseña temporal
+        const nuevaContraseña = "Temporal1*";
 
-        if (rowCount === 0) {
-            return null; // Retorna null si el usuario no existe
+        // Encriptar la contraseña temporal
+        const contraseñaCifrada = await bcrypt.hash(nuevaContraseña, 10);
+
+        // Actualiza la contraseña en la base de datos
+        const { rows } = await pool.query(
+            `UPDATE usuarios 
+                SET contraseña = $1 
+                WHERE usuario = $2
+                RETURNING id, usuario, correo`,
+            [contraseñaCifrada, usuario]
+        );
+
+        if (rows.length === 0) {
+            throw new Error("Usuario no encontrado");
         }
 
-        return rows[0];
+        return { mensaje: "Contraseña reseteada correctamente", usuario: rows[0] };
     } catch (error) {
         throw error;
     }
-}
+};
 

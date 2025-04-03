@@ -1,6 +1,8 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'; // Para cifrar contraseñas
-import { getUserM, getUserIdM, postUserM, updateUserM, deleteUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM } from "../models/user.models.js";
+import jwt from "jsonwebtoken";
+
+import { getUserM, getUserIdM, postUserM, updateUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM, resetContraseñaM } from "../models/user.models.js";
 
 export const getUserC = async (req, res) => {
     try {
@@ -90,10 +92,10 @@ export const verificarUsuarioC = async (req, res) => {
 
 export const postUserC = async (req, res) => {
     try {
-        const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor } = req.body
+        const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor } = req.body
         console.log(req.body);
 
-        const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor)
+        const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor)
         //res.json(users)
         res.json({ message: "Usuario Agregado Exitosamente", user: users });
     } catch (error) {
@@ -121,12 +123,12 @@ export const updateUserC = async (req, res) => {
 
 
 
-export const updateContraseñaUserC = async (req, res) => {
+export const updateContraseñaC = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { usuario } = req.params;
         const { nuevaContraseña } = req.body
 
-        const users = await updateContraseñaM(nuevaContraseña, id)
+        const users = await updateContraseñaM(nuevaContraseña, usuario)
 
         res.json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
     } catch (error) {
@@ -137,22 +139,78 @@ export const updateContraseñaUserC = async (req, res) => {
 
 
 
-
-export const deleteUserC = async (req, res) => {
+export const resetContraseñaUserC = async (req, res) => {
     try {
-        const { id } = req.params
-        const users = await deleteUserM(id)
-        console.log(users);
+        const { usuario } = req.params;
+        
+        const usuarioActualizado = await resetContraseñaM(usuario);
+
+        res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1'.", user: usuarioActualizado });
+    } catch (error) {
+        console.error("Error al resetear la contraseña del usuario: ", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};
 
 
-        if (!users) {
-            return res.status(404).json({ message: "User not found" });
+// Controlador para el login
+export const loginC = async (req, res) => {
+    try {
+        const { usuario, contraseña } = req.body;
+        console.log(req.body);
+
+        if (!usuario || !contraseña) {
+            console.log("Faltan datos en la solicitud");
+            return res.status(400).json({ error: "Faltan datos en la solicitud" });
         }
 
-        res.json({ message: "Usuario Eliminado Exitosamente", user: users });
-    } catch (error) {
-        console.error('Error al eliminar el usuario: ', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
+        const user = await verificarUsuarioM(usuario);
 
-}
+        if (!user) {
+            console.log("Usuario o contraseña incorrectos");
+            return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+        }
+
+        // Comparar la contraseña ingresada con la almacenada
+        const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
+        if (!contraseñaValida) {
+            console.log("Usuario o contraseña incorrectos");
+            return res.status(401).json({ message: "Credenciales incorrectas" });
+        }
+
+        // Si ya hay una sesión activa, cerrarla (poner sesionactiva a false)
+        if (user.sesionactiva) {
+            console.log("Ya tienes una sesión activa, se cerrará la sesión anterior.");
+            await pool.query('UPDATE usuarios SET sesionactiva = FALSE WHERE id = $1', [user.id]);
+        }
+
+
+        // Verificar si la contraseña es la temporal
+        const contraseñaTemporal = await bcrypt.compare("Temporal1", user.contraseña);
+        if (contraseñaTemporal) {
+            return res.status(401).json({ 
+                message: "Debe cambiar su contraseña", 
+                changePasswordRequired: true, 
+                user: { id: user.id, usuario: user.usuario } 
+            });
+        }
+
+        // Marcar la sesión como activa (poner sesionactiva a true)
+        await pool.query('UPDATE usuarios SET sesionactiva = TRUE WHERE id = $1', [user.id]);
+
+        // Generar token de sesión
+        const token = jwt.sign(
+            { id: user.id, usuario: user.usuario },
+            process.env.JWT_SECRET,
+            { expiresIn: "8h" }
+        );
+
+        return res.json({ 
+            message: "Inicio de sesión exitoso. Si había una sesión activa, ha sido cerrada.", 
+            token 
+        });
+    } catch (error) {
+        console.error("Error en login: ", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};

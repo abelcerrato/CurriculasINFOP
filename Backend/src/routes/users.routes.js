@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {pool} from '../db.js'
-import {  deleteUserC, getUserC, getUserIdC, postUserC, updateContraseñaUserC, updateUserC, verificarUsuarioC} from "../controllers/users.controllers.js";
+import {   getUserC, getUserIdC, loginC, postUserC, resetContraseñaUserC, updateContraseñaC, updateUserC, verificarUsuarioC} from "../controllers/users.controllers.js";
 
 const router=Router();
 
@@ -14,9 +14,12 @@ router.post('/postUsers', postUserC)
 
 router.put('/users/:id', updateUserC)
 
-router.put('putPassword/:id', updateContraseñaUserC)
+router.put('/putPassword/:usuario', resetContraseñaUserC) //resetea la contraseña y asigna Temporal1*
 
-router.delete('/users/:id', deleteUserC)
+router.post('/login', loginC)//hace login y verifica si la contraseña es temporal
+
+router.put('/actualizarContra/:usuario', updateContraseñaC)//actualiza la contraseña en caso que sea temporal o nuevo usuario
+
 
 
 
