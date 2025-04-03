@@ -127,7 +127,7 @@ export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento,
 
 
 
-export const updatePasswordM = async (nuevaContraseña, id ) => {
+export const updateContraseñaM = async (nuevaContraseña, id ) => {
     try {
         // Encriptar la nueva contraseña
         const contraseñaCifrada = await bcrypt.hash(nuevaContraseña, 10);

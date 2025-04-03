@@ -1,6 +1,6 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'; // Para cifrar contraseñas
-import { getUserM, getUserIdM, postUserM, updateUserM, deleteUserM, getUsuarioIdM, verificarUsuarioM } from "../models/user.models.js";
+import { getUserM, getUserIdM, postUserM, updateUserM, deleteUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM } from "../models/user.models.js";
 
 export const getUserC = async (req, res) => {
     try {
@@ -119,17 +119,18 @@ export const updateUserC = async (req, res) => {
     }
 }
 
-export const putContraseñaUserC = async (req, res) => {
 
+
+export const updateContraseñaUserC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario } = req.body
+        const { nuevaContraseña } = req.body
 
-        const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario, id)
+        const users = await updateContraseñaM(nuevaContraseña, id)
 
-        res.json({ message: "Usuario Actualizado Exitosamente", user: users });
+        res.json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
     } catch (error) {
-        console.error('Error al actualizar el usuario: ', error);
+        console.error('Error al actualizar la contraseña del usuario: ', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
