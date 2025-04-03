@@ -3,8 +3,8 @@ import { pool } from '../db.js'
 
 export const getDepartamentosM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from departamentos')
-        console.log(rows);
+        const { rows } = await pool.query('SELECT * FROM departamentos ORDER BY id ASC');
+
         return rows;
     } catch (error) {
         throw error;

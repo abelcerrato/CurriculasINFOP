@@ -1,6 +1,6 @@
 import { pool } from '../db.js'
 import bcrypt from 'bcrypt'; // Para cifrar contraseñas
-import { getUserM, getUserIdM, postUserM, updateUserM, deleteUserM, getUsuarioIdM, verificarUsuarioM } from "../models/user.models.js";
+import { getUserM, getUserIdM, postUserM, updateUserM, deleteUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM } from "../models/user.models.js";
 
 export const getUserC = async (req, res) => {
     try {
@@ -75,7 +75,6 @@ export const verificarUsuarioC = async (req, res) => {
             return res.status(401).json({ message: "Credenciales incorrectas" });
         }
 
-        console.log("Usuario autenticado. Su usuario es:", user.nombre);
 
         return res.json({
             message: `Usuario autenticado. Su usuario es: ${user.nombre}`,
@@ -91,10 +90,10 @@ export const verificarUsuarioC = async (req, res) => {
 
 export const postUserC = async (req, res) => {
     try {
-        const { nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, creadopor } = req.body
+        const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor } = req.body
         console.log(req.body);
 
-        const users = await postUserM(nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, creadopor)
+        const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, creadopor)
         //res.json(users)
         res.json({ message: "Usuario Agregado Exitosamente", user: users });
     } catch (error) {
@@ -109,18 +108,34 @@ export const updateUserC = async (req, res) => {
 
     try {
         const { id } = req.params;
-        const { nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, modificadopor, usuario } = req.body
+        const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario } = req.body
 
-        const users = await updateUserM(nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, idestudiante, idmaestros, estado, modificadopor, usuario, id)
-        //res.json(users)
+        const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario, id)
+
         res.json({ message: "Usuario Actualizado Exitosamente", user: users });
     } catch (error) {
         console.error('Error al actualizar el usuario: ', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
-
-
 }
+
+
+
+export const updateContraseñaUserC = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nuevaContraseña } = req.body
+
+        const users = await updateContraseñaM(nuevaContraseña, id)
+
+        res.json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
+    } catch (error) {
+        console.error('Error al actualizar la contraseña del usuario: ', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
+
 
 
 export const deleteUserC = async (req, res) => {

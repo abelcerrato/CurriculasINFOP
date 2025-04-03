@@ -2,7 +2,15 @@ import { pool } from '../db.js'
 
 export const getAldeasM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from aldeas')
+        const { rows } = await pool.query(`  
+            SELECT 
+            a.id, 
+            a.aldea, 
+            m.municipio, 
+            m.id AS idmunicipio
+            FROM aldeas a  
+            INNER JOIN municipios m ON a.idmunicipio = m.id
+            ORDER BY a.id ASC;`)
         console.log(rows);
         return rows;
     } catch (error) {

@@ -14,25 +14,46 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import LocalLibraryOutlinedIcon from "@mui/icons-material/LocalLibraryOutlined";
-import LoginIcon from "@mui/icons-material/Login";
-import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
+import RoomOutlinedIcon from '@mui/icons-material/RoomOutlined';
+import SignpostOutlinedIcon from '@mui/icons-material/SignpostOutlined';
+
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+
+import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
+import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
 const ProjectDrawer = ({ open }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openPages, setOpenPages] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const menuAnchorRef = useRef(null);
 
-  const handleMenuOpen = (event) => {
+  // Estados separados para cada menú
+  const [openMantenimiento, setOpenMantenimiento] = useState(false);
+  const [openSeguridad, setOpenSeguridad] = useState(false);
+
+  // Refs y estados para los menús flotantes
+  const mantenimientoAnchorRef = useRef(null);
+  const seguridadAnchorRef = useRef(null);
+  const [mantenimientoMenuOpen, setMantenimientoMenuOpen] = useState(false);
+  const [seguridadMenuOpen, setSeguridadMenuOpen] = useState(false);
+
+  const handleMantenimientoMenuOpen = (event) => {
     if (!open) {
-      setAnchorEl(event.currentTarget);
+      setMantenimientoMenuOpen(true);
+    }
+  };
+
+  const handleSeguridadMenuOpen = (event) => {
+    if (!open) {
+      setSeguridadMenuOpen(true);
     }
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
+    setMantenimientoMenuOpen(false);
+    setSeguridadMenuOpen(false);
   };
 
   const handleItemClick = (path) => {
@@ -40,15 +61,18 @@ const ProjectDrawer = ({ open }) => {
     handleMenuClose();
   };
 
-  const menuOpen = Boolean(anchorEl);
   const isActive = (path) => location.pathname === path;
-  const isParentActive =
-    isActive("/Departamentos") ||
-    isActive("/Municipios") ||
-    isActive("/Aldeas");
+  const isMantenimientoActive =
+    isActive("/Mantenimiento/Departamentos") ||
+    isActive("/Mantenimiento/Municipios") ||
+    isActive("/Mantenimiento/Aldeas") ||
+    isActive("/Mantenimiento/Etnias") ||
+    isActive("/Mantenimiento/Tipo-Educador");
 
-  const getMenuItemStyles = (path, isParent = false) => {
-    const active = isParent ? isParentActive : isActive(path);
+  const isSeguridadActive = isActive("/Usuarios");
+
+  const getMenuItemStyles = (path, isParent = false, parentActive = false) => {
+    const active = isParent ? parentActive : isActive(path);
 
     return {
       justifyContent: open ? "initial" : "center",
@@ -60,8 +84,8 @@ const ProjectDrawer = ({ open }) => {
         backgroundColor: active
           ? "#88CFE0"
           : !open
-          ? "red"
-          : "rgba(0, 0, 0, 0.04)",
+            ? "red"
+            : "rgba(0, 0, 0, 0.04)",
         "& .MuiListItemIcon-root, & .MuiListItemText-root": {
           color: active || !open ? "white" : "inherit",
         },
@@ -75,13 +99,13 @@ const ProjectDrawer = ({ open }) => {
     };
   };
 
-  const MenuItem = ({ path, icon, text, onClick, isParent }) => (
+  const MenuItem = ({ path, icon, text, onClick, isParent, parentActive, menuRef, onMouseEnter, onMouseLeave }) => (
     <ListItemButton
       onClick={onClick}
-      sx={getMenuItemStyles(path, isParent)}
-      ref={isParent && !open ? menuAnchorRef : null}
-      onMouseEnter={isParent && !open ? handleMenuOpen : undefined}
-      onMouseLeave={isParent && !open ? handleMenuClose : undefined}
+      sx={getMenuItemStyles(path, isParent, parentActive)}
+      ref={menuRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <ListItemIcon
         sx={{
@@ -96,7 +120,7 @@ const ProjectDrawer = ({ open }) => {
         {icon}
       </ListItemIcon>
       {open && <ListItemText primary={text} />}
-      {open && isParent && (openPages ? <ExpandLess /> : <ExpandMore />)}
+      {open && isParent && ((isParent === "mantenimiento" ? openMantenimiento : openSeguridad) ? <ExpandLess /> : <ExpandMore />)}
     </ListItemButton>
   );
 
@@ -152,126 +176,243 @@ const ProjectDrawer = ({ open }) => {
           path="/mantenimiento"
           icon={<BuildOutlinedIcon />}
           text="Mantenimiento"
-          onClick={() => (open ? setOpenPages(!openPages) : null)}
-          isParent
+          onClick={() => (open ? setOpenMantenimiento(!openMantenimiento) : null)}
+          isParent="mantenimiento"
+          parentActive={isMantenimientoActive}
+          menuRef={mantenimientoAnchorRef}
+          onMouseEnter={handleMantenimientoMenuOpen}
+          onMouseLeave={handleMenuClose}
         />
 
         {open && (
-          <Collapse in={openPages} timeout="auto" unmountOnExit>
+          <Collapse in={openMantenimiento} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
             <List component="div" disablePadding>
               <MenuItem
-                path="/Departamentos"
-                icon={<LoginIcon />}
+                path="/Mantenimiento/Departamentos"
+                icon={<PublicOutlinedIcon />}
                 text="Departamentos"
-                onClick={() => navigate("/Departamentos")}
+                onClick={() => navigate("/Mantenimiento/Departamentos")}
               />
               <MenuItem
-                path="/Municipios"
-                icon={<AppRegistrationIcon />}
+                path="/Mantenimiento/Municipios"
+                icon={<RoomOutlinedIcon />}
                 text="Municipios"
-                onClick={() => navigate("/Municipios")}
+                onClick={() => navigate("/Mantenimiento/Municipios")}
               />
               <MenuItem
-                path="/Aldeas"
-                icon={<AppRegistrationIcon />}
+                path="/Mantenimiento/Mantenimiento/Aldeas"
+                icon={<SignpostOutlinedIcon />}
                 text="Aldeas"
-                onClick={() => navigate("/Aldeas")}
+                onClick={() => navigate("/Mantenimiento/Aldeas")}
+              />
+              <MenuItem
+                path="/Mantenimiento/Etnias"
+                icon={<Diversity2OutlinedIcon />}
+                text="Etnias"
+                onClick={() => navigate("/Mantenimiento/Etnias")}
+              />
+              <MenuItem
+                path="/Mantenimiento/Tipo-Educador"
+                icon={<Groups2OutlinedIcon />}
+                text="Tipo Educador"
+                onClick={() => navigate("/Mantenimiento/Tipo-Educador")}
               />
             </List>
           </Collapse>
         )}
 
-        {/* Menú flotante al lado del icono */}
+        {/* Menú flotante de Mantenimiento */}
         <Menu
-          anchorEl={anchorEl}
-          open={menuOpen && !open}
+          anchorEl={mantenimientoAnchorRef.current}
+          open={mantenimientoMenuOpen && !open}
           onClose={handleMenuClose}
           anchorOrigin={{
-            vertical: "center", // Centrado verticalmente con el icono
-            horizontal: "right", // Aparece a la derecha del icono
+            vertical: "center",
+            horizontal: "right",
           }}
           transformOrigin={{
-            vertical: "center", // Se alinea verticalmente
-            horizontal: "left", // Comienza desde la izquierda del anchor
+            vertical: "center",
+            horizontal: "left",
           }}
           PaperProps={{
             sx: {
               marginTop: 27,
-              ml: 8, // Margen izquierdo pequeño
-              boxShadow: 3, // Sombra más pronunciada
-              minWidth: 200, // Ancho mínimo
+              ml: 8,
+              boxShadow: 3,
+              minWidth: 200,
             },
           }}
           disableAutoFocusItem
         >
           <MuiMenuItem
-            onClick={() => handleItemClick("/Departamentos")}
+            onClick={() => handleItemClick("/Mantenimiento/Departamentos")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Departamentos")
+                backgroundColor: isActive("/Mantenimiento/Departamentos")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
             <ListItemIcon>
-              <LoginIcon
+              <PublicOutlinedIcon
                 fontSize="small"
-                color={isActive("/Departamentos") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Departamentos"
               primaryTypographyProps={{
-                color: isActive("/Departamentos") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
-            onClick={() => handleItemClick("/Municipios")}
+            onClick={() => handleItemClick("/Mantenimiento/Municipios")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Municipios")
+                backgroundColor: isActive("/Mantenimiento/Municipios")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
             <ListItemIcon>
-              <AppRegistrationIcon
+              <RoomOutlinedIcon
                 fontSize="small"
-                color={isActive("/Municipios") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Municipios") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Municipios"
               primaryTypographyProps={{
-                color: isActive("/Municipios") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Municipios") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
-            onClick={() => handleItemClick("/Aldeas")}
+            onClick={() => handleItemClick("/Mantenimiento/Aldeas")}
             sx={{
               "&:hover": {
-                backgroundColor: isActive("/Aldeas")
+                backgroundColor: isActive("/Mantenimiento/Aldeas")
                   ? "#88CFE0"
                   : "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
             <ListItemIcon>
-              <AppRegistrationIcon
+              <Diversity2OutlinedIcon
                 fontSize="small"
-                color={isActive("/Aldeas") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Etnias") ? "primary" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Aldeas"
               primaryTypographyProps={{
-                color: isActive("/Aldeas") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Etnias") ? "primary" : "inherit",
+              }}
+            />
+          </MuiMenuItem>
+          <MuiMenuItem
+            onClick={() => handleItemClick("/Mantenimiento/Tipo-Educador")}
+            sx={{
+              "&:hover": {
+                backgroundColor: isActive("/Mantenimiento/Tipo-Educador")
+                  ? "#88CFE0"
+                  : "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <ListItemIcon>
+              <Groups2OutlinedIcon
+                fontSize="small"
+                color={isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Tipo Educador"
+              primaryTypographyProps={{
+                color: isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit",
+              }}
+            />
+          </MuiMenuItem>
+        </Menu>
+      </List>
+
+      {open && <Divider />}
+
+      {/* Seguridad con menú flotante */}
+      <List>
+        <MenuItem
+          path="/seguridad"
+          icon={<AdminPanelSettingsOutlinedIcon />}
+          text="Seguridad"
+          onClick={() => (open ? setOpenSeguridad(!openSeguridad) : null)}
+          isParent="seguridad"
+          parentActive={isSeguridadActive}
+          menuRef={seguridadAnchorRef}
+          onMouseEnter={handleSeguridadMenuOpen}
+          onMouseLeave={handleMenuClose}
+        />
+
+        {open && (
+          <Collapse in={openSeguridad} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
+            <List component="div" disablePadding>
+              <MenuItem
+                path="/Usuarios"
+                icon={<PeopleAltOutlinedIcon />}
+                text="Usuarios"
+                onClick={() => navigate("/Usuarios")}
+              />
+            </List>
+          </Collapse>
+        )}
+
+        {/* Menú flotante de Seguridad */}
+        <Menu
+          anchorEl={seguridadAnchorRef.current}
+          open={seguridadMenuOpen && !open}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "center",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "center",
+            horizontal: "left",
+          }}
+          PaperProps={{
+            sx: {
+              marginTop: 35,
+              ml: 8,
+              boxShadow: 3,
+              minWidth: 200,
+            },
+          }}
+          disableAutoFocusItem
+        >
+          <MuiMenuItem
+            onClick={() => handleItemClick("/Usuarios")}
+            sx={{
+              "&:hover": {
+                backgroundColor: isActive("/Usuarios")
+                  ? "#88CFE0"
+                  : "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <ListItemIcon>
+              <PeopleAltOutlinedIcon
+                fontSize="small"
+                color={isActive("/Usuarios") ? "primary" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Usuarios"
+              primaryTypographyProps={{
+                color: isActive("/Usuarios") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>

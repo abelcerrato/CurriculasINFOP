@@ -2,8 +2,16 @@ import { pool } from '../db.js'
 
 export const getMunicipiosM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from municipios')
-        console.log(rows);
+        const { rows } = await pool.query(`
+            SELECT 
+             m.id, 
+              m.municipio, 
+              d.departamento, 
+              d.id AS iddepartamento
+            FROM municipios m
+            INNER JOIN departamentos d ON m.iddepartamento = d.id
+            ORDER BY m.id ASC;
+            `);  
         return rows;
     } catch (error) {
         throw error;
@@ -14,8 +22,7 @@ export const getMunicipiosM = async () => {
 export const getMunicipioIdM = async (id) => {
     console.log('Municipio enviado:', id);
     try {
-        const { rows } = await pool.query('SELECT municipio, iddepartamento FROM municipios WHERE id=$1', [id]);
-        console.log('Resultado de la consulta del Municipio:', rows); 
+        const { rows } = await pool.query('SELECT municipio,id, iddepartamento FROM municipios WHERE iddepartamento =$1', [id]);
         return rows;
     } catch (error) {
         console.error('Error al obtener el Municipio:', error); 

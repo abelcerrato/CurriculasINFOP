@@ -14,6 +14,7 @@ export const getMunicipiosC = async (req, res) => {
 export const getMunicipioIdC = async (req, res) => {
     try {
         const { id } = req.params
+
         const municipio = await getMunicipioIdM(id);
 
         if (!municipio) {
@@ -21,7 +22,7 @@ export const getMunicipioIdC = async (req, res) => {
         }
 
         // Retornar el ID del municipio 
-        res.json({ id: municipio[0].id });
+        res.json(municipio)
     } catch (error) {
         console.error('Error al obtener el municipio:', error);
         res.status(500).json({ error: 'Error interno del servidor' });

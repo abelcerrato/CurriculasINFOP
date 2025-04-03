@@ -29,15 +29,15 @@ export const getMaestroIdC = async (req, res) => {
 
 export const postMaestroC = async (req, res) => {
     try {
-        const {nombre, identificacion, correo, telefono, genero, idniveleducativo, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            educacionformal, creadopor, idtipoeducador } = req.body
+        const { nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idtipoeducador, creadopor } = req.body
         console.log(req.body);
 
 
-        const Maestros = await postMaestroM(nombre, identificacion, correo, telefono, genero, idniveleducativo, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            educacionformal, creadopor, idtipoeducador)
+        const Maestros = await postMaestroM(nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idtipoeducador, creadopor)
 
         res.json({ message: "Maestro agregado", Maestro: Maestros });
     } catch (error) {
@@ -50,13 +50,13 @@ export const postMaestroC = async (req, res) => {
 export const putMaestroC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, identificacion, correo, telefono, genero, idniveleducativo, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            educacionformal,  idtipoeducador, modificadopor } = req.body;
+        const { nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idtipoeducador, modificadopor } = req.body;
 
-        const Maestros = await putMaestroM(nombre, identificacion, correo, telefono, genero, idniveleducativo, 
-            iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            educacionformal,  idtipoeducador, modificadopor, id);
+        const Maestros = await putMaestroM(nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idtipoeducador, modificadopor, id);
 
         res.json({ message: "Maestro actualizado", Maestro: Maestros });
     } catch (error) {
