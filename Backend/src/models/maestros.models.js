@@ -44,6 +44,22 @@ export const postMaestroM = async (nombre, identificacion, correo, telefono, gen
     }
 }
 
+
+export const postEducacionNoFormalM = async (educacionNoFormal, idmaestro) => {
+    try {
+        const { rows } = await pool.query(`
+            INSERT INTO educacionNoFormal 
+                        (educacionNoFormal, idmaestro) 
+            VALUES ($1, $2) RETURNING *`,
+            [educacionNoFormal, idmaestro]);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
 export const putMaestroM = async (nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
     idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
     idtipoeducador, modificadopor, id) => {
@@ -61,6 +77,16 @@ export const putMaestroM = async (nombre, identificacion, correo, telefono, gene
                 idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion,
                 idtipoeducador, modificadopor, id]);
         return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export const deleteEducacionNoFormalM = async ( idmaestro) => {
+    try {
+        // Eliminar los cursos anteriores del estudiante
+        await pool.query(`DELETE FROM educacionNoFormal WHERE idmaestro=$1`, [idmaestro]);
     } catch (error) {
         throw error;
     }

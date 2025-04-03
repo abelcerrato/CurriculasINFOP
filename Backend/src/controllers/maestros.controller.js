@@ -1,4 +1,4 @@
-import { getMaestroIdM, getMaestrosM, postMaestroM, putMaestroM } from "../models/maestros.models.js";
+import { deleteEducacionNoFormalM, getMaestroIdM, getMaestrosM, postEducacionNoFormalM, postMaestroM, putMaestroM } from "../models/maestros.models.js";
 
 export const getMaestrosC = async (req, res) => {
     try {
@@ -30,16 +30,34 @@ export const getMaestroIdC = async (req, res) => {
 export const postMaestroC = async (req, res) => {
     try {
         const { nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
-            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            idtipoeducador, creadopor } = req.body
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion,
+            idtipoeducador, creadopor,
+            educacionNoFormal } = req.body
         console.log(req.body);
 
 
         const Maestros = await postMaestroM(nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
-            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion,
             idtipoeducador, creadopor)
 
-        res.json({ message: "Maestro agregado", Maestro: Maestros });
+
+        const idmaestro = Maestros[0].id;
+        //console.log("id del estudiante: ", idmaestro);
+
+        let cursosInsertados = [];
+        if (Array.isArray(educacionNoFormal)) {
+            for (const curso of educacionNoFormal) {
+                const result = await postEducacionNoFormalM(curso, idmaestro);
+                cursosInsertados.push(result);
+            }
+        }
+
+
+        res.json({
+            message: "Maestro agregado",
+            Maestros,
+            EducacionNoFormal: cursosInsertados
+        });
     } catch (error) {
         console.error('Error al insertar', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -51,14 +69,32 @@ export const putMaestroC = async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
-            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
-            idtipoeducador, modificadopor } = req.body;
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion,
+            idtipoeducador, modificadopor,
+            educacionNoFormal } = req.body;
 
         const Maestros = await putMaestroM(nombre, identificacion, correo, telefono, genero, fechanacimiento, edad,
-            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion, 
+            idniveleducativo, idgradoacademico, iddepartamento, idmunicipio, idaldea, caserio, direccion,
             idtipoeducador, modificadopor, id);
 
-        res.json({ message: "Maestro actualizado", Maestro: Maestros });
+        //elimina la educacion no formal existente del estudiante
+        await deleteEducacionNoFormalM(id);
+
+        //registra la nueva educacion no formal
+        let cursosActualizados = [];
+        if (Array.isArray(educacionNoFormal)) {
+            for (const curso of educacionNoFormal) {
+                const result = await postEducacionNoFormalM(curso, id);
+                cursosActualizados.push(result);
+            }
+        }
+
+
+        res.json({ 
+            message: "Maestro actualizado", 
+            Maestros,
+            EducacionNoFormal: cursosActualizados
+        });
     } catch (error) {
         console.error('Error al actualizar', error);
         res.status(500).json({ error: 'Error interno del servidor' });
