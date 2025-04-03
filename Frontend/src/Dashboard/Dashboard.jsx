@@ -23,10 +23,10 @@ const Dashboard = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: 5,
           marginTop: "100px",
-          marginLeft: openDrawer ? "10px" : "50px",
-          marginRight: openDrawer ? "10px" : "50px",
+          marginLeft: openDrawer ? "20px" : "50px",
+          marginRight: openDrawer ? "20px" : "50px",
           width: openDrawer ? "calc(100% - 250px)" : "calc(100% - 72px)",
           height: "calc(100vh - 80px)",
           overflow: "auto",

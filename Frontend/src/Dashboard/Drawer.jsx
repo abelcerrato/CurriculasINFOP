@@ -23,7 +23,8 @@ import SignpostOutlinedIcon from '@mui/icons-material/SignpostOutlined';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
-
+import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
+import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
 const ProjectDrawer = ({ open }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +65,9 @@ const ProjectDrawer = ({ open }) => {
   const isMantenimientoActive =
     isActive("/Mantenimiento/Departamentos") ||
     isActive("/Mantenimiento/Municipios") ||
-    isActive("/Mantenimiento/Aldeas");
+    isActive("/Mantenimiento/Aldeas") ||
+    isActive("/Mantenimiento/Etnias") ||
+    isActive("/Mantenimiento/Tipo-Educador");
 
   const isSeguridadActive = isActive("/Usuarios");
 
@@ -203,10 +206,16 @@ const ProjectDrawer = ({ open }) => {
                 onClick={() => navigate("/Mantenimiento/Aldeas")}
               />
               <MenuItem
-                path="/Etnias"
-                icon={<SignpostOutlinedIcon />}
+                path="/Mantenimiento/Etnias"
+                icon={<Diversity2OutlinedIcon />}
                 text="Etnias"
                 onClick={() => navigate("/Mantenimiento/Etnias")}
+              />
+              <MenuItem
+                path="/Mantenimiento/Tipo-Educador"
+                icon={<Groups2OutlinedIcon />}
+                text="Tipo Educador"
+                onClick={() => navigate("/Mantenimiento/Tipo-Educador")}
               />
             </List>
           </Collapse>
@@ -294,7 +303,7 @@ const ProjectDrawer = ({ open }) => {
             }}
           >
             <ListItemIcon>
-              <SignpostOutlinedIcon
+              <Diversity2OutlinedIcon
                 fontSize="small"
                 color={isActive("/Mantenimiento/Etnias") ? "primary" : "inherit"}
               />
@@ -303,6 +312,29 @@ const ProjectDrawer = ({ open }) => {
               primary="Aldeas"
               primaryTypographyProps={{
                 color: isActive("/Mantenimiento/Etnias") ? "primary" : "inherit",
+              }}
+            />
+          </MuiMenuItem>
+          <MuiMenuItem
+            onClick={() => handleItemClick("/Mantenimiento/Tipo-Educador")}
+            sx={{
+              "&:hover": {
+                backgroundColor: isActive("/Mantenimiento/Tipo-Educador")
+                  ? "#88CFE0"
+                  : "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <ListItemIcon>
+              <Groups2OutlinedIcon
+                fontSize="small"
+                color={isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Tipo Educador"
+              primaryTypographyProps={{
+                color: isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit",
               }}
             />
           </MuiMenuItem>
