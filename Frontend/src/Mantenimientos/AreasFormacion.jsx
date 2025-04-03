@@ -28,11 +28,12 @@ const DataTable = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/tipoEducador`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/areasFormacion`);
+            console.log("areas de formacion", response.data);
 
             setRows(response.data.map(item => ({
                 id: item.id,
-                tipoeducador: item.tipoeducador
+                areaformacion: item.areaformacion
             })));
         } catch (error) {
             console.error("Hubo un error al obtener los datos:", error);
@@ -43,7 +44,7 @@ const DataTable = () => {
     }, []);
 
     const handleAddClick = () => {
-        setEditRowData({ id: 'temp', tipoeducador: '' });
+        setEditRowData({ id: 'temp', areaformacion: '' });
         setEditRowId('temp');
         setIsAdding(true);
     };
@@ -65,13 +66,13 @@ const DataTable = () => {
             if (isAdding) {
                 // Lógica para INSERT
                 const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/tipoEducador`,
-                    { tipoeducador: editRowData.tipoeducador }
+                    `${process.env.REACT_APP_API_URL}/areasFormacion`,
+                    { areaformacion: editRowData.areaformacion }
                 );
                 fetchData();
                 Swal.fire({
                     title: "Registro Creado",
-                    text: "El tipo educador a sido rigistrado exitosamente.",
+                    text: "La área de formación a sido rigistrado exitosamente.",
                     icon: "success",
                     timer: 6000,
                 });
@@ -79,17 +80,17 @@ const DataTable = () => {
                 // Lógica para UPDATE
                 const payload = {
                     id: editRowData.id,
-                    tipoeducador: editRowData.tipoeducador
+                    areaformacion: editRowData.areaformacion
                 };
 
                 await axios.put(
-                    `${process.env.REACT_APP_API_URL}/tipoEducador/${editRowId}`,
+                    `${process.env.REACT_APP_API_URL}/areasFormacion/${editRowId}`,
                     payload
                 );
                 fetchData();
                 Swal.fire({
                     title: "Registro Actualizado",
-                    text: "El tipo educador ha sido actualizado exitosamente.",
+                    text: "La área de formación ha sido actualizado exitosamente.",
                     icon: "success",
                     timer: 6000,
                 });
@@ -166,16 +167,16 @@ const DataTable = () => {
             }
         },
         {
-            field: 'tipoeducador',
-            headerName: 'Tipo Educador',
+            field: 'areaformacion',
+            headerName: 'Área de Formación',
             width: 250,
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
                         <TextField
                             variant="standard"
-                            name="tipoeducador"
-                            value={editRowData.tipoeducador || ''}
+                            name="areaformacion"
+                            value={editRowData.areaformacion || ''}
                             onChange={handleEditRowChange}
                             fullWidth
                             autoFocus
@@ -193,7 +194,7 @@ const DataTable = () => {
     ];
 
     // Filas para el DataGrid (incluyendo la temporal si está en modo añadir)
-    const gridRows = isAdding ? [{ id: 'temp', tipoeducador: '' }, ...rows] : rows;
+    const gridRows = isAdding ? [{ id: 'temp', areaformacion: '' }, ...rows] : rows;
 
     return (
         <Dashboard>
@@ -202,7 +203,7 @@ const DataTable = () => {
                     <Typography variant="h3" component="h2" sx={{
                         fontWeight: 'bold', color: color.azul
                     }}>
-                        Tipo Educador
+                        Áreas de Formación
                     </Typography>
                     <Button
                         variant="contained"

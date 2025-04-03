@@ -8,7 +8,11 @@ const BreadcrumbsDinamico = () => {
     const pathnames = location.pathname.split('/').filter((x) => x);
 
     const formatName = (path) => {
-        return path
+        // Primero decodifica los caracteres especiales (como %C3%B3 -> ó)
+        const decodedPath = decodeURIComponent(path);
+
+        // Luego formatea el nombre (convierte "nombre-ruta" a "Nombre Ruta")
+        return decodedPath
             .split('-')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
@@ -28,11 +32,14 @@ const BreadcrumbsDinamico = () => {
 
         // Breadcrumbs dinámicos basados en la ruta
         pathnames.forEach((name, index) => {
-            accumulatedPath += `/${name}`;
+            // Decodifica el nombre para la visualización
+            const decodedName = decodeURIComponent(name);
+            accumulatedPath += `/${name}`; // Mantiene la codificación en la URL
+
             const isLast = index === pathnames.length - 1;
 
             breadcrumbs.push({
-                name: formatName(name),
+                name: formatName(decodedName),
                 path: accumulatedPath,
                 isCurrent: isLast
             });
@@ -52,9 +59,6 @@ const BreadcrumbsDinamico = () => {
                         sx={{
                             color: color.rojo,
                             fontWeight: 'bold',
-                            '&:hover': {
-                                color: color.contrastText
-                            },
                         }}
                     >
                         {crumb.name}
@@ -70,7 +74,6 @@ const BreadcrumbsDinamico = () => {
                             fontWeight: 'bold',
                             '&:hover': {
                                 textDecoration: 'underline',
-                                //color: color.contrastText
                             }
                         }}
                     >

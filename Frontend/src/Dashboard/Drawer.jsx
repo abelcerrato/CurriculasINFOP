@@ -25,6 +25,9 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
+
+import SchemaOutlinedIcon from '@mui/icons-material/SchemaOutlined';
+import BlindOutlinedIcon from '@mui/icons-material/BlindOutlined';
 const ProjectDrawer = ({ open }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,13 +64,21 @@ const ProjectDrawer = ({ open }) => {
     handleMenuClose();
   };
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    // Decodifica tanto la ruta actual como la ruta que estamos comparando
+    const decodedCurrentPath = decodeURIComponent(location.pathname);
+    const decodedComparePath = decodeURIComponent(path);
+    return decodedCurrentPath === decodedComparePath;
+  };
   const isMantenimientoActive =
     isActive("/Mantenimiento/Departamentos") ||
     isActive("/Mantenimiento/Municipios") ||
     isActive("/Mantenimiento/Aldeas") ||
     isActive("/Mantenimiento/Etnias") ||
-    isActive("/Mantenimiento/Tipo-Educador");
+    isActive("/Mantenimiento/Área-Formación") ||
+    isActive("/Mantenimiento/Tipo-Educador") ||
+    isActive("/Mantenimiento/Discapacidades")
+    ;
 
   const isSeguridadActive = isActive("/Usuarios");
 
@@ -129,12 +140,13 @@ const ProjectDrawer = ({ open }) => {
       variant="permanent"
       open={open}
       sx={{
-        width: open ? 250 : 72,
+        width: open ? 255 : 75,
         flexShrink: 0,
         whiteSpace: "nowrap",
         "& .MuiDrawer-paper": {
-          width: open ? 240 : 92,
+          width: open ? 257 : 110,
           overflowX: "hidden",
+          alignItems: open ? "" : "center",
           transition: (theme) =>
             theme.transitions.create("width", {
               easing: theme.transitions.easing.sharp,
@@ -185,7 +197,7 @@ const ProjectDrawer = ({ open }) => {
         />
 
         {open && (
-          <Collapse in={openMantenimiento} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
+          <Collapse in={openMantenimiento} timeout="auto" unmountOnExit sx={{ ml: 2.5 }}>
             <List component="div" disablePadding>
               <MenuItem
                 path="/Mantenimiento/Departamentos"
@@ -217,6 +229,18 @@ const ProjectDrawer = ({ open }) => {
                 text="Tipo Educador"
                 onClick={() => navigate("/Mantenimiento/Tipo-Educador")}
               />
+              <MenuItem
+                path="/Mantenimiento/Área-Formación"
+                icon={<SchemaOutlinedIcon />}
+                text="Áreas de Formación"
+                onClick={() => navigate("/Mantenimiento/Área-Formación")}
+              />
+              <MenuItem
+                path="/Mantenimiento/Discapacidades"
+                icon={<BlindOutlinedIcon />}
+                text="Discapacidades"
+                onClick={() => navigate("/Mantenimiento/Discapacidades")}
+              />
             </List>
           </Collapse>
         )}
@@ -246,95 +270,105 @@ const ProjectDrawer = ({ open }) => {
         >
           <MuiMenuItem
             onClick={() => handleItemClick("/Mantenimiento/Departamentos")}
-            sx={{
-              "&:hover": {
-                backgroundColor: isActive("/Mantenimiento/Departamentos")
-                  ? "#88CFE0"
-                  : "rgba(0, 0, 0, 0.04)",
-              },
-            }}
+
           >
             <ListItemIcon>
               <PublicOutlinedIcon
                 fontSize="small"
-                color={isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Departamentos") ? "error" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Departamentos"
               primaryTypographyProps={{
-                color: isActive("/Mantenimiento/Departamentos") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Departamentos") ? "error" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
             onClick={() => handleItemClick("/Mantenimiento/Municipios")}
-            sx={{
-              "&:hover": {
-                backgroundColor: isActive("/Mantenimiento/Municipios")
-                  ? "#88CFE0"
-                  : "rgba(0, 0, 0, 0.04)",
-              },
-            }}
+
           >
             <ListItemIcon>
               <RoomOutlinedIcon
                 fontSize="small"
-                color={isActive("/Mantenimiento/Municipios") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Municipios") ? "error" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Municipios"
               primaryTypographyProps={{
-                color: isActive("/Mantenimiento/Municipios") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Municipios") ? "error" : "inherit",
               }}
             />
           </MuiMenuItem>
 
           <MuiMenuItem
             onClick={() => handleItemClick("/Mantenimiento/Aldeas")}
-            sx={{
-              "&:hover": {
-                backgroundColor: isActive("/Mantenimiento/Aldeas")
-                  ? "#88CFE0"
-                  : "rgba(0, 0, 0, 0.04)",
-              },
-            }}
+
           >
             <ListItemIcon>
               <Diversity2OutlinedIcon
                 fontSize="small"
-                color={isActive("/Mantenimiento/Etnias") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Aldeas") ? "error" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Aldeas"
               primaryTypographyProps={{
-                color: isActive("/Mantenimiento/Etnias") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Aldeas") ? "error" : "inherit",
               }}
             />
           </MuiMenuItem>
           <MuiMenuItem
             onClick={() => handleItemClick("/Mantenimiento/Tipo-Educador")}
-            sx={{
-              "&:hover": {
-                backgroundColor: isActive("/Mantenimiento/Tipo-Educador")
-                  ? "#88CFE0"
-                  : "rgba(0, 0, 0, 0.04)",
-              },
-            }}
+
           >
             <ListItemIcon>
               <Groups2OutlinedIcon
                 fontSize="small"
-                color={isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit"}
+                color={isActive("/Mantenimiento/Tipo-Educador") ? "error" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Tipo Educador"
               primaryTypographyProps={{
-                color: isActive("/Mantenimiento/Tipo-Educador") ? "primary" : "inherit",
+                color: isActive("/Mantenimiento/Tipo-Educador") ? "error" : "inherit",
+              }}
+            />
+          </MuiMenuItem>
+          <MuiMenuItem
+            onClick={() => handleItemClick("/Mantenimiento/Área-Formación")}
+
+          >
+            <ListItemIcon>
+              <BlindOutlinedIcon
+                fontSize="small"
+                color={isActive("/Mantenimiento/Área-Formación") ? "error" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Áreas de Formación"
+              primaryTypographyProps={{
+                color: isActive("/Mantenimiento/Área-Formación") ? "error" : "inherit",
+              }}
+            />
+          </MuiMenuItem>
+
+          <MuiMenuItem
+            onClick={() => handleItemClick("/Mantenimiento/Discapacidades")}
+          >
+            <ListItemIcon>
+              <SchemaOutlinedIcon
+                fontSize="small"
+                color={isActive("/Mantenimiento/Discapacidades") ? "error" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary="Discapacidades"
+              primaryTypographyProps={{
+                color: isActive("/Mantenimiento/Discapacidades") ? "error" : "inherit",
               }}
             />
           </MuiMenuItem>
@@ -358,7 +392,7 @@ const ProjectDrawer = ({ open }) => {
         />
 
         {open && (
-          <Collapse in={openSeguridad} timeout="auto" unmountOnExit sx={{ ml: 3 }}>
+          <Collapse in={openSeguridad} timeout="auto" unmountOnExit sx={{ ml: 2.5 }}>
             <List component="div" disablePadding>
               <MenuItem
                 path="/Usuarios"
@@ -406,13 +440,13 @@ const ProjectDrawer = ({ open }) => {
             <ListItemIcon>
               <PeopleAltOutlinedIcon
                 fontSize="small"
-                color={isActive("/Usuarios") ? "primary" : "inherit"}
+                color={isActive("/Usuarios") ? "error" : "inherit"}
               />
             </ListItemIcon>
             <ListItemText
               primary="Usuarios"
               primaryTypographyProps={{
-                color: isActive("/Usuarios") ? "primary" : "inherit",
+                color: isActive("/Usuarios") ? "error" : "inherit",
               }}
             />
           </MuiMenuItem>

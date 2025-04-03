@@ -29,11 +29,8 @@ const DataTable = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/departamentos`);
-      // Asegurarse de que los datos tengan el formato correcto
-      const data = Array.isArray(response.data) ? response.data :
-        response.data.updatedDepto ? response.data.updatedDepto :
-          response.data.newDepto ? response.data.newDepto : [];
-      setRows(data.map(item => ({
+
+      setRows(response.data.map(item => ({
         id: item.id,
         departamento: item.departamento
       })));

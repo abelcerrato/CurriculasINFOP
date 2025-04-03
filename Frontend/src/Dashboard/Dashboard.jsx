@@ -6,7 +6,7 @@ import React from "react";
 import BreadcrumbsDinamico from "./BreadcrumbsDinamico";
 
 const Dashboard = ({ children }) => {
-  const [openDrawer, setOpenDrawer] = useState(true);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
