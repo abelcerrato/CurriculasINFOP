@@ -185,10 +185,20 @@ export const loginC = async (req, res) => {
         }
 
 
+        // Verificar si la contraseña de nuevo usuario
+        const contraseñaNuevoUsuario = await bcrypt.compare("NuevoUsuario1*", user.contraseña);
+        if (contraseñaNuevoUsuario) {
+            return res.status(403).json({ 
+                message: "Debe cambiar su contraseña", 
+                changePasswordRequired: true, 
+                user: { id: user.id, usuario: user.usuario } 
+            });
+        }
+
         // Verificar si la contraseña es la temporal
         const contraseñaTemporal = await bcrypt.compare("Temporal1*", user.contraseña);
         if (contraseñaTemporal) {
-            return res.status(401).json({ 
+            return res.status(402).json({ 
                 message: "Debe cambiar su contraseña", 
                 changePasswordRequired: true, 
                 user: { id: user.id, usuario: user.usuario } 
