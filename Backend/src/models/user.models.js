@@ -125,6 +125,34 @@ export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento,
 
 }
 
+
+
+export const updatePasswordM = async (nuevaContraseña, id ) => {
+    try {
+        // Encriptar la nueva contraseña
+        const contraseñaCifrada = await bcrypt.hash(nuevaContraseña, 10);
+
+        // Actualizar solo la contraseña
+        const { rows } = await pool.query(
+            `UPDATE usuarios 
+                SET contraseña = $1
+                WHERE id = $2
+                RETURNING id, usuario, correo`,
+            [contraseñaCifrada, id]
+        );
+
+        if (rows.length === 0) {
+            throw new Error("Usuario no encontrado");
+        }
+
+        return { mensaje: "Contraseña actualizada correctamente", usuario: rows[0] };
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+
 export const deleteUserM = async (id) => {
     try {
         const { rows, rowCount } = await pool.query('DELETE FROM usuarios WHERE id=$1 RETURNING *', [id])
