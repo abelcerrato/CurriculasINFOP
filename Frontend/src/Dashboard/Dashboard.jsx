@@ -1,12 +1,27 @@
 import { Box, Typography } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppBarComponent from "./AppBar";
 import ProjectDrawer from "./Drawer";
 import React from "react";
 import BreadcrumbsDinamico from "./BreadcrumbsDinamico";
+import { useUser } from "../Components/UserContext";
+import CambiarContraModal from "../Login/CambiarContraModal";
+
 
 const Dashboard = ({ children }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
+  const { user } = useUser();
+
+
+  useEffect(() => {
+    // Verificar si el usuario requiere cambio de contraseña
+    if (user?.changePasswordRequired) {
+      setOpenChangePasswordModal(true);
+    }
+  }, [user]);
+
+
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
@@ -51,6 +66,11 @@ const Dashboard = ({ children }) => {
           {"Copyright © "}
           Propiedad intelectual del Consejo Nacional de Educación
         </Typography>
+        <CambiarContraModal
+          open={openChangePasswordModal}
+          onClose={() => { }}
+          mandatory={true} 
+        />
       </Box>
     </Box>
   );

@@ -16,7 +16,7 @@ import LogoCONED from "../Components/img/logos_CONED.png";
 import LogoDGDP from "../Components/img/LogoINFOP.png";
 import Swal from "sweetalert2";
 import { useUser } from "../Components/UserContext"
-
+import { color } from "../Components/style/Color";
 
 export default function Login() {
   const { setUser } = useUser();
@@ -25,6 +25,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ usuario: "", contraseña: "" });
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{5,}$/;
+
+
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -46,59 +48,71 @@ export default function Login() {
 
 
   const handleSubmit = async (event) => {
-      event.preventDefault();
-  
-      try {
-          const response = await axios.post(
-              `${process.env.REACT_APP_API_URL}/verificarUsuario`,
-              formData
-          );
-  
-          if (response.status === 200) {
-              // Si la autenticación es exitosa
-              const { id, usuario } = response.data.user;
-              
-              // Guarda el usuario en el contexto global
-              setUser({ id, usuario });
-  
-              // Guarda en localStorage
-              localStorage.setItem("user", JSON.stringify({ id, usuario }));
-  
-              // Indica que la sesión está activa
-              sessionStorage.setItem("isAuthenticated", "true");
-  
-              // Redirige al dashboard
-              navigate("/dashboard");
-          } else {
-              Swal.fire({
-                  title: "Error",
-                  text: "Error en la autenticación. Verifique sus credenciales.",
-                  icon: "error",
-                  timer: 6000,
-              });
-          }
-      } catch (error) {
-          console.error("Error en la autenticación:", error);
-  
-          if (error.response) {
-              if (error.response.status === 401) {
-                  Swal.fire({
-                      title: "Error",
-                      text: error.response.data.message,
-                      icon: "error",
-                      timer: 6000,
-                  });
-              } else {
-                  alert("Error en la autenticación. Inténtelo de nuevo.");
-              }
-          } else if (error.request) {
-              alert("Error en la conexión con el servidor.");
-          } else {
-              alert("Hubo un problema con la solicitud. Inténtelo de nuevo.");
-          }
+    event.preventDefault();
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/login`,
+        formData
+      );
+
+      if (response.status === 200) {
+        const { id, usuario } = response.data.user;
+
+        // Guarda el usuario en el contexto global
+        setUser({ id, usuario }); // Añadimos flag
+
+        // Guarda en localStorage
+        localStorage.setItem("user", JSON.stringify({
+          id,
+          usuario,
+        }));
+
+        // Indica que la sesión está activa
+        sessionStorage.setItem("isAuthenticated", "true");
+
+        // Redirige al dashboard
+        navigate("/dashboard");
       }
+    } catch (error) {
+      console.error("Error en la autenticación:", error);
+
+      if (error.response) {
+        if (error.response.status === 401) {
+          Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error",
+            timer: 6000,
+          });
+        } else if (error.response.status === 402) {
+          console.log(error.response.status);
+
+          const { id, usuario } = error.response.data.user; // Asume que el backend envía estos datos
+
+          // Guarda el usuario marcando que requiere cambio de contraseña
+          setUser({ id, usuario, changePasswordRequired: true });
+
+          localStorage.setItem("user", JSON.stringify({
+            id,
+            usuario,
+            requiresPasswordChange: true
+          }));
+
+          sessionStorage.setItem("isAuthenticated", "true");
+
+          // Redirige al dashboard igualmente
+          navigate("/dashboard");
+        } else {
+          alert("Error en la autenticación. Inténtelo de nuevo.");
+        }
+      } else if (error.request) {
+        alert("Error en la conexión con el servidor.");
+      } else {
+        alert("Hubo un problema con la solicitud. Inténtelo de nuevo.");
+      }
+    }
   };
-  
 
   return (
 
@@ -130,8 +144,9 @@ export default function Login() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#E53935",
+            backgroundColor: color.rojo,
             p: 4,
+            width: "55%",
           }}
         >
           <Card
@@ -145,20 +160,22 @@ export default function Login() {
             }}
           >
             <Typography
+              sx={{
+                color: color.blanco,
+                fontWeight: "bold",
+                mb: 5,
+                textAlign: "center"
+              }}
               variant="h4"
-              color="white"
-              fontWeight="bold"
-              align="center"
-              mb={5}
             >
               Inicio de Sesión
             </Typography>
 
             {/* Campo de email */}
             <TextField
+              variant="outlined"
               margin="normal"
               required
-              fullWidth
               id="usuario"
               placeholder="Usuario"
               name="usuario"
@@ -168,12 +185,12 @@ export default function Login() {
               onChange={handleChange}
               InputProps={{
                 endAdornment: (
-                  <InputAdornment position="end">
+                  <InputAdornment sx={{ mr: 1, ml: 1 }} position="end">
                     <Person />
                   </InputAdornment>
                 ),
               }}
-              sx={{ backgroundColor: "white", borderRadius: "10px" }}
+              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "400px" }}
             />
 
             {/* Campo de contraseña */}
@@ -198,7 +215,7 @@ export default function Login() {
                   </InputAdornment>
                 ),
               }}
-              sx={{ backgroundColor: "white", borderRadius: "10px" }}
+              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "400px" }}
             />
 
             {/* Enlace "Olvidé mi contraseña" */}
@@ -217,7 +234,7 @@ export default function Login() {
               variant="contained"
               fullWidth
               sx={{
-                backgroundColor: "white",
+                backgroundColor: color.blanco,
                 color: "#E53935",
                 fontWeight: "bold",
                 borderRadius: "30px",
@@ -250,7 +267,7 @@ export default function Login() {
           sx={{
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "white",
+            backgroundColor: color.blanco,
             p: 4,
           }}
         >
