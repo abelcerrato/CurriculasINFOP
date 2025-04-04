@@ -125,12 +125,14 @@ export const updateUserC = async (req, res) => {
 
 export const updateContraseñaC = async (req, res) => {
     try {
+        console.log("Entro a la función de actualizar contraseña");
+        
         const { usuario } = req.params;
         const { nuevaContraseña } = req.body
 
         const users = await updateContraseñaM(nuevaContraseña, usuario)
 
-        res.json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
+        res.status(200).json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
     } catch (error) {
         console.error('Error al actualizar la contraseña del usuario: ', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -142,7 +144,7 @@ export const updateContraseñaC = async (req, res) => {
 export const resetContraseñaUserC = async (req, res) => {
     try {
         const { usuario } = req.params;
-        
+
         const usuarioActualizado = await resetContraseñaM(usuario);
 
         res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1*'.", user: usuarioActualizado });
@@ -152,80 +154,100 @@ export const resetContraseñaUserC = async (req, res) => {
     }
 };
 
+export const verificarToken = async (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1];
+  
+    if (!token) {
+      return res.status(401).json({ valid: false, message: "Token no proporcionado" });
+    }
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+      const result = await pool.query(
+        'SELECT sesionactiva FROM ms_usuarios WHERE id = $1',
+        [decoded.id]
+      );
+  
+      const storedToken = result.rows[0]?.sesionactiva;
+  
+      if (storedToken !== token) {
+        return res.status(403).json({ valid: false, message: "Sesión inválida o cerrada en otro lugar" });
+      }
+  
+      return res.json({ valid: true });
+    } catch (err) {
+      return res.status(401).json({ valid: false, message: "Token inválido o expirado" });
+    }
+  };
+  
 
 // Controlador para el login
 export const loginC = async (req, res) => {
-    try {
-        const { usuario, contraseña } = req.body;
-        console.log(req.body);
+  try {
+    const { usuario, contraseña } = req.body;
 
-        if (!usuario || !contraseña) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        }
-
-        const user = await verificarUsuarioM(usuario);
-
-        if (!user) {
-            console.log("Usuario o contraseña incorrectos");
-            return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
-        }
-
-        // Comparar la contraseña ingresada con la almacenada
-        const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
-        if (!contraseñaValida) {
-            console.log("Usuario o contraseña incorrectos");
-            return res.status(401).json({ message: "Credenciales incorrectas" });
-        }
-
-        // Si ya hay una sesión activa, cerrarla (poner sesionactiva a false)
-        if (user.sesionactiva) {
-            console.log("Ya tienes una sesión activa, se cerrará la sesión anterior.");
-            await pool.query('UPDATE ms_usuarios SET sesionactiva = FALSE WHERE id = $1', [user.id]);
-        }
-
-
-        // Verificar si la contraseña de nuevo usuario
-        const contraseñaNuevoUsuario = await bcrypt.compare("NuevoUsuario1*", user.contraseña);
-        if (contraseñaNuevoUsuario) {
-            return res.status(403).json({ 
-                message: "Debe cambiar su contraseña", 
-                changePasswordRequired: true, 
-                user: { id: user.id, usuario: user.usuario } 
-            });
-        }
-
-        // Verificar si la contraseña es la temporal
-        const contraseñaTemporal = await bcrypt.compare("Temporal1*", user.contraseña);
-        if (contraseñaTemporal) {
-            return res.status(402).json({ 
-                message: "Debe cambiar su contraseña", 
-                changePasswordRequired: true, 
-                user: { id: user.id, usuario: user.usuario } 
-            });
-        }
-
-        // Marcar la sesión como activa (poner sesionactiva a true)
-        await pool.query('UPDATE ms_usuarios SET sesionactiva = TRUE WHERE id = $1', [user.id]);
-
-        // Generar token de sesión
-        const token = jwt.sign(
-            { id: user.id, usuario: user.usuario },
-            process.env.JWT_SECRET,
-            { expiresIn: "8h" }
-        );
-
-        return res.json({ 
-            message: "Inicio de sesión exitoso. Si había una sesión activa, ha sido cerrada.", 
-            token,
-            user: { id: user.id, usuario: user.usuario, sesionactiva:user.sesionactiva} 
-        });
-    } catch (error) {
-        console.error("Error en login: ", error);
-        res.status(500).json({ error: "Error interno del servidor" });
+    if (!usuario || !contraseña) {
+      return res.status(400).json({ error: "Faltan datos en la solicitud" });
     }
-};
 
+    const user = await verificarUsuarioM(usuario);
+
+    if (!user) {
+      return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+    }
+
+    const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
+    if (!contraseñaValida) {
+      return res.status(401).json({ message: "Credenciales incorrectas" });
+    }
+
+    const contraseñaNuevoUsuario = await bcrypt.compare("NuevoUsuario1*", user.contraseña);
+    const contraseñaTemporal = await bcrypt.compare("Temporal1*", user.contraseña);
+
+    if (contraseñaNuevoUsuario || contraseñaTemporal) {
+      return res.status(403).json({ 
+        message: "Debe cambiar su contraseña", 
+        changePasswordRequired: true, 
+        user: { id: user.id, usuario: user.usuario } 
+      });
+    }
+
+    // Verificar si ya había una sesión activa
+    const yaHabiaSesion = user.sesionactiva !== null;
+
+    //  Generar nuevo token
+    const token = jwt.sign(
+      { id: user.id, usuario: user.usuario },
+      process.env.JWT_SECRET,
+      { expiresIn: "8h" }
+    );
+
+    //  Guardar nuevo token en BD
+    await pool.query(
+      'UPDATE ms_usuarios SET sesionactiva = $1 WHERE id = $2',
+      [token, user.id]
+    );
+
+    // Responder incluyendo si ya había sesión activa
+    return res.json({
+      message: yaHabiaSesion
+        ? "Inicio de sesión exitoso. Se cerró otra sesión activa."
+        : "Inicio de sesión exitoso.",
+      token,
+      user: {
+        id: user.id,
+        usuario: user.usuario,
+        sesionactiva: token
+      },
+      yaHabiaSesion 
+    });
+
+  } catch (error) {
+    console.error("Error en login: ", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 
 export const logoutC = async (req, res) => {
@@ -234,7 +256,7 @@ export const logoutC = async (req, res) => {
         console.log("ID del usuario que quiere cerrar sesión: ", id);
 
         // Cerrar sesión del usuario (poner sesionactiva a false)
-        await pool.query('UPDATE ms_usuarios SET sesionactiva = FALSE WHERE id = $1', [id]);
+        await pool.query('UPDATE ms_usuarios SET sesionactiva = null WHERE id = $1', [id]);
 
         return res.json({ message: "Sesión cerrada exitosamente." });
     } catch (error) {

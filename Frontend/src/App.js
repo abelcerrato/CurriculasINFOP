@@ -12,6 +12,8 @@ import AreasFormacion from './Mantenimientos/AreasFormacion';
 import Disacapacidad from './Mantenimientos/Discapacidades';
 import Usuarios from './Seguridad/Usuarios';
 import { UserProvider } from './Components/UserContext';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const ProtectedRoute = () => {
   const navigate = useNavigate();
@@ -24,8 +26,48 @@ const ProtectedRoute = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  // Verificar validez del token cada 10 segundos
+  React.useEffect(() => {
+    const checkSessionValidity = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/verify-token`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.data.valid) {
+          logoutAndRedirect();
+        }
+      } catch (error) {
+        logoutAndRedirect();
+      }
+    };
+
+    const logoutAndRedirect = () => {
+      localStorage.clear();
+      sessionStorage.clear();
+      Swal.fire({
+        icon: "info",
+        title: "Sesión cerrada",
+        text: "Tu sesión ha sido cerrada porque se inició desde otro dispositivo.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      navigate("/", { replace: true });
+    };
+
+    const interval = setInterval(checkSessionValidity, 10000);
+    return () => clearInterval(interval);
+  }, [navigate]);
+
   return isAuthenticated ? <Outlet /> : null;
 };
+
+
 
 function App() {
   return (
