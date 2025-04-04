@@ -57,24 +57,11 @@ export default function Login() {
       );
 
       if (response.status === 200) {
-        const { id, usuario, sesionactiva } = response.data.user;
-        const { token, message } = response.data;
-
-        // Si la sesión ya está activa, mostrar alerta y cerrar otras sesiones
-        if (sesionactiva) {
-          await Swal.fire({
-            icon: 'info',
-            title: 'Inicio de sesión',
-            text: message,
-            confirmButtonText: 'OK'
-          });
-
-          // Cerrar otras sesiones llamando al endpoint de logout
-          await axios.put(`${process.env.REACT_APP_API_URL}/logout/${id}`);
-        }
+        const { id, usuario } = response.data.user;
+        const { token, message, yaHabiaSesion } = response.data;
 
         // Guardar el usuario en el contexto global
-        setUser({ id, usuario, sesionactiva: true }); // Forzar a true porque ahora es la sesión activa
+        setUser({ id, usuario });
 
         // Guardar en localStorage
         localStorage.setItem("user", JSON.stringify({
@@ -84,13 +71,15 @@ export default function Login() {
         localStorage.setItem("token", token);
 
         // Mostrar mensaje de éxito (si no es caso de sesión activa)
-        if (!sesionactiva) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Inicio de sesión',
-            text: message
-          });
-        }
+        Swal.fire({
+          icon: yaHabiaSesion ? 'info' : 'success',
+          title: 'Inicio de sesión',
+          text: yaHabiaSesion
+            ? 'Existe una sesión abierta en otro dispositivo. Por motivos de seguridad, fue cerrada.'
+            : message,
+          timer: 3000,
+          showConfirmButton: false
+        });
 
         // Indicar que la sesión está activa
         sessionStorage.setItem("isAuthenticated", "true");
@@ -108,7 +97,7 @@ export default function Login() {
             icon: "error",
             timer: 6000,
           });
-        } else if (error.response.status === 402) {
+        } else if (error.response.status === 403) {
           const { id, usuario } = error.response.data.user;
 
           setUser({ id, usuario, changePasswordRequired: true });
