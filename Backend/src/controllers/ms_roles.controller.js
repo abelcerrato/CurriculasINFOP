@@ -1,4 +1,3 @@
-import e from "express";
 import { getRolesM, getRolIdM, postRolesM, putRolesM } from "../models/ms_roles.models.js";
 
 export const getRolesC = async (req, res) => {
@@ -21,8 +20,8 @@ export const getRolIdC = async (req, res) => {
             return res.status(404).json({ message: "Rol no encontrado" });
         }
 
-        // Retornar el ID del rol 
-        res.json({ id: rol[0].id });
+        
+        res.json(rol);
     } catch (error) {
         console.error('Error al obtener el rol:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
@@ -32,7 +31,7 @@ export const getRolIdC = async (req, res) => {
 
 export const postRolesC = async (req, res) => {
     try {
-        const { rol } = req.body;
+        const { rol, estado, descripcion, creadopor } = req.body;
         console.log(req.body);
 
 
@@ -41,7 +40,7 @@ export const postRolesC = async (req, res) => {
             return res.status(400).json({ error: "Faltan datos en la solicitud" });
         }
 
-        const newRol = await postRolesM(rol);
+        const newRol = await postRolesM(rol, estado, descripcion, creadopor);
         res.json({ message: "Rol agregado exitosamente: ", newRol });
 
     } catch (error) {
@@ -54,14 +53,14 @@ export const postRolesC = async (req, res) => {
 export const putRolesC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { rol } = req.body;
+        const { rol,  estado, descripcion, modificadopor} = req.body;
 
         if (!rol) {
             console.log("Faltan datos en la solicitud");
             return res.status(400).json({ error: "Faltan datos en la solicitud" });
         }
 
-        const updatedRol = await putRolesM(rol, id);
+        const updatedRol = await putRolesM(rol, estado, descripcion, modificadopor, id);
         res.json({ message: "Rol actualizado exitosamente: ", updatedRol });
 
 
@@ -69,7 +68,9 @@ export const putRolesC = async (req, res) => {
         console.error('Error al actualizar el rol:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
-
-
 }
+
+
+
+
 

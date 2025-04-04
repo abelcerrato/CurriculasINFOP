@@ -1,4 +1,4 @@
-import e from "express";
+
 import { getDepartamentoIdM, getDepartamentosM, postDepartamentosM, putDepartamentoM } from "../models/departamentos.models.js";
 
 export const getDepartamentosC = async (req, res) => {

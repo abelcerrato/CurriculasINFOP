@@ -9,8 +9,6 @@ import etniasRoutes from "./routes/etnias.routes.js";
 import discapacidadRoutes from "./routes/discapacidades.router.js"
 import tipoEducadorRoutes from "./routes/tipoEducador.routes.js"
 import areasFormacionRoutes from "./routes/areasFormacion.routes.js"
-import rolesRoutes from "./routes/ms_roles.routes.js"
-import permisosRoutes from "./routes/permisos.routes.js"
 
 import estudiantesRouter from "./routes/estudiantes.routes.js";
 import maestrosRouter from "./routes/maestros.routes.js";
@@ -21,6 +19,10 @@ import cursosRoutes from "./routes/cursos.routes.js"
 import modulosCursosRoutes from "./routes/modulosCursos.routes.js"
 import clasesModCursos from './routes/clasesModCursos.routes.js'
 
+import ms_rolesRoutes from "./routes/ms_roles.routes.js";
+import ms_modulosRoutes from "./routes/ms_modulos.routes.js"
+import ms_objetosRoutes from "./routes/ms_objetos.routes.js";
+import ms_permisosRoutes from "./routes/ms_permisos.routes.js"
 
 import cors from "cors"
 
@@ -41,8 +43,8 @@ app.use(etniasRoutes)
 app.use(discapacidadRoutes)
 app.use(tipoEducadorRoutes)
 app.use(areasFormacionRoutes)
-app.use(rolesRoutes)
-app.use(permisosRoutes)
+
+
 
 app.use(estudiantesRouter)
 app.use(maestrosRouter)
@@ -53,6 +55,10 @@ app.use(cursosRoutes)
 app.use(modulosCursosRoutes)
 app.use(clasesModCursos)
 
+app.use(ms_rolesRoutes)
+app.use(ms_modulosRoutes)
+app.use(ms_objetosRoutes)
+app.use(ms_permisosRoutes)
 
 
 console.log("DB_USER:", process.env.DB_USER); // Prueba si se está cargando correctamente

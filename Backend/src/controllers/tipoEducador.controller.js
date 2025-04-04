@@ -1,4 +1,4 @@
-import e from "express";
+
 import { getTipoEducadorIdM, getTipoEducadorM, postTipoEducadorM, putTipoEducadorM } from "../models/tipoEducador.models.js";
 
 export const getTipoEducadorC = async (req, res) => {
