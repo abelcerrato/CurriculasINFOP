@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {pool} from '../db.js'
-import {   getUserC, getUserIdC, loginC, postUserC, resetContraseñaUserC, updateContraseñaC, updateUserC, verificarUsuarioC} from "../controllers/users.controllers.js";
+import {   getUserC, getUserIdC, loginC, logoutC, postUserC, resetContraseñaUserC, updateContraseñaC, updateUserC, verificarUsuarioC} from "../controllers/ms_usuarios.controllers.js";
 
 const router=Router();
 
@@ -20,6 +20,7 @@ router.post('/login', loginC)//hace login y verifica si la contraseña es tempor
 
 router.put('/actualizarContra/:usuario', updateContraseñaC)//actualiza la contraseña en caso que sea temporal o nuevo usuario
 
+router.put('/logout/:id', logoutC)//cambie el estado se sesionactiva a false
 
 
 

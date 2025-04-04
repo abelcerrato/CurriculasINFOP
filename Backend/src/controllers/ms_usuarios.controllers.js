@@ -2,7 +2,7 @@ import { pool } from '../db.js'
 import bcrypt from 'bcrypt'; // Para cifrar contraseñas
 import jwt from "jsonwebtoken";
 
-import { getUserM, getUserIdM, postUserM, updateUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM, resetContraseñaM } from "../models/user.models.js";
+import { getUserM, getUserIdM, postUserM, updateUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM, resetContraseñaM } from "../models/ms_usuarios.models.js";
 
 export const getUserC = async (req, res) => {
     try {
@@ -181,7 +181,7 @@ export const loginC = async (req, res) => {
         // Si ya hay una sesión activa, cerrarla (poner sesionactiva a false)
         if (user.sesionactiva) {
             console.log("Ya tienes una sesión activa, se cerrará la sesión anterior.");
-            await pool.query('UPDATE usuarios SET sesionactiva = FALSE WHERE id = $1', [user.id]);
+            await pool.query('UPDATE ms_usuarios SET sesionactiva = FALSE WHERE id = $1', [user.id]);
         }
 
 
@@ -206,7 +206,7 @@ export const loginC = async (req, res) => {
         }
 
         // Marcar la sesión como activa (poner sesionactiva a true)
-        await pool.query('UPDATE usuarios SET sesionactiva = TRUE WHERE id = $1', [user.id]);
+        await pool.query('UPDATE ms_usuarios SET sesionactiva = TRUE WHERE id = $1', [user.id]);
 
         // Generar token de sesión
         const token = jwt.sign(
@@ -222,6 +222,23 @@ export const loginC = async (req, res) => {
         });
     } catch (error) {
         console.error("Error en login: ", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+};
+
+
+
+export const logoutC = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("ID del usuario que quiere cerrar sesión: ", id);
+
+        // Cerrar sesión del usuario (poner sesionactiva a false)
+        await pool.query('UPDATE ms_usuarios SET sesionactiva = FALSE WHERE id = $1', [id]);
+
+        return res.json({ message: "Sesión cerrada exitosamente." });
+    } catch (error) {
+        console.error("Error al cerrar sesión: ", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 };

@@ -2,7 +2,7 @@ import { pool } from '../db.js'
 
 export const getEstudiantesM = async (req, res) => {
     try {
-        const { rows } = await pool.query('SELECT * from estudiantes')
+        const { rows } = await pool.query(`SELECT * from estudiantes`)
         console.log(rows);
         return rows;
     } catch (error) {

@@ -1,5 +1,5 @@
 import e from "express";
-import { getRolesM, getRolIdM, postRolesM, putRolesM } from "../models/roles.models.js";
+import { getRolesM, getRolIdM, postRolesM, putRolesM } from "../models/ms_roles.models.js";
 
 export const getRolesC = async (req, res) => {
     try {

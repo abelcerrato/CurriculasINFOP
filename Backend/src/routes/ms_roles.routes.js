@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {getRolesC, getRolIdC, postRolesC, putRolesC } from "../controllers/roles.controller.js";
+import {getRolesC, getRolIdC, postRolesC, putRolesC } from "../controllers/ms_roles.controller.js";
 
 const router=Router();
 router.get('/roles', getRolesC)

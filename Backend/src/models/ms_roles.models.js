@@ -2,7 +2,9 @@ import { pool } from '../db.js'
 
 export const getRolesM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from ms_roles')
+        const { rows } = await pool.query(`
+            SELECT id, rol, fechacreacion, fechamodificacion, estado, descripcion, creadopor, modificadopor 
+        from ms_roles`)
         console.log(rows);
         return rows;
     } catch (error) {
