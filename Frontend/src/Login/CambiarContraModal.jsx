@@ -65,29 +65,19 @@ const CambiarContraModal = ({ open, onClose, mandatory = false, onSuccess }) => 
 
         try {
             setLoading(true);
-
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_URL}/actualizarContra/${user?.usuario}`,
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/actualizarContra/${user?.usuario}`,
                 {
                     nuevaContraseña: passwords.newPassword,
                 }
+
             );
 
             if (response.status === 200) {
-                alert("contraseña cambiada")
-
-
-                onClose();
-
-
-                // Reset form
-                setPasswords({
-                    newPassword: "",
-                    confirmPassword: "",
-                });
+                Swal.fire("¡Éxito!", "Contraseña cambiada correctamente", "success");
+                if (onSuccess) onSuccess(); // Esto cerrará el modal
             }
         } catch (error) {
-            alert("no se cambio contraseña cambiada")
+            Swal.fire("Error", "No se pudo cambiar la contraseña", "error");
         } finally {
             setLoading(false);
         }

@@ -11,20 +11,29 @@ import CambiarContraModal from "../Login/CambiarContraModal";
 const Dashboard = ({ children }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openChangePasswordModal, setOpenChangePasswordModal] = useState(false);
-  const { user } = useUser();
-
-
-  useEffect(() => {
-    // Verificar si el usuario requiere cambio de contraseña
-    if (user?.changePasswordRequired) {
-      setOpenChangePasswordModal(true);
-    }
-  }, [user]);
-
 
 
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
+  };
+
+
+  const { user, updateUser } = useUser();
+
+  useEffect(() => {
+    // Verificar si necesita cambio de contraseña solo al cargar el dashboard
+    if (user?.changePasswordRequired) {
+      setOpenChangePasswordModal(true);
+    }
+  }, [user?.changePasswordRequired]); // Solo se ejecuta cuando cambia este valor
+
+  const handlePasswordChangeSuccess = () => {
+    // Actualizar el estado del usuario para eliminar el requerimiento
+    updateUser({ ...user, changePasswordRequired: false });
+    setOpenChangePasswordModal(false);
+    
+    // Opcional: Guardar en localStorage/sessionStorage
+    sessionStorage.setItem('passwordChanged', 'true');
   };
 
   return (
@@ -66,10 +75,12 @@ const Dashboard = ({ children }) => {
           {"Copyright © "}
           Propiedad intelectual del Consejo Nacional de Educación
         </Typography>
+
         <CambiarContraModal
           open={openChangePasswordModal}
-          onClose={() => { }}
-          mandatory={true} 
+          onClose={() => !user?.changePasswordRequired && setOpenChangePasswordModal(false)}
+          mandatory={user?.changePasswordRequired}
+          onSuccess={handlePasswordChangeSuccess}
         />
       </Box>
     </Box>

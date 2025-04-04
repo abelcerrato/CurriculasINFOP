@@ -7,6 +7,7 @@ import {
   Tooltip,
   Grid,
 } from "@mui/material";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../Components/UserContext";
 import Logo from "../Components/img/LogoINFOP.png";
@@ -20,12 +21,34 @@ const AppBarComponent = ({ open, toggleDrawer }) => {
   const navigate = useNavigate();
   const { user } = useUser();
 
-  const handleRedirect = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
-    navigate("/", { replace: true });
-  };
+  const handleRedirect = async () => {
+    try {
+      // Verifica que user.id exista
+      if (!user?.id) {
+        console.error("No se encontró el ID del usuario");
+        throw new Error("Usuario no identificado");
+      }
 
+      // Llama al endpoint sin token (si no es necesario)
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/logout/${user.id}`);
+      console.log("Respuesta del backend:", response.data); // Para depuración
+
+      // Limpieza y redirección
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      navigate("/", { replace: true });
+
+    } catch (error) {
+      console.error("Error completo:", {
+        message: error.message,
+        response: error.response?.data, // Respuesta del backend si hay error HTTP
+      });
+      // Fuerza la limpieza y redirección
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      navigate("/", { replace: true });
+    }
+  };
   return (
     <AppBar
       position="fixed"

@@ -8,7 +8,13 @@ export const UserProvider = ({ children }) => {
     // Recuperamos el usuario del localStorage si existe
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const [user, setUser] = useState(storedUser); // Estado para el usuario
-
+    
+    const updateUser = (newUserData) => {
+        setUser(newUserData);
+        // Persistir en sessionStorage
+        sessionStorage.setItem('user', JSON.stringify(newUserData));
+      };
+    
     // Cada vez que el estado 'user' cambie, lo guardamos en el localStorage
     useEffect(() => {
         if (user) {
@@ -19,7 +25,7 @@ export const UserProvider = ({ children }) => {
     }, [user]);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, updateUser }}>
             {children}
         </UserContext.Provider>
     );

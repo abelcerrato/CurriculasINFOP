@@ -58,7 +58,7 @@ export default function Login() {
 
       if (response.status === 200) {
         const { id, usuario } = response.data.user;
-
+        const { token, message } = response.data;
         // Guarda el usuario en el contexto global
         setUser({ id, usuario }); // Añadimos flag
 
@@ -67,6 +67,13 @@ export default function Login() {
           id,
           usuario,
         }));
+        // Guarda el token en localStorage
+        localStorage.setItem("token", token);
+        Swal.fire({
+          icon: 'info',
+          title: 'Inicio de sesión',
+          text: message
+        });
 
         // Indica que la sesión está activa
         sessionStorage.setItem("isAuthenticated", "true");
@@ -75,8 +82,6 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (error) {
-      console.error("Error en la autenticación:", error);
-
       if (error.response) {
         if (error.response.status === 401) {
           Swal.fire({
@@ -86,7 +91,6 @@ export default function Login() {
             timer: 6000,
           });
         } else if (error.response.status === 402) {
-          console.log(error.response.status);
 
           const { id, usuario } = error.response.data.user; // Asume que el backend envía estos datos
 
