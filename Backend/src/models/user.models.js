@@ -18,10 +18,10 @@ export const getUserM = async () => {
         m.municipio,
         d.departamento,
         r.rol
-            FROM usuarios u  
+            FROM ms_usuarios u  
             INNER JOIN municipios m ON u.idmunicipio = m.id
             INNER JOIN departamentos d  ON u.iddepartamento = d.id
-            left  JOIN roles r   ON u.idrol = r.id
+            left  JOIN ms_roles r   ON u.idrol = r.id
             ORDER BY u.id ASC;
         `)
         console.log(rows);
@@ -36,7 +36,7 @@ export const getUsuarioIdM = async (usuario) => {
     try {
         const { rows } = await pool.query(`
             SELECT id, nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, estado, fechacreacion, creadopor, fechamodificacion, modificadopor 
-            FROM usuarios 
+            FROM ms_usuarios 
             WHERE usuario=$1`, 
             [usuario]);
         console.log('Resultado de la consulta de usuario:', rows); 
@@ -54,7 +54,7 @@ export const getUserIdM = async (id) => {
         const { rows } = await pool.query(`
             SELECT nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, 
             estado, fechacreacion, creadopor, fechamodificacion, modificadopor, usuario
-            FROM usuarios WHERE id=$1`, [id])
+            FROM ms_usuarios WHERE id=$1`, [id])
 
         if (rows.length === 0) {
             return null
@@ -72,7 +72,7 @@ export const getUserIdM = async (id) => {
 export const verificarUsuarioM = async (usuario) => {
     try {
 
-        const { rows, rowCount } = await pool.query('SELECT id, usuario, nombre, contraseña, correo, sesionactiva FROM usuarios WHERE usuario = $1', 
+        const { rows, rowCount } = await pool.query('SELECT id, usuario, nombre, contraseña, correo, sesionactiva FROM ms_usuarios WHERE usuario = $1', 
             [usuario]);
 
 
@@ -96,7 +96,7 @@ export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddeparta
 
 
         const contraseñaCifrada  = await bcrypt.hash(ContraseñaUsuarioNuevo, 10);
-        const { rows } = await pool.query(`INSERT INTO usuarios
+        const { rows } = await pool.query(`INSERT INTO ms_usuarios
                                                 (nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
                                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, null) RETURNING *`,
@@ -115,7 +115,7 @@ export const updateUserM = async ( nombre, cecap, correo, idrol, iddepartamento,
 
         //const contraseñaCifrada  = await bcrypt.hash(contraseña, 10);
 
-        const { rows } = await pool.query(`UPDATE usuarios SET 
+        const { rows } = await pool.query(`UPDATE ms_usuarios SET 
                                                 nombre=$1, cecap=$2, correo=$3, idrol=$4, iddepartamento=$5, idmunicipio=$6,
                                                 estado=$7, modificadopor=$8, usuario=$9,
                                                 fechamodificacion=CURRENT_TIMESTAMP, fechacreacion=null
@@ -138,7 +138,7 @@ export const updateContraseñaM = async (nuevaContraseña, usuario ) => {
 
         // Actualizar solo la contraseña
         const { rows } = await pool.query(
-            `UPDATE usuarios 
+            `UPDATE ms_usuarios 
                 SET contraseña = $1
                 WHERE usuario = $2
                 RETURNING usuario, nombre, correo`,
@@ -167,7 +167,7 @@ export const resetContraseñaM = async (usuario) => {
 
         // Actualiza la contraseña en la base de datos
         const { rows } = await pool.query(
-            `UPDATE usuarios 
+            `UPDATE ms_usuarios 
                 SET contraseña = $1 
                 WHERE usuario = $2
                 RETURNING id, usuario, correo`,

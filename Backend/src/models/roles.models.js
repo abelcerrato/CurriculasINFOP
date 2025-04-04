@@ -2,7 +2,7 @@ import { pool } from '../db.js'
 
 export const getRolesM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from roles')
+        const { rows } = await pool.query('SELECT * from ms_roles')
         console.log(rows);
         return rows;
     } catch (error) {
@@ -13,7 +13,7 @@ export const getRolesM = async () => {
 export const getRolIdM = async (id) => {
     console.log('Rol enviada:', id);
     try {
-        const { rows } = await pool.query('SELECT * FROM roles WHERE id=$1', [id]);
+        const { rows } = await pool.query('SELECT * FROM ms_roles WHERE id=$1', [id]);
         console.log('Resultado de la consulta del Rol:', rows);
         return rows;
     } catch (error) {
@@ -24,7 +24,7 @@ export const getRolIdM = async (id) => {
 
 export const postRolesM = async (rol) => {
     try {
-        const { rows } = await pool.query('INSERT INTO roles (rol, fechacreacion, fechamodificacion) VALUES ($1, CURRENT_TIMESTAMP, null) RETURNING *', [rol]);
+        const { rows } = await pool.query('INSERT INTO ms_roles (rol, fechacreacion, fechamodificacion) VALUES ($1, CURRENT_TIMESTAMP, null) RETURNING *', [rol]);
         return rows;
     } catch (error) {
         console.error('Error al insertar el Rol:', error);
@@ -34,7 +34,7 @@ export const postRolesM = async (rol) => {
 
 export const putRolesM = async (rol, id) => {
     try {
-        const { rows } = await pool.query('UPDATE roles SET rol=$1, fechamodificacion=CURRENT_TIMESTAMP WHERE id=$2 RETURNING *', [rol, id]);
+        const { rows } = await pool.query('UPDATE ms_roles SET rol=$1, fechamodificacion=CURRENT_TIMESTAMP WHERE id=$2 RETURNING *', [rol, id]);
         return rows;
     } catch (error) {
         console.error('Error al actualizar el Rol:', error);
