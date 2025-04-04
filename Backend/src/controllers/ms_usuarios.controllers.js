@@ -218,7 +218,7 @@ export const loginC = async (req, res) => {
         return res.json({ 
             message: "Inicio de sesión exitoso. Si había una sesión activa, ha sido cerrada.", 
             token,
-            user: { id: user.id, usuario: user.usuario } 
+            user: { id: user.id, usuario: user.usuario, sesionactiva:user.sesionactiva} 
         });
     } catch (error) {
         console.error("Error en login: ", error);

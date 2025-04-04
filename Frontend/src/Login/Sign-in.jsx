@@ -57,31 +57,49 @@ export default function Login() {
       );
 
       if (response.status === 200) {
-        const { id, usuario } = response.data.user;
+        const { id, usuario, sesionactiva } = response.data.user;
         const { token, message } = response.data;
-        // Guarda el usuario en el contexto global
-        setUser({ id, usuario }); // Añadimos flag
 
-        // Guarda en localStorage
+        // Si la sesión ya está activa, mostrar alerta y cerrar otras sesiones
+        if (sesionactiva) {
+          await Swal.fire({
+            icon: 'info',
+            title: 'Inicio de sesión',
+            text: message,
+            confirmButtonText: 'OK'
+          });
+
+          // Cerrar otras sesiones llamando al endpoint de logout
+          await axios.put(`${process.env.REACT_APP_API_URL}/logout/${id}`);
+        }
+
+        // Guardar el usuario en el contexto global
+        setUser({ id, usuario, sesionactiva: true }); // Forzar a true porque ahora es la sesión activa
+
+        // Guardar en localStorage
         localStorage.setItem("user", JSON.stringify({
           id,
           usuario,
         }));
-        // Guarda el token en localStorage
         localStorage.setItem("token", token);
-        Swal.fire({
-          icon: 'info',
-          title: 'Inicio de sesión',
-          text: message
-        });
 
-        // Indica que la sesión está activa
+        // Mostrar mensaje de éxito (si no es caso de sesión activa)
+        if (!sesionactiva) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Inicio de sesión',
+            text: message
+          });
+        }
+
+        // Indicar que la sesión está activa
         sessionStorage.setItem("isAuthenticated", "true");
 
-        // Redirige al dashboard
+        // Redirigir al dashboard
         navigate("/dashboard");
       }
     } catch (error) {
+      // Manejo de errores existente...
       if (error.response) {
         if (error.response.status === 401) {
           Swal.fire({
@@ -91,10 +109,8 @@ export default function Login() {
             timer: 6000,
           });
         } else if (error.response.status === 402) {
+          const { id, usuario } = error.response.data.user;
 
-          const { id, usuario } = error.response.data.user; // Asume que el backend envía estos datos
-
-          // Guarda el usuario marcando que requiere cambio de contraseña
           setUser({ id, usuario, changePasswordRequired: true });
 
           localStorage.setItem("user", JSON.stringify({
@@ -105,7 +121,6 @@ export default function Login() {
 
           sessionStorage.setItem("isAuthenticated", "true");
 
-          // Redirige al dashboard igualmente
           navigate("/dashboard");
         } else {
           alert("Error en la autenticación. Inténtelo de nuevo.");
