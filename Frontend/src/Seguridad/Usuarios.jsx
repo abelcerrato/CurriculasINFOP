@@ -4,12 +4,15 @@ import Swal from 'sweetalert2';
 import { useUser } from "../Components/UserContext";
 import { color } from '../Components/style/Color';
 import Dashboard from '../Dashboard/Dashboard';
+import PasswordOutlinedIcon from '@mui/icons-material/PasswordOutlined';
+
+
 
 // Material-UI
 import {
     Paper, Box, Typography, TextField, Button, IconButton,
     FormControl, Select, MenuItem, Dialog, DialogTitle,
-    DialogContent, DialogActions, InputLabel
+    DialogContent, DialogActions, InputLabel, Tooltip
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
@@ -91,6 +94,7 @@ const DataTable = () => {
                 nombre: item.nombre,
                 cecap: item.cecap,
                 correo: item.correo,
+                idrol: item.idrol,
                 rol: item.rol,
                 iddepartamento: item.iddepartamento,
                 idmunicipio: item.idmunicipio,
@@ -235,12 +239,25 @@ const DataTable = () => {
             field: 'actions',
             headerName: 'Acción',
             renderCell: (params) => (
-                <IconButton
-                    onClick={() => handleEditClick(params.id)}
-                    sx={{ color: color.azul }}
-                >
-                    <EditIcon />
-                </IconButton>
+                <>
+                    <Tooltip title="Editar" arrow>
+                        <IconButton
+                            onClick={() => handleEditClick(params.id)}
+                            sx={{ color: color.azul }}
+                        >
+                            <EditIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Restablecer Contraseña" arrow>
+                        <IconButton
+                            onClick={() => handleResetearContra()}
+                            sx={{ color: color.azul }}
+                        >
+                            <PasswordOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>
+                </>
+
             ),
         },
         { field: 'id', headerName: 'ID' },
@@ -249,11 +266,28 @@ const DataTable = () => {
         { field: 'correo', headerName: 'Correo Electrónico', width: 250 },
         { field: 'usuario', headerName: 'Usuario' },
         { field: 'contraseña', headerName: 'Contraseña' },
-        { field: 'idrol', headerName: 'Rol' }, { field: 'departamento', headerName: 'Departamento de Residencia', width: 250 },
+        { field: 'rol', headerName: 'Rol' },
+        { field: 'departamento', headerName: 'Departamento de Residencia', width: 250 },
         { field: 'municipio', headerName: 'Municipio de Residencia', width: 250 },
         { field: 'estado', headerName: 'Estado' },
     ];
 
+    const handleResetearContra = async () => {
+        try {
+
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/putPassword/${user.usuario}`);
+
+            Swal.fire({
+                title: "Contraseña Restablecida",
+                text: "La contraseña ha sido restablecida exitosamente a Temporal1*.",
+                icon: "success",
+                timer: 6000,
+            });
+        } catch (error) {
+            console.error('Error al restablecer la contraseña:', error);
+
+        }
+    };
     return (
         <Dashboard>
             <Box component={Paper} sx={{ p: 5 }}>
@@ -287,9 +321,9 @@ const DataTable = () => {
                 />
 
                 {/* Modal para edición/creación */}
-                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md" fullWidth>
-                    <DialogTitle>
-                        {isAdding ? 'Nuevo Usuario' : 'Editar Usuario'}
+                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+                    <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
+                        {isAdding ? 'Nuevo Usuario' : 'Actualizar Usuario'}
                     </DialogTitle>
                     <DialogContent dividers>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 5 }}>
@@ -326,7 +360,7 @@ const DataTable = () => {
                                 fullWidth
                                 variant="standard"
                             />
-                            <TextField
+                            {/*   <TextField
                                 label="Contraseña"
                                 name="contraseña"
                                 type="password"
@@ -334,7 +368,7 @@ const DataTable = () => {
                                 onChange={handleEditRowChange}
                                 fullWidth
                                 variant="standard"
-                            />
+                            /> */}
                             <FormControl fullWidth variant="standard">
                                 <InputLabel id="demo-simple-select-label">Rol</InputLabel>
                                 <Select
@@ -403,7 +437,7 @@ const DataTable = () => {
                         <Button onClick={handleCloseModal} color="error">
                             Cancelar
                         </Button>
-                        <Button onClick={handleSaveClick} color="primary" variant="contained">
+                        <Button onClick={handleSaveClick} sx={{ background: color.azul }} variant="contained">
                             Guardar
                         </Button>
                     </DialogActions>

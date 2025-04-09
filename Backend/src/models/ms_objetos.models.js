@@ -9,9 +9,9 @@ export const getObjetosM = async () => {
             muc.nombre as creadopor, mso.fechacreacion, mum.nombre as modificadopor, 
             mso.fechamodificacion 
         FROM ms_objetos mso
-        inner join ms_modulos mm  on mso.idmodulo = mm.id 
-        inner join ms_usuarios muc on mso.creadopor = muc.id 
-        inner join ms_usuarios mum on mso.modificadopor = mum.id 
+        left join ms_modulos mm  on mso.idmodulo = mm.id 
+        left join ms_usuarios muc on mso.creadopor = muc.id 
+        left join ms_usuarios mum on mso.modificadopor = mum.id 
         order by mso.id asc`)
         console.log(rows);
         return rows;

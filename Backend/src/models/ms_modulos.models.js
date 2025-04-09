@@ -6,8 +6,8 @@ export const getModulosM = async () => {
         SELECT
             mm.id,mm. modulo, mm.descripcion, muc.nombre as creadopor, mm.fechacreacion, mum.nombre as modificadopor, mm.fechamodificacion 
         FROM ms_modulos mm
-        inner join ms_usuarios muc on mm.creadopor = muc.id 
-        inner join ms_usuarios mum on mm.modificadopor = mum.id
+        left join ms_usuarios muc on mm.creadopor = muc.id 
+        left join ms_usuarios mum on mm.modificadopor = mum.id
         order by mm.id asc`)
         console.log(rows);
         return rows;

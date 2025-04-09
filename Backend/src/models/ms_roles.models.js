@@ -6,8 +6,8 @@ export const getRolesM = async () => {
         SELECT 
             r.id, r.rol, r.estado, r.descripcion,  muc.nombre as creadopor, r.fechacreacion, mum.nombre as modificadopor, r.fechamodificacion
         from ms_roles as r
-        inner join ms_usuarios muc on r.creadopor = muc.id 
-        inner join ms_usuarios mum on r.modificadopor = mum.id
+        left join ms_usuarios muc on r.creadopor = muc.id 
+        left join ms_usuarios mum on r.modificadopor = mum.id
         order by r.id asc`)
         console.log(rows);
         return rows;

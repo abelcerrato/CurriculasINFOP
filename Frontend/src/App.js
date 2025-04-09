@@ -10,7 +10,11 @@ import Etnias from './Mantenimientos/Etnias';
 import TipoEducador from './Mantenimientos/TipoEducador';
 import AreasFormacion from './Mantenimientos/AreasFormacion';
 import Disacapacidad from './Mantenimientos/Discapacidades';
+import NivelesAcadémicos from './Mantenimientos/NivelesAcademicos';
+import GradosAcademicos from './Mantenimientos/GradosAcademicos';
 import Usuarios from './Seguridad/Usuarios';
+import RolesyPermisos from './Seguridad/RolesyPermisos';
+
 import { UserProvider } from './Components/UserContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -89,8 +93,12 @@ function App() {
             <Route path="/Mantenimiento/Tipo-Educador" element={<TipoEducador />} />
             <Route path="/Mantenimiento/Área-Formación" element={<AreasFormacion />} />
             <Route path="/Mantenimiento/Discapacidades" element={<Disacapacidad />} />
+            <Route path="/Mantenimiento/Niveles-Académicos" element={<NivelesAcadémicos />} />
+            <Route path="/Mantenimiento/Grados-Académicos" element={<GradosAcademicos />} />
             
-            <Route path="/Usuarios" element={<Usuarios />} />
+            {/* Seguridad */}
+            <Route path="/Seguridad/Usuarios" element={<Usuarios />} />
+            <Route path="/Seguridad/Roles-y-Permisos" element={<RolesyPermisos />} />
           </Route>
         </Routes>
       </BrowserRouter>

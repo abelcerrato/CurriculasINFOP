@@ -209,7 +209,7 @@ export const loginC = async (req, res) => {
       return res.status(403).json({ 
         message: "Debe cambiar su contraseña", 
         changePasswordRequired: true, 
-        user: { id: user.id, usuario: user.usuario } 
+        user: { id: user.id, usuario: user.usuario, idrol: user.idrol } 
       });
     }
 
@@ -218,7 +218,7 @@ export const loginC = async (req, res) => {
 
     //  Generar nuevo token
     const token = jwt.sign(
-      { id: user.id, usuario: user.usuario },
+      { id: user.id, usuario: user.usuario,idrol: user.idrol },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
@@ -238,6 +238,7 @@ export const loginC = async (req, res) => {
       user: {
         id: user.id,
         usuario: user.usuario,
+        idrol: user.idrol,
         sesionactiva: token
       },
       yaHabiaSesion 

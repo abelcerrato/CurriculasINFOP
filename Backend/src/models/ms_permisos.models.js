@@ -2,7 +2,7 @@ import { pool } from '../db.js'
 
 export const getPermisosM = async () => {
     try {
-        const { rows } = await pool.query(`
+       /*  const { rows } = await pool.query(`
         select
             p.id, p.idrol, mr.rol, p.idobjeto, mo.objeto, 
             p.consultar, p.insertar, p.actualizar, 
@@ -11,7 +11,32 @@ export const getPermisosM = async () => {
             left join ms_roles mr on p.idrol =mr.id 
             left join ms_objetos mo on p.idobjeto = mo.id 
             left join ms_usuarios muc on p.creadopor = muc.id 
-            left join ms_usuarios mum on p.modificadopor = mum.id `)
+            left join ms_usuarios mum on p.modificadopor = mum.id `) */
+
+ const { rows } = await pool.query(`
+SELECT 
+    mr.id AS idrol,
+    mr.descripcion,
+    mr.rol,
+    muc.nombre AS creadopor,
+    mr.estado,
+    json_agg(json_build_object(
+        'idobjeto', mo.id,
+        'objeto', mo.objeto,
+        'idmodulo', mm.id,
+        'modulo', mm.modulo,
+        'consultar', p.consultar,
+        'insertar', p.insertar,
+        'actualizar', p.actualizar
+    )) AS permisos
+FROM ms_permisos p
+LEFT JOIN ms_roles mr ON p.idrol = mr.id
+LEFT JOIN ms_objetos mo ON p.idobjeto = mo.id
+LEFT JOIN ms_modulos mm ON mo.idmodulo = mm.id
+LEFT JOIN ms_usuarios muc ON p.creadopor = muc.id
+GROUP BY mr.id, mr.rol, mr.estado, muc.nombre;
+
+ `)
         console.log(rows);
         return rows;
     } catch (error) {
@@ -25,7 +50,7 @@ export const getPermisosIdRolM = async (id) => {
     try {
         const { rows } = await pool.query(`
         select
-            p.id, p.idrol, mr.rol, p.idobjeto, mo.objeto, 
+            p.id, p.idrol, mr.rol, p.idobjeto, mo.objeto,mo.idmodulo, 
             p.consultar, p.insertar, p.actualizar, 
             muc.nombre as creadopor, p.fechacreacion, mum.nombre as modificadopor, p.fechamodificacion 
         FROM ms_permisos p
@@ -34,7 +59,7 @@ export const getPermisosIdRolM = async (id) => {
             left join ms_usuarios muc on p.creadopor = muc.id 
             left join ms_usuarios mum on p.modificadopor = mum.id 
         where 
-            p.idrol `, [id]);
+            p.idrol=$1 `, [id]);
         console.log('Resultado de la consulta de los permisos que tiene el Rol:', rows);
         return rows;
     } catch (error) {

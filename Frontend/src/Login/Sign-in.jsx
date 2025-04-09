@@ -19,7 +19,7 @@ import { useUser } from "../Components/UserContext"
 import { color } from "../Components/style/Color";
 
 export default function Login() {
-  const { setUser } = useUser();
+  const { setUser, setPermissions } = useUser();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -57,11 +57,11 @@ export default function Login() {
       );
 
       if (response.status === 200) {
-        const { id, usuario } = response.data.user;
+        const { id, usuario, idrol } = response.data.user;
         const { token, message, yaHabiaSesion } = response.data;
 
         // Guardar el usuario en el contexto global
-        setUser({ id, usuario });
+        setUser({ id, usuario, idrol });
 
         // Guardar en localStorage
         localStorage.setItem("user", JSON.stringify({
@@ -70,6 +70,27 @@ export default function Login() {
         }));
         localStorage.setItem("token", token);
 
+        const permisosResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/permisos/${idrol}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        if (permisosResponse.status === 200) {
+          const permisos = permisosResponse.data.map(p => ({
+            idobjeto: p.idobjeto,
+            objeto: p.objeto,
+            idmodulo: p.idmodulo,
+            consultar: p.consultar,
+            insertar: p.insertar,
+            actualizar: p.actualizar,
+          }));
+
+          setPermissions(permisos); // Guardar en contexto y localStorage
+        }
         // Mostrar mensaje de éxito (si no es caso de sesión activa)
         Swal.fire({
           icon: yaHabiaSesion ? 'info' : 'success',
@@ -125,7 +146,7 @@ export default function Login() {
   return (
 
     <Container
-      fixed
+
       sx={{
         display: "flex",
         justifyContent: "center",
@@ -133,11 +154,12 @@ export default function Login() {
         minHeight: "100vh",
         flexDirection: "column",
       }}
+      maxWidth="md"
     >
       <Grid
         container
         sx={{
-          minHeight: "50vh",
+          minHeight: "40vh",
           boxShadow: 3,
           borderRadius: 3,
           overflow: "hidden",
@@ -162,7 +184,6 @@ export default function Login() {
             onSubmit={handleSubmit}
             sx={{
               p: 3,
-              width: "70%",
               backgroundColor: "transparent",
               boxShadow: "none",
             }}
@@ -198,7 +219,7 @@ export default function Login() {
                   </InputAdornment>
                 ),
               }}
-              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "400px" }}
+              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "350px" }}
             />
 
             {/* Campo de contraseña */}
@@ -223,7 +244,7 @@ export default function Login() {
                   </InputAdornment>
                 ),
               }}
-              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "400px" }}
+              sx={{ backgroundColor: color.blanco, borderRadius: "10px", width: "350px" }}
             />
 
             {/* Enlace "Olvidé mi contraseña" */}
@@ -246,6 +267,8 @@ export default function Login() {
                 color: "#E53935",
                 fontWeight: "bold",
                 borderRadius: "30px",
+                justifyContent: "center",
+                alignItems: "center",
                 py: 1.5,
               }}
             >
@@ -282,12 +305,12 @@ export default function Login() {
           <img
             src={LogoDGDP}
             alt="Logo DGDP"
-            style={{ width: "90%", maxWidth: "400px", marginTop: "50px" }}
+            style={{ width: "90%", maxWidth: "300px", marginTop: "50px" }}
           />
           <img
             src={LogoCONED}
             alt="Logo CONED"
-            style={{ width: "90%", maxWidth: "400px" }}
+            style={{ width: "80%", maxWidth: "300px" }}
           />
         </Grid>
       </Grid>
