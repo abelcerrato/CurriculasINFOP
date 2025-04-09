@@ -14,6 +14,7 @@ import NivelesAcadémicos from './Mantenimientos/NivelesAcademicos';
 import GradosAcademicos from './Mantenimientos/GradosAcademicos';
 import Usuarios from './Seguridad/Usuarios';
 import RolesyPermisos from './Seguridad/RolesyPermisos';
+import Maestros from './Maestros/Maestros';
 
 import { UserProvider } from './Components/UserContext';
 import axios from 'axios';
@@ -84,7 +85,10 @@ function App() {
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            {/* Maestros */}
+            <Route path="/Maestros" element={<Maestros />} />
             
+            {/* Rutas de mantenimiento */}
             {/* Mantenimientos */}
             <Route path="/Mantenimiento/Departamentos" element={<Departamentos />} />
             <Route path="/Mantenimiento/Municipios" element={<Municipios />} />

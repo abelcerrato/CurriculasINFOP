@@ -7,12 +7,11 @@ import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
+import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -174,7 +173,7 @@ const DataTable = () => {
                             onClick={() => handleEditClick(params.id)}
                             sx={{ color: color.azul }}
                         >
-                            <EditIcon />
+                            <EditOutlinedIcon />
                         </IconButton>
                     );
                 }

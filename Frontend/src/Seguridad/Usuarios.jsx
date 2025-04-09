@@ -4,18 +4,18 @@ import Swal from 'sweetalert2';
 import { useUser } from "../Components/UserContext";
 import { color } from '../Components/style/Color';
 import Dashboard from '../Dashboard/Dashboard';
-import PasswordOutlinedIcon from '@mui/icons-material/PasswordOutlined';
-
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 
 
 // Material-UI
 import {
     Paper, Box, Typography, TextField, Button, IconButton,
     FormControl, Select, MenuItem, Dialog, DialogTitle,
-    DialogContent, DialogActions, InputLabel, Tooltip
+    DialogContent, DialogActions, InputLabel, Tooltip, Grid
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+
+import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
 
 
 const DataTable = () => {
@@ -245,7 +245,7 @@ const DataTable = () => {
                             onClick={() => handleEditClick(params.id)}
                             sx={{ color: color.azul }}
                         >
-                            <EditIcon />
+                            <EditOutlinedIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Restablecer Contraseña" arrow>
@@ -253,7 +253,7 @@ const DataTable = () => {
                             onClick={() => handleResetearContra()}
                             sx={{ color: color.azul }}
                         >
-                            <PasswordOutlinedIcon />
+                            <VpnKeyOutlinedIcon />
                         </IconButton>
                     </Tooltip>
                 </>
@@ -326,7 +326,7 @@ const DataTable = () => {
                         {isAdding ? 'Nuevo Usuario' : 'Actualizar Usuario'}
                     </DialogTitle>
                     <DialogContent dividers>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 5 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pl: 5, pr: 5 }}>
 
                             <TextField
                                 label="CECAP"
@@ -352,72 +352,74 @@ const DataTable = () => {
                                 fullWidth
                                 variant="standard"
                             />
-                            <TextField
-                                label="Usuario"
-                                name="usuario"
-                                value={editRowData.usuario || ''}
-                                onChange={handleEditRowChange}
-                                fullWidth
-                                variant="standard"
-                            />
-                            {/*   <TextField
-                                label="Contraseña"
-                                name="contraseña"
-                                type="password"
-                                value={editRowData.contraseña || ''}
-                                onChange={handleEditRowChange}
-                                fullWidth
-                                variant="standard"
-                            /> */}
-                            <FormControl fullWidth variant="standard">
-                                <InputLabel id="demo-simple-select-label">Rol</InputLabel>
-                                <Select
-                                    name="idrol"
-                                    value={editRowData.idrol || ''}
-                                    onChange={handleEditRowChange}
-                                    label="Departamento"
-                                >
-                                    <MenuItem value="">Seleccionar rol</MenuItem>
-                                    {roles.map(dep => (
-                                        <MenuItem key={dep.id} value={dep.id}>
-                                            {dep.rol}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth variant="standard">
-                                <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
-                                <Select
-                                    name="iddepartamento"
-                                    value={editRowData.iddepartamento || ''}
-                                    onChange={handleEditRowChange}
-                                    label="Departamento"
-                                >
-                                    <MenuItem value="">Seleccionar departamento</MenuItem>
-                                    {departamentos.map(dep => (
-                                        <MenuItem key={dep.id} value={dep.id}>
-                                            {dep.departamento}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth variant="standard">
-                                <InputLabel id="demo-simple-select-label">Municipio</InputLabel>
-                                <Select
-                                    name="idmunicipio"
-                                    value={editRowData.idmunicipio || ''}
-                                    onChange={handleEditRowChange}
-                                    label="Municipio"
-                                    disabled={!municipios.length}
-                                >
-                                    <MenuItem value="">Seleccionar municipio</MenuItem>
-                                    {municipios.map(muni => (
-                                        <MenuItem key={muni.id} value={muni.id}>
-                                            {muni.municipio}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Grid container spacing={5}>
+                                <Grid item size={6}>
+                                    <TextField
+                                        label="Usuario"
+                                        name="usuario"
+                                        value={editRowData.usuario || ''}
+                                        onChange={handleEditRowChange}
+                                        fullWidth
+                                        variant="standard"
+                                    />
+                                </Grid>
+                                <Grid item size={6}>
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel id="demo-simple-select-label">Rol</InputLabel>
+                                        <Select
+                                            name="idrol"
+                                            value={editRowData.idrol || ''}
+                                            onChange={handleEditRowChange}
+                                            label="Departamento"
+                                        >
+                                            <MenuItem value="">Seleccionar rol</MenuItem>
+                                            {roles.map(dep => (
+                                                <MenuItem key={dep.id} value={dep.id}>
+                                                    {dep.rol}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl></Grid>
+                            </Grid>
+
+                            <Grid container spacing={5}>
+                                <Grid item size={6}>
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
+                                        <Select
+                                            name="iddepartamento"
+                                            value={editRowData.iddepartamento || ''}
+                                            onChange={handleEditRowChange}
+                                            label="Departamento"
+                                        >
+                                            <MenuItem value="">Seleccionar departamento</MenuItem>
+                                            {departamentos.map(dep => (
+                                                <MenuItem key={dep.id} value={dep.id}>
+                                                    {dep.departamento}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl></Grid>
+
+                                <Grid item size={6}>
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel id="demo-simple-select-label">Municipio</InputLabel>
+                                        <Select
+                                            name="idmunicipio"
+                                            value={editRowData.idmunicipio || ''}
+                                            onChange={handleEditRowChange}
+                                            label="Municipio"
+                                            disabled={!municipios.length}
+                                        >
+                                            <MenuItem value="">Seleccionar municipio</MenuItem>
+                                            {municipios.map(muni => (
+                                                <MenuItem key={muni.id} value={muni.id}>
+                                                    {muni.municipio}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl></Grid>
+                            </Grid>
                             <FormControl fullWidth variant="standard">
                                 <InputLabel id="demo-simple-select-label">Estado</InputLabel>
                                 <Select

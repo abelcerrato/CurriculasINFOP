@@ -7,15 +7,13 @@ import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
-
+import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
 
 
 
@@ -139,7 +137,7 @@ const DataTable = () => {
                                     .azul
                             }}
                         >
-                            <EditIcon />
+                            <EditOutlinedIcon />
                         </IconButton>
                     );
                 }

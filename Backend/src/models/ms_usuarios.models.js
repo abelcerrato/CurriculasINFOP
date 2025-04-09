@@ -100,7 +100,7 @@ export const postUserM = async (nombre, cecap, usuario, correo, idrol, iddeparta
                                                 (nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña,
                                                 estado, creadopor, fechacreacion, fechamodificacion) 
                                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, null) RETURNING *`,
-            [nombre, cecap,usuario, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
+            [nombre, usuario,cecap, correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
 
         console.log(rows);
         return rows[0]
