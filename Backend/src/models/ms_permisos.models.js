@@ -45,7 +45,7 @@ export const getPermisosM = async () => {
 
 //Trae los permisos que se le han dado al rol
 export const getPermisosIdRolM = async (id) => {
-    console.log('Rol enviada:', id);
+    console.log('Rol enviado:', id);
     try {
         const { rows } = await pool.query(`
         select
@@ -70,7 +70,7 @@ export const getPermisosIdRolM = async (id) => {
 
 
 
-export const postPerfilPermisosM = async (rol, estado, descripcion, creadopor, permisos) => {
+export const postRolyPermisosM = async (rol, estado, descripcion, creadopor, permisos) => {
     // console.log(req.body);
     try {
         await pool.query('BEGIN');

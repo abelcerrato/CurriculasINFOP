@@ -1,4 +1,4 @@
-import { getPermisosIdRolM, getPermisosM, postPerfilPermisosM, putPerfilPermisosM } from "../models/ms_permisos.models.js";
+import { getPermisosIdRolM, getPermisosM, postRolyPermisosM, putPerfilPermisosM } from "../models/ms_permisos.models.js";
 
 export const getPermisosC = async (req, res) => {
     try {
@@ -30,7 +30,7 @@ export const getPermisosIdRolC = async (req, res) => {
 
 
 
-export const postPerfilPermisosC = async (req, res) => {
+export const postRolyPermisosC = async (req, res) => {
     const { rol, estado, descripcion, creadopor, permisos } = req.body;
     console.log(req.body);
     
@@ -39,7 +39,7 @@ export const postPerfilPermisosC = async (req, res) => {
             return res.status(400).json({ error: 'Faltan datos requeridos: rol, creadopor o permisos.' });
         }
 
-        const resultado = await postPerfilPermisosM(rol, estado, descripcion, creadopor, permisos);
+        const resultado = await postRolyPermisosM(rol, estado, descripcion, creadopor, permisos);
         res.status(201).json(resultado);
 
     } catch (error) {

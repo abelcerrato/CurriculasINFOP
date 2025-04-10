@@ -34,7 +34,7 @@ export const getEstudianteIdC = async (req, res) => {
 
 export const postEstudianteC = async (req, res) => {
     try {
-        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idetnia, telefono,
             estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
             iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
@@ -45,7 +45,7 @@ export const postEstudianteC = async (req, res) => {
         console.log(req.body);
 
 
-        const Estudiantes = await postEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+        const Estudiantes = await postEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idetnia, telefono,
             estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
             iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
@@ -82,7 +82,7 @@ export const postEstudianteC = async (req, res) => {
 export const putEstudianteC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+        const { identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idetnia, telefono,
             estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
             iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
@@ -92,7 +92,7 @@ export const putEstudianteC = async (req, res) => {
         console.log(req.body);
 
 
-        const Estudiantes = await putEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idednia, telefono,
+        const Estudiantes = await putEstudianteM(identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idetnia, telefono,
             estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
             iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
