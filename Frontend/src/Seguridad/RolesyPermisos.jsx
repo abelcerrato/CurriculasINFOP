@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import {
     KeyboardArrowDown, KeyboardArrowUp,
-    Add as AddIcon, Edit as EditIcon,
+    Add as AddIcon, Edit as EditOutlined,
     ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 import Swal from 'sweetalert2';
@@ -257,7 +257,7 @@ const DataTable = () => {
                             handleOpenModal(params.row);
                         }}
                     >
-                        <EditIcon />
+                        <EditOutlined />
                     </IconButton>
                     <IconButton
                         size="small"

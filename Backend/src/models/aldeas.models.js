@@ -22,7 +22,7 @@ export const getAldeasM = async () => {
 export const getAldeaIdM = async (id) => {
     console.log('Aldea enviada:', id);
     try {
-        const { rows } = await pool.query('SELECT aldea, idmunicipio FROM aldeas WHERE id=$1', [id]);
+        const { rows } = await pool.query('SELECT aldea, idmunicipio FROM aldeas WHERE idmunicipio=$1', [id]);
         console.log('Resultado de la consulta de la Aldea:', rows); 
         return rows;
     } catch (error) {

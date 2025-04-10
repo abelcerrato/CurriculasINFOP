@@ -3,7 +3,39 @@ import { pool } from '../db.js'
 
 export const getMaestrosM = async () => {
     try {
-        const { rows } = await pool.query('SELECT * from maestros')
+        const { rows } = await pool.query(`
+            SELECT 
+                m.id, 
+                m.nombre,
+                m.identificacion,
+                m.correo, 
+                TO_CHAR(m.fechanacimiento, 'DD/MM/YYYY') AS fechanacimiento,
+                m.telefono,
+                m.genero,
+                m.caserio,
+                m.direccion,
+                m.edad,
+                m.iddepartamento, 
+                d.departamento,
+                m.idmunicipio,
+                m2.municipio,
+                m.idaldea,
+                a.aldea,
+                m.idtipoeducador,
+                t.tipoeducador,
+                m.idniveleducativo,
+                na.nivelacademico as niveleducativo,
+                m.idgradoacademico,
+                g.gradoacademico
+
+                from maestros m  
+                left join departamentos d on m.iddepartamento = d.id
+                left join municipios m2 on m.idmunicipio = m2.id
+                left join aldeas a on m.idaldea = a.id
+                left join tipoeducador t on m.idtipoeducador = t.id
+                left join nivelesacademicos na on na.id = m.idniveleducativo
+                left join gradosacademicos g on m.idgradoacademico = g.id
+            `)
         console.log(rows);
         return rows;
     } catch (error) {

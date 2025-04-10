@@ -77,7 +77,7 @@ export const getGradoAcademicoIdNivelM = async (IdNivel) => {
     try {
         const { rows } = await pool.query(
             `SELECT 
-                ga.id as idgradoacademico, ga.gradoacademico, ga.idnivelacademico,  n.nivelacademico 
+                ga.id, ga.gradoacademico, ga.idnivelacademico,  n.nivelacademico 
             FROM gradosacademicos as ga
             INNER JOIN nivelesacademicos n ON ga.idnivelacademico = n.id 
             WHERE ga.idnivelacademico = $1
