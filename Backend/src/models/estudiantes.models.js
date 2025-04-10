@@ -24,7 +24,7 @@ export const getEstudiantesM = async (req, res) => {
             left join municipios muni on e.idmunicipio = muni.id
             left join aldeas ald on e.idaldea = ald.id 
             left join ms_usuarios muc on e.creadopor = muc.id 
-            left join ms_usuarios mum on e.modificadopor = mum.id from estudiantes
+            left join ms_usuarios mum on e.modificadopor = mum.id
             order by e.id desc`)
         console.log(rows);
         return rows;
