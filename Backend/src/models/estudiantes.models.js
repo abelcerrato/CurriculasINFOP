@@ -3,7 +3,7 @@ import { pool } from '../db.js'
 export const getEstudiantesM = async (req, res) => {
     try {
         const { rows } = await pool.query(`
-            SELECT e.id, e.identificacion, e.nombre, e.fechanacimiento, e.edad, e.genero, 
+            SELECT e.id, e.identificacion, e.nombre, TO_CHAR(e.fechanacimiento, 'DD/MM/YYYY') AS fechanacimiento, e.edad, e.genero, 
                 e.idnacionalidad, n.nacionalidad ,  e.idetnia, e2.etnia,
                 e.telefono, e.estadocivil, 
                 e.idniveleducativo, na.nivelacademico, e.idgradoacademico, g.gradoacademico,
@@ -38,7 +38,7 @@ export const getEstudianteIdM = async (id) => {
     console.log('Estudiante enviado:', id);
     try {
         const { rows } = await pool.query(`
-            SELECT e.id, e.identificacion, e.nombre, e.fechanacimiento, e.edad, e.genero, 
+            SELECT e.id, e.identificacion, e.nombre,  TO_CHAR(e.fechanacimiento, 'DD/MM/YYYY') AS fechanacimiento, e.edad, e.genero, 
                 e.idnacionalidad, n.nacionalidad ,  e.idetnia, e2.etnia,
                 e.telefono, e.estadocivil, 
                 e.idniveleducativo, na.nivelacademico, e.idgradoacademico, g.gradoacademico,
