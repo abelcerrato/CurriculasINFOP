@@ -2,41 +2,40 @@ import { pool } from '../db.js'
 
 export const getPermisosM = async () => {
     try {
-       /*  const { rows } = await pool.query(`
-        select
-            p.id, p.idrol, mr.rol, p.idobjeto, mo.objeto, 
-            p.consultar, p.insertar, p.actualizar, 
-            muc.nombre as creadopor, p.fechacreacion, mum.nombre as modificadopor, p.fechamodificacion 
-        FROM ms_permisos p
-            left join ms_roles mr on p.idrol =mr.id 
-            left join ms_objetos mo on p.idobjeto = mo.id 
-            left join ms_usuarios muc on p.creadopor = muc.id 
-            left join ms_usuarios mum on p.modificadopor = mum.id `) */
+        /*  const { rows } = await pool.query(`
+         select
+             p.id, p.idrol, mr.rol, p.idobjeto, mo.objeto, 
+             p.consultar, p.insertar, p.actualizar, 
+             muc.nombre as creadopor, p.fechacreacion, mum.nombre as modificadopor, p.fechamodificacion 
+         FROM ms_permisos p
+             left join ms_roles mr on p.idrol =mr.id 
+             left join ms_objetos mo on p.idobjeto = mo.id 
+             left join ms_usuarios muc on p.creadopor = muc.id 
+             left join ms_usuarios mum on p.modificadopor = mum.id `) */
 
- const { rows } = await pool.query(`
-SELECT 
-    mr.id AS idrol,
-    mr.descripcion,
-    mr.rol,
-    muc.nombre AS creadopor,
-    mr.estado,
-    json_agg(json_build_object(
-        'idobjeto', mo.id,
-        'objeto', mo.objeto,
-        'idmodulo', mm.id,
-        'modulo', mm.modulo,
-        'consultar', p.consultar,
-        'insertar', p.insertar,
-        'actualizar', p.actualizar
-    )) AS permisos
-FROM ms_permisos p
-LEFT JOIN ms_roles mr ON p.idrol = mr.id
-LEFT JOIN ms_objetos mo ON p.idobjeto = mo.id
-LEFT JOIN ms_modulos mm ON mo.idmodulo = mm.id
-LEFT JOIN ms_usuarios muc ON p.creadopor = muc.id
-GROUP BY mr.id, mr.rol, mr.estado, muc.nombre;
-
- `)
+        const { rows } = await pool.query(`
+                SELECT 
+                    mr.id AS idrol,
+                    mr.descripcion,
+                    mr.rol,
+                    muc.nombre AS creadopor,
+                    mr.estado,
+                    json_agg(json_build_object(
+                        'idobjeto', mo.id,
+                        'objeto', mo.objeto,
+                        'idmodulo', mm.id,
+                        'modulo', mm.modulo,
+                        'consultar', p.consultar,
+                        'insertar', p.insertar,
+                        'actualizar', p.actualizar
+                    )) AS permisos
+                FROM ms_permisos p
+                LEFT JOIN ms_roles mr ON p.idrol = mr.id
+                LEFT JOIN ms_objetos mo ON p.idobjeto = mo.id
+                LEFT JOIN ms_modulos mm ON mo.idmodulo = mm.id
+                LEFT JOIN ms_usuarios muc ON p.creadopor = muc.id
+                GROUP BY mr.id, mr.rol, mr.estado, muc.nombre;
+                `)
         console.log(rows);
         return rows;
     } catch (error) {
@@ -117,7 +116,7 @@ export const postPerfilPermisosM = async (rol, estado, descripcion, creadopor, p
 }
 
 
-export const putPerfilPermisosM = async (rol, estado, descripcion, modificadopor, permisos, idrol ) => {
+export const putPerfilPermisosM = async (rol, estado, descripcion, modificadopor, permisos, idrol) => {
     try {
         await pool.query('BEGIN');
         //insertar en roles

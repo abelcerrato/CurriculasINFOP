@@ -5,182 +5,182 @@ import jwt from "jsonwebtoken";
 import { getUserM, getUserIdM, postUserM, updateUserM, getUsuarioIdM, verificarUsuarioM, updateContraseñaM, resetContraseñaM } from "../models/ms_usuarios.models.js";
 
 export const getUserC = async (req, res) => {
-    try {
-        const users = await getUserM();
-        res.json(users)
-    } catch (error) {
-        console.error('Error al obtener usuarios:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
+  try {
+    const users = await getUserM();
+    res.json(users)
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 
 }
 
 export const getUsuarioIdC = async (req, res) => {
-    try {
-        const { usuario } = req.params
-        const users = await getUsuarioIdM(usuario);
+  try {
+    const { usuario } = req.params
+    const users = await getUsuarioIdM(usuario);
 
-        if (!users) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Retornar el ID del usuario (suponiendo que el resultado tiene un campo 'id')
-        res.json(users);
-    } catch (error) {
-        console.error('Error al obtener el usuario:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+    if (!users) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // Retornar el ID del usuario (suponiendo que el resultado tiene un campo 'id')
+    res.json(users);
+  } catch (error) {
+    console.error('Error al obtener el usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 }
 
 
 export const getUserIdC = async (req, res) => {
-    try {
-        const { id } = req.params
-        const users = await getUserIdM(id);
+  try {
+    const { id } = req.params
+    const users = await getUserIdM(id);
 
-        if (!users) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.json(users)
-    } catch (error) {
-        console.error('Error al obtener el usuario:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+    if (!users) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    res.json(users)
+  } catch (error) {
+    console.error('Error al obtener el usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 
 
 }
 
 
 export const verificarUsuarioC = async (req, res) => {
-    try {
-        const { usuario, contraseña } = req.body;
-        console.log(req.body);
+  try {
+    const { usuario, contraseña } = req.body;
+    console.log(req.body);
 
-        if (!usuario || !contraseña) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        }
-
-        const user = await verificarUsuarioM(usuario);
-
-
-        if (!user) {
-            console.log("Usuario o contraseña incorrectos");
-            return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
-        }
-
-
-        const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
-        if (!contraseñaValida) {
-            console.log("Usuario o contraseña incorrectos");
-            return res.status(401).json({ message: "Credenciales incorrectas" });
-        }
-
-
-        return res.json({
-            message: `Usuario autenticado. Su usuario es: ${user.nombre}`,
-            user: user
-        });
-
-    } catch (error) {
-        console.error("Error al verificar usuario:", error);
-        res.status(500).json({ error: "Error en el servidor" });
+    if (!usuario || !contraseña) {
+      console.log("Faltan datos en la solicitud");
+      return res.status(400).json({ error: "Faltan datos en la solicitud" });
     }
+
+    const user = await verificarUsuarioM(usuario);
+
+
+    if (!user) {
+      console.log("Usuario o contraseña incorrectos");
+      return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+    }
+
+
+    const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
+    if (!contraseñaValida) {
+      console.log("Usuario o contraseña incorrectos");
+      return res.status(401).json({ message: "Credenciales incorrectas" });
+    }
+
+
+    return res.json({
+      message: `Usuario autenticado. Su usuario es: ${user.nombre}`,
+      user: user
+    });
+
+  } catch (error) {
+    console.error("Error al verificar usuario:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
 };
 
 
 export const postUserC = async (req, res) => {
-    try {
-        const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor } = req.body
-        console.log(req.body);
+  try {
+    const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor } = req.body
+    console.log(req.body);
 
-        const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor)
-        //res.json(users)
-        res.json({ message: "Usuario Agregado Exitosamente", user: users });
-    } catch (error) {
-        console.error('Error al insertar el usuario:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
+    const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor)
+    //res.json(users)
+    res.json({ message: "Usuario Agregado Exitosamente", user: users });
+  } catch (error) {
+    console.error('Error al insertar el usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 }
 
 
 
 export const updateUserC = async (req, res) => {
 
-    try {
-        const { id } = req.params;
-        const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario } = req.body
+  try {
+    const { id } = req.params;
+    const { nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario } = req.body
 
-        const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario, id)
+    const users = await updateUserM(nombre, cecap, correo, idrol, iddepartamento, idmunicipio, estado, modificadopor, usuario, id)
 
-        res.json({ message: "Usuario Actualizado Exitosamente", user: users });
-    } catch (error) {
-        console.error('Error al actualizar el usuario: ', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
+    res.json({ message: "Usuario Actualizado Exitosamente", user: users });
+  } catch (error) {
+    console.error('Error al actualizar el usuario: ', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 }
 
 
 
 export const updateContraseñaC = async (req, res) => {
-    try {
-        console.log("Entro a la función de actualizar contraseña");
-        
-        const { usuario } = req.params;
-        const { nuevaContraseña } = req.body
+  try {
+    console.log("Entro a la función de actualizar contraseña");
 
-        const users = await updateContraseñaM(nuevaContraseña, usuario)
+    const { usuario } = req.params;
+    const { nuevaContraseña } = req.body
 
-        res.status(200).json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
-    } catch (error) {
-        console.error('Error al actualizar la contraseña del usuario: ', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
+    const users = await updateContraseñaM(nuevaContraseña, usuario)
+
+    res.status(200).json({ message: "Contraseña del Usuario Actualizada Exitosamente", user: users });
+  } catch (error) {
+    console.error('Error al actualizar la contraseña del usuario: ', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 }
 
 
 
 export const resetContraseñaUserC = async (req, res) => {
-    try {
-        const { usuario } = req.params;
+  try {
+    const { usuario } = req.params;
 
-        const usuarioActualizado = await resetContraseñaM(usuario);
+    const usuarioActualizado = await resetContraseñaM(usuario);
 
-        res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1*'.", user: usuarioActualizado });
-    } catch (error) {
-        console.error("Error al resetear la contraseña del usuario: ", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
+    res.json({ message: "Contraseña reseteada con éxito. Se asignó 'Temporal1*'.", user: usuarioActualizado });
+  } catch (error) {
+    console.error("Error al resetear la contraseña del usuario: ", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 };
 
 export const verificarToken = async (req, res) => {
-    const token = req.headers.authorization?.split(" ")[1];
-  
-    if (!token) {
-      return res.status(401).json({ valid: false, message: "Token no proporcionado" });
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ valid: false, message: "Token no proporcionado" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const result = await pool.query(
+      'SELECT sesionactiva FROM ms_usuarios WHERE id = $1',
+      [decoded.id]
+    );
+
+    const storedToken = result.rows[0]?.sesionactiva;
+
+    if (storedToken !== token) {
+      return res.status(403).json({ valid: false, message: "Sesión inválida o cerrada en otro lugar" });
     }
-  
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
-      const result = await pool.query(
-        'SELECT sesionactiva FROM ms_usuarios WHERE id = $1',
-        [decoded.id]
-      );
-  
-      const storedToken = result.rows[0]?.sesionactiva;
-  
-      if (storedToken !== token) {
-        return res.status(403).json({ valid: false, message: "Sesión inválida o cerrada en otro lugar" });
-      }
-  
-      return res.json({ valid: true });
-    } catch (err) {
-      return res.status(401).json({ valid: false, message: "Token inválido o expirado" });
-    }
-  };
-  
+
+    return res.json({ valid: true });
+  } catch (err) {
+    return res.status(401).json({ valid: false, message: "Token inválido o expirado" });
+  }
+};
+
 
 // Controlador para el login
 export const loginC = async (req, res) => {
@@ -202,14 +202,21 @@ export const loginC = async (req, res) => {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    const contraseñaNuevoUsuario = await bcrypt.compare("NuevoUsuario1*", user.contraseña);
+    // const contraseñaNuevoUsuario = await bcrypt.compare("NuevoUsuario1*", user.contraseña);
     const contraseñaTemporal = await bcrypt.compare("Temporal1*", user.contraseña);
 
-    if (contraseñaNuevoUsuario || contraseñaTemporal) {
-      return res.status(403).json({ 
-        message: "Debe cambiar su contraseña", 
-        changePasswordRequired: true, 
-        user: { id: user.id, usuario: user.usuario, idrol: user.idrol } 
+
+    const requiereCambio = user.cambiocontraseña === true || contraseñaTemporal;
+
+    if (requiereCambio) {
+      return res.status(403).json({
+        message: "Debe cambiar su contraseña",
+        changePasswordRequired: user.cambiocontraseña,
+        user: {
+          id: user.id,
+          usuario: user.usuario,
+          idrol: user.idrol
+        }
       });
     }
 
@@ -218,7 +225,7 @@ export const loginC = async (req, res) => {
 
     //  Generar nuevo token
     const token = jwt.sign(
-      { id: user.id, usuario: user.usuario,idrol: user.idrol },
+      { id: user.id, usuario: user.usuario, idrol: user.idrol },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
@@ -241,7 +248,7 @@ export const loginC = async (req, res) => {
         idrol: user.idrol,
         sesionactiva: token
       },
-      yaHabiaSesion 
+      yaHabiaSesion
     });
 
   } catch (error) {
@@ -252,16 +259,16 @@ export const loginC = async (req, res) => {
 
 
 export const logoutC = async (req, res) => {
-    try {
-        const { id } = req.params;
-        console.log("ID del usuario que quiere cerrar sesión: ", id);
+  try {
+    const { id } = req.params;
+    console.log("ID del usuario que quiere cerrar sesión: ", id);
 
-        // Cerrar sesión del usuario (poner sesionactiva a false)
-        await pool.query('UPDATE ms_usuarios SET sesionactiva = null WHERE id = $1', [id]);
+    // Cerrar sesión del usuario (poner sesionactiva a false)
+    await pool.query('UPDATE ms_usuarios SET sesionactiva = null WHERE id = $1', [id]);
 
-        return res.json({ message: "Sesión cerrada exitosamente." });
-    } catch (error) {
-        console.error("Error al cerrar sesión: ", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
+    return res.json({ message: "Sesión cerrada exitosamente." });
+  } catch (error) {
+    console.error("Error al cerrar sesión: ", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 };
