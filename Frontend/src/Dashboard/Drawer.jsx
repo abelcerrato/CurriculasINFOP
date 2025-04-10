@@ -10,12 +10,14 @@ import {
   Menu,
   MenuItem as MuiMenuItem,
 } from "@mui/material";
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import LocalLibraryOutlinedIcon from "@mui/icons-material/LocalLibraryOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import Groups3OutlinedIcon from '@mui/icons-material/Groups3Outlined';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 import RoomOutlinedIcon from '@mui/icons-material/RoomOutlined';
 import SignpostOutlinedIcon from '@mui/icons-material/SignpostOutlined';
@@ -34,7 +36,18 @@ import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlin
 
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import { useUser } from "../Components/UserContext";
-
+import { color } from "../Components/style/Color";
+import { styled } from '@mui/material/styles';
+const LightTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.white,
+    color: color.rojo,
+    boxShadow: theme.shadows[1],
+    fontSize: 15,
+  },
+}));
 
 
 
@@ -197,14 +210,35 @@ const ProjectDrawer = ({ open }) => {
       </List>
 
       {open && <Divider />}
+      {/* Instructores */}
+      <List>
+
+        <LightTooltip title="Instructores" placement="right" disableHoverListener={open} >
+          <div>
+            <MenuItem
+              path="/Instructores"
+              icon={<LocalLibraryOutlinedIcon />}
+              text="Instructores"
+              onClick={() => navigate("/Instructores")}
+            />
+          </div>
+        </LightTooltip >
+
+      </List>
+
+      {open && <Divider />}
       {/* Maestros */}
       <List>
-        <MenuItem
-          path="/Maestros"
-          icon={<LocalLibraryOutlinedIcon />}
-          text="Maestros"
-          onClick={() => navigate("/Maestros")}
-        />
+        <LightTooltip title="Estudiantes" placement="right" disableHoverListener={open}>
+          <div>
+            <MenuItem
+              path="/Estudiantes"
+              icon={<Groups3OutlinedIcon />}
+              text="Estudiantes"
+              onClick={() => navigate("/Estudiantes")}
+            />
+          </div>
+        </LightTooltip>
       </List>
 
       {tienePermisosModulo(1) && (
@@ -252,54 +286,54 @@ const ProjectDrawer = ({ open }) => {
                       onClick={() => navigate("/Mantenimiento/Aldeas")}
                     />
                   )}
-                  {tienePermiso(4) && (
-                    <MenuItem
-                      path="/Mantenimiento/Etnias"
-                      icon={<Diversity2OutlinedIcon />}
-                      text="Etnias"
-                      onClick={() => navigate("/Mantenimiento/Etnias")}
-                    />
-                  )}
-                  {tienePermiso(5) && (
-                    <MenuItem
-                      path="/Mantenimiento/Tipo-Educador"
-                      icon={<Groups2OutlinedIcon />}
-                      text="Tipo Educador"
-                      onClick={() => navigate("/Mantenimiento/Tipo-Educador")}
-                    />
-                  )}
-                  {tienePermiso(6) && (
-                    <MenuItem
-                      path="/Mantenimiento/Área-Formación"
-                      icon={<SchemaOutlinedIcon />}
-                      text="Áreas de Formación"
-                      onClick={() => navigate("/Mantenimiento/Área-Formación")}
-                    />
-                  )}
-                  {tienePermiso(7) && (
-                    <MenuItem
-                      path="/Mantenimiento/Discapacidades"
-                      icon={<BlindOutlinedIcon />}
-                      text="Discapacidades"
-                      onClick={() => navigate("/Mantenimiento/Discapacidades")}
-                    />
-                  )}
-                  {tienePermiso(8) && (
-                    <MenuItem
-                      path="/Mantenimiento/Niveles-Académicos"
-                      icon={<AutoStoriesIcon />}
-                      text="Niveles Académicos"
-                      onClick={() => navigate("/Mantenimiento/Niveles-Académicos")}
-                    />
-                  )}
-                  {tienePermiso(9) && (
-                    <MenuItem
-                      path="/Mantenimiento/Grados-Académicos"
-                      icon={<ImportContactsOutlinedIcon />}
-                      text="Grados Académicos"
-                      onClick={() => navigate("/Mantenimiento/Grados-Académicos")}
-                    />
-                  )}
+
+                  <MenuItem
+                    path="/Mantenimiento/Etnias"
+                    icon={<Diversity2OutlinedIcon />}
+                    text="Etnias"
+                    onClick={() => navigate("/Mantenimiento/Etnias")}
+                  />
+
+
+                  <MenuItem
+                    path="/Mantenimiento/Tipo-Educador"
+                    icon={<Groups2OutlinedIcon />}
+                    text="Tipo Educador"
+                    onClick={() => navigate("/Mantenimiento/Tipo-Educador")}
+                  />
+
+
+                  <MenuItem
+                    path="/Mantenimiento/Área-Formación"
+                    icon={<SchemaOutlinedIcon />}
+                    text="Áreas de Formación"
+                    onClick={() => navigate("/Mantenimiento/Área-Formación")}
+                  />
+
+
+                  <MenuItem
+                    path="/Mantenimiento/Discapacidades"
+                    icon={<BlindOutlinedIcon />}
+                    text="Discapacidades"
+                    onClick={() => navigate("/Mantenimiento/Discapacidades")}
+                  />
+
+
+                  <MenuItem
+                    path="/Mantenimiento/Niveles-Académicos"
+                    icon={<AutoStoriesIcon />}
+                    text="Niveles Académicos"
+                    onClick={() => navigate("/Mantenimiento/Niveles-Académicos")}
+                  />
+
+
+                  <MenuItem
+                    path="/Mantenimiento/Grados-Académicos"
+                    icon={<ImportContactsOutlinedIcon />}
+                    text="Grados Académicos"
+                    onClick={() => navigate("/Mantenimiento/Grados-Académicos")}
+                  />
+
                 </List>
               </Collapse>
             )}
@@ -319,8 +353,8 @@ const ProjectDrawer = ({ open }) => {
               }}
               PaperProps={{
                 sx: {
-                  marginTop: 27,
-                  ml: 8,
+                  marginTop: 35,
+                  ml: 10,
                   boxShadow: 3,
                   minWidth: 200,
                 },
@@ -537,8 +571,8 @@ const ProjectDrawer = ({ open }) => {
           }}
           PaperProps={{
             sx: {
-              marginTop: 35,
-              ml: 8,
+              marginTop: 43,
+              ml: 10,
               boxShadow: 3,
               minWidth: 200,
             },
