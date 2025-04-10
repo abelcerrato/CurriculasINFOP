@@ -92,10 +92,10 @@ export const verificarUsuarioC = async (req, res) => {
 
 export const postUserC = async (req, res) => {
   try {
-    const { nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor } = req.body
+    const { nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, estado, creadopor } = req.body
     console.log(req.body);
 
-    const users = await postUserM(nombre, cecap, usuario, correo, idrol, iddepartamento, idmunicipio, estado, creadopor)
+    const users = await postUserM(nombre, usuario, cecap, correo, idrol, iddepartamento, idmunicipio, estado, creadopor)
     //res.json(users)
     res.json({ message: "Usuario Agregado Exitosamente", user: users });
   } catch (error) {

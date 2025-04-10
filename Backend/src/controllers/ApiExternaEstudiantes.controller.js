@@ -3,54 +3,53 @@ import bcrypt from 'bcrypt'; // Para cifrar contraseñas
 import jwt from "jsonwebtoken";
 import { verificarUsuarioM } from '../models/ms_usuarios.models.js';
 import { getPermisosUsuarioM } from '../models/ApiExternaEstudiantes.models.js';
-import { postEstudianteM } from '../models/estudiantes.models.js';
+import { postEstudianteC, postEstudianteExternoC } from './estudiantes.controller.js';
+import { postEducacionNoFormalM, postEstudianteM } from '../models/estudiantes.models.js';
 
 
 
-export const verificarUsuarioC = async (req, res) => {
+export const verificarUsuarioC = async (usuario, contraseña) => {
     try {
-        const { usuario, contraseña } = req.body;
-        console.log(req.body);
-
         if (!usuario || !contraseña) {
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
+            return { existe: false, error: "Faltan datos en la solicitud" };
         }
 
         const user = await verificarUsuarioM(usuario);
-
         if (!user) {
             console.log("Usuario o contraseña incorrectos");
-            return res.json({ existe: false });  // usuario no encontrado
+            return { existe: false, error: "Usuario o contraseña incorrectos" };
         }
 
         const contraseñaValida = await bcrypt.compare(contraseña, user.contraseña);
         if (!contraseñaValida) {
             console.log("Usuario o contraseña incorrectos");
-            return res.json({ existe: false });  // contraseña incorrecta
+            return { existe: false, error: "Usuario o contraseña incorrectos" };
         }
 
         console.log("Usuario autenticado. Bienvenido: ", user.nombre);
-        return res.json({ existe: true });  // usuario y contraseña válidos
+        return { existe: true, user };
 
     } catch (error) {
         console.error("Error al verificar usuario:", error);
-        res.status(500).json({ error: "Error en el servidor" });
+        return { existe: false, error: "Error en el servidor" };
     }
 };
 
 
 
+
 //permisos que tiene el usuario
-export const getPermisosUsuarioC = async (req, res) => {
+export const getPermisosUsuarioC = async (usuario) => {
+    //const { usuario } = req.body;
+
     try {
-        const { usuario } = req.body;
         const permisos = await getPermisosUsuarioM(usuario);
 
         if (!permisos || permisos.length === 0) {
-            return res.status(404).json({ message: "Permisos no encontrados" });
+            return { ok: false, error: "Permisos no encontrados" };
         }
 
-        const permisosUsuario = permisos[0].permisos; // array de permisos agregados por json_agg
+        const permisosUsuario = permisos[0].permisos;
 
         const puedeInsertarEstudiantes = permisosUsuario.some(p =>
             p.objeto === "Estudiantes" &&
@@ -58,34 +57,48 @@ export const getPermisosUsuarioC = async (req, res) => {
             p.insertar === true
         );
 
-        if (puedeInsertarEstudiantes) {
-            return res.json({
-                message: "El usuario tiene permisos para insertar estudiantes.",
-                puedeInsertar: true
-            });
-        } else {
-            return res.json({
-                message: "El usuario NO tiene permisos para insertar estudiantes.",
-                puedeInsertar: false
-            });
-        }
+        return ({
+            ok: true,
+            puedeInsertar: puedeInsertarEstudiantes,
+            permisos: permisosUsuario // útil para frontend si quieres mostrar opciones
+        });
 
     } catch (error) {
         console.error('Error al obtener los permisos del usuario: ', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        return { ok: false, error: 'Error interno del servidor' };
     }
-}
+};
 
 
 
 
 
 const tipoDeDato = (valor, tipo) => {
+    // Permitir valores nulos o vacíos (excepto para tipos obligatorios si así lo defines más adelante)
+    if (valor === null || valor === undefined) {
+        return null;
+    }
+
     if (tipo === 'date') {
-        // Validar que el valor sea una fecha válida
-        const fecha = new Date(valor);
+        const regexFecha = /^(\d{4})-(\d{2})-(\d{2})$/;
+        const match = valor.match(regexFecha);
+        if (!match) {
+            return `El campo ${valor} no tiene el formato correcto (yyyy-mm-dd).`;
+        }
+
+        const [_, anio, mes, dia ] = match;
+        const fecha = new Date(`${anio}-${mes}-${dia}`);
+
         if (isNaN(fecha.getTime())) {
             return `El campo ${valor} no es una fecha válida.`;
+        }
+
+        return null;
+    }
+
+    if (tipo === 'number') {
+        if (isNaN(Number(valor))) {
+            return `El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`;
         }
         return null;
     }
@@ -93,100 +106,169 @@ const tipoDeDato = (valor, tipo) => {
     if (typeof valor !== tipo) {
         return `El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`;
     }
+
     return null;
 };
 
 
 
-export const procesarEstudiantes = async (req, res) => {
-    const { usuario, contraseña } = req.body;
-    const { estudiantes } = req.body;
 
-    // Verificar que el usuario y contraseña sean válidos
-    const usuarioValido = await verificarUsuarioC(req, res);
-    if (!usuarioValido) {
+export const procesarEstudiantes = async (req, res) => {
+    const { usuario, contraseña, estudiantes } = req.body;
+
+    if (!usuario || !contraseña || !Array.isArray(estudiantes)) {
+        return res.status(400).json({ error: 'Faltan datos en la solicitud o el formato de estudiantes no es válido' });
+    }
+
+    // Verificar usuario
+    const usuarioValido = await verificarUsuarioC(usuario, contraseña);
+    if (!usuarioValido?.existe) {
         return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
 
-    // Verificar los permisos del usuario
-    const permisosValidados = await getPermisosUsuarioC(req, res);
-    if (!permisosValidados.puedeInsertar) {
-        return res.status(403).json({ error: 'El usuario no tiene permisos para insertar estudiantes' });
+    // Verificar permisos
+    const permisosValidados = await getPermisosUsuarioC(usuario);
+    if (!permisosValidados.ok || !permisosValidados.puedeInsertar) {
+        return res.status(403).json({ error: permisosValidados.error || 'El usuario no tiene permisos para insertar estudiantes' });
     }
 
-    // Si la validación y permisos son correctos, continuar con la transacción
-    const client = await pool.connect();  // Obtén el cliente para manejar la transacción
+    const client = await pool.connect();
 
     try {
-        await client.query('BEGIN');  // Inicia la transacción
+        await client.query('BEGIN');
 
         for (const estudiante of estudiantes) {
-            let errorMessage = null;
+            console.log('Procesando estudiante:', estudiante);
 
-            // Validación de todos los campos
-            const campos = [
-                { campo: 'identificacion', tipo: 'string' },
-                { campo: 'nombre', tipo: 'string' },
-                { campo: 'fechanacimiento', tipo: 'date' },
-                { campo: 'edad', tipo: 'number' },
-                { campo: 'genero', tipo: 'string' },
-                { campo: 'idnacionalidad', tipo: 'number' },
-                { campo: 'idetnia', tipo: 'number' },
-                { campo: 'telefono', tipo: 'string' },
-                { campo: 'estadocivil', tipo: 'string' },
-                { campo: 'idniveleducativo', tipo: 'number' },
-                { campo: 'idgradoacademico', tipo: 'number' },
-                { campo: 'estudianoformal', tipo: 'number' },
-                { campo: 'trabajaactualmente', tipo: 'number' },
-                { campo: 'iddiscapacidad', tipo: 'number' },
-                { campo: 'detallediscapacidad', tipo: 'string' },
-                { campo: 'iddepartamento', tipo: 'number' },
-                { campo: 'idmunicipio', tipo: 'number' },
-                { campo: 'idaldea', tipo: 'number' },
-                { campo: 'caserio', tipo: 'string' },
-                { campo: 'direccion', tipo: 'string' },
-                { campo: 'sabecomputacion', tipo: 'string' },
-                { campo: 'manejaprogramas', tipo: 'string' },
-                { campo: 'dispositivostecnologicos', tipo: 'string' },
-                { campo: 'plataformasvirtuales', tipo: 'string' },
-                { campo: 'estudioencasa', tipo: 'number' },
-                { campo: 'pasarsindistraccion', tipo: 'number' },
-                { campo: 'migranteretornado', tipo: 'number' },
-                { campo: 'motivomigracion', tipo: 'string' },
-                { campo: 'otromotivomigracion', tipo: 'string' },
-                { campo: 'llegousa', tipo: 'string' },
-                { campo: 'familiarmigranteretornado', tipo: 'string' },
-                { campo: 'miembrosalioynoregreso', tipo: 'string' },
-                { campo: 'volveriaamigrar', tipo: 'string' }
-            ];
+            // Validar campos obligatorios y corregir nombres
+            const camposRequeridos = {
+                identificacion: 'string',
+                nombre: 'string',
+                fechanacimiento: 'date',
+                edad: 'number',
+                genero: 'string',
+                //idnacionalidad: 'number',
+                //idetnia: 'number',  // Nombre correcto del campo
+                //idniveleducativo: 'number',
+                //idgradoacademico: 'number',
+                estudianoformal: 'number',
+                trabajaactualmente: 'number',
+                //iddepartamento: 'number',
+                //idmunicipio: 'number',
+                //idaldea: 'number',
+                //direccion: 'string',
+                sabecomputacion: 'string',
+                manejaprogramas: 'string',
+                dispositivostecnologicos: 'string',
+                plataformasvirtuales: 'string',
+                estudioencasa: 'number',
+                pasarsindistraccion: 'number',
+                migranteretornado: 'number'
+            };
 
-            // Iterar sobre los campos y verificar el tipo
-            for (let { campo, tipo } of campos) {
-                errorMessage = tipoDeDato(estudiante[campo], tipo);
-                if (errorMessage) {
-                    await client.query('ROLLBACK');  // Revertir la transacción si ocurre un error
-                    return res.status(400).json({ error: `${campo}: ${errorMessage}` });
+            // Verificar campos requeridos
+            for (const [campo, tipo] of Object.entries(camposRequeridos)) {
+                if (estudiante[campo] === undefined || estudiante[campo] === null) {
+                    await client.query('ROLLBACK');
+                    client.release();
+                    return res.status(400).json({ 
+                        error: `El campo ${campo} es obligatorio`,
+                        estudiante: estudiante,
+                        campoFaltante: campo
+                    });
+                }
+                
+                // Validar tipo de dato
+                const errorTipo = tipoDeDato(estudiante[campo], tipo);
+                if (errorTipo) {
+                    await client.query('ROLLBACK');
+                    client.release();
+                    return res.status(400).json({ 
+                        error: errorTipo,
+                        estudiante: estudiante,
+                        campo: campo
+                    });
                 }
             }
 
-            // Si no hubo errores, se insertan los registros
+            // Preparar datos con el usuario creador
+            const datosEstudiante = {
+                ...estudiante,
+                creadopor: usuarioValido.user.id // Asegurar que tenga creador
+            };
+
             try {
-                await postEstudianteM(estudiante, client);  // Asegúrate de pasar el client a la función del modelo
+                // Insertar estudiante
+                const result = await postEstudianteM(
+                    datosEstudiante.identificacion,
+                    datosEstudiante.nombre,
+                    datosEstudiante.fechanacimiento,
+                    datosEstudiante.edad,
+                    datosEstudiante.genero,
+                    datosEstudiante.idnacionalidad,
+                    datosEstudiante.idetnia,  
+                    datosEstudiante.telefono,
+                    datosEstudiante.estadocivil,
+                    datosEstudiante.idniveleducativo,
+                    datosEstudiante.idgradoacademico,
+                    datosEstudiante.estudianoformal,
+                    datosEstudiante.trabajaactualmente,
+                    datosEstudiante.iddiscapacidad,
+                    datosEstudiante.detallediscapacidad,
+                    datosEstudiante.iddepartamento,
+                    datosEstudiante.idmunicipio,
+                    datosEstudiante.idaldea,
+                    datosEstudiante.caserio,
+                    datosEstudiante.direccion,
+                    datosEstudiante.sabecomputacion,
+                    datosEstudiante.manejaprogramas,
+                    datosEstudiante.dispositivostecnologicos,
+                    datosEstudiante.plataformasvirtuales,
+                    datosEstudiante.estudioencasa,
+                    datosEstudiante.pasarsindistraccion,
+                    datosEstudiante.migranteretornado,
+                    datosEstudiante.motivomigracion,
+                    datosEstudiante.otromotivomigracion,
+                    datosEstudiante.llegousa,
+                    datosEstudiante.familiarmigranteretornado,
+                    datosEstudiante.miembrosalioynoregreso,
+                    datosEstudiante.volveriaamigrar,
+                    datosEstudiante.creadopor
+                );
+
+                // Insertar educación no formal
+                if (datosEstudiante.educacionNoFormal && Array.isArray(datosEstudiante.educacionNoFormal)) {
+                    const idestudiante = result[0].id;
+                    for (const curso of datosEstudiante.educacionNoFormal) {
+                        await postEducacionNoFormalM(curso, idestudiante);
+                    }
+                }
             } catch (error) {
-                await client.query('ROLLBACK');  // Revertir la transacción si ocurre un error al insertar
-                return res.status(500).json({ error: 'Error al insertar el estudiante' });
+                console.error('Error al insertar estudiante:', error);
+                await client.query('ROLLBACK');
+                client.release();
+                return res.status(500).json({ 
+                    error: 'Error al insertar el estudiante',
+                    detalle: error.message,
+                    estudiante: datosEstudiante
+                });
             }
         }
 
-        // Si todo va bien, hacer commit de la transacción
         await client.query('COMMIT');
-        return res.status(200).json({ mensaje: 'Estudiantes procesados correctamente' });
+        client.release();
+        return res.status(200).json({ 
+            mensaje: 'Estudiantes procesados correctamente',
+            total: estudiantes.length 
+        });
 
     } catch (error) {
-        await client.query('ROLLBACK');  // Revertir la transacción en caso de cualquier otro error
+        await client.query('ROLLBACK');
+        client.release();
         console.error('Error en la transacción:', error);
-        return res.status(500).json({ error: 'Error en la transacción de los estudiantes' });
-    } finally {
-        client.release();  // Liberar el cliente de la conexión
+        return res.status(500).json({ 
+            error: 'Error en la transacción de los estudiantes',
+            detalle: error.message 
+        });
     }
 };
