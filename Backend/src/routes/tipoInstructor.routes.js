@@ -1,6 +1,6 @@
 import {Router} from "express";
 
-import { getTipoEducadorC, getTipoEducadorIdC, postTipoEducadorC, putTipoEducadorC } from "../controllers/tipoEducador.controller.js";
+import { getTipoEducadorC, getTipoEducadorIdC, postTipoEducadorC, putTipoEducadorC } from "../controllers/tipoInstructor.controller.js";
 
 const router=Router();
 

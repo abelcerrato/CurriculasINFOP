@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { getMaestroIdC, getMaestrosC, postMaestroC, putMaestroC } from "../controllers/maestros.controller.js";
+import { getMaestroIdC, getMaestrosC, postMaestroC, putMaestroC } from "../controllers/instructores.controller.js";
 
 const router=Router();
 

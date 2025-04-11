@@ -4,10 +4,10 @@ export const getMunicipiosM = async () => {
     try {
         const { rows } = await pool.query(`
             SELECT 
-             m.id, 
-              m.municipio, 
-              d.departamento, 
-              d.id AS iddepartamento
+                m.id, 
+                m.municipio, 
+                d.departamento, 
+                d.id AS iddepartamento
             FROM municipios m
             INNER JOIN departamentos d ON m.iddepartamento = d.id
             ORDER BY m.id ASC;

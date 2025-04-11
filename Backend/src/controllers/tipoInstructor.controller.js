@@ -1,5 +1,5 @@
 
-import { getTipoEducadorIdM, getTipoEducadorM, postTipoEducadorM, putTipoEducadorM } from "../models/tipoEducador.models.js";
+import { getTipoEducadorIdM, getTipoEducadorM, postTipoEducadorM, putTipoEducadorM } from "../models/tipoInstructor.models.js";
 
 export const getTipoEducadorC = async (req, res) => {
     try {

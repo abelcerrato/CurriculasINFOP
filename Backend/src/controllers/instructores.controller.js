@@ -1,4 +1,4 @@
-import { deleteEducacionNoFormalM, getMaestroIdM, getMaestrosM, postEducacionNoFormalM, postMaestroM, putMaestroM } from "../models/maestros.models.js";
+import { deleteEducacionNoFormalM, getMaestroIdM, getMaestrosM, postEducacionNoFormalM, postMaestroM, putMaestroM } from "../models/instructores.models.js";
 
 export const getMaestrosC = async (req, res) => {
     try {
