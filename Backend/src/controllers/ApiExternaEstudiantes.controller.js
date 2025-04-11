@@ -2,10 +2,7 @@ import { pool } from '../db.js'
 import bcrypt from 'bcrypt'; // Para cifrar contraseñas
 import jwt from "jsonwebtoken";
 import { verificarUsuarioM } from '../models/ms_usuarios.models.js';
-import { getPermisosUsuarioM } from '../models/ApiExternaEstudiantes.models.js';
-import { postEstudianteC, postEstudianteExternoC } from './estudiantes.controller.js';
-import { postEducacionNoFormalM, postEstudianteM } from '../models/estudiantes.models.js';
-
+import { getPermisosUsuarioM, postEducacionNoFormalEExternoM, postEstudianteExternoM } from '../models/ApiExternaEstudiantes.models.js';
 
 
 export const verificarUsuarioC = async (usuario, contraseña) => {
@@ -83,13 +80,15 @@ const tipoDeDato = (valor, tipo) => {
         const regexFecha = /^(\d{4})-(\d{2})-(\d{2})$/;
         const match = valor.match(regexFecha);
         if (!match) {
-            return `El campo ${valor} no tiene el formato correcto (yyyy-mm-dd).`;
+            console.log( `El campo ${valor} no tiene el formato correcto (Año-mes-día).`);
+            return `El campo ${valor} no tiene el formato correcto (Año-mes-día).`;
         }
 
         const [_, anio, mes, dia ] = match;
         const fecha = new Date(`${anio}-${mes}-${dia}`);
 
         if (isNaN(fecha.getTime())) {
+            log(`El campo ${valor} no es una fecha válida.`);
             return `El campo ${valor} no es una fecha válida.`;
         }
 
@@ -98,12 +97,14 @@ const tipoDeDato = (valor, tipo) => {
 
     if (tipo === 'number') {
         if (isNaN(Number(valor))) {
+            console.log(`El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`);
             return `El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`;
         }
         return null;
     }
 
     if (typeof valor !== tipo) {
+        console.log(`El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`);
         return `El campo tiene un valor de tipo ${typeof valor}, se esperaba tipo ${tipo}`;
     }
 
@@ -132,10 +133,10 @@ export const procesarEstudiantes = async (req, res) => {
         return res.status(403).json({ error: permisosValidados.error || 'El usuario no tiene permisos para insertar estudiantes' });
     }
 
-    //const pool = await pool.connect();
+    const client = await pool.connect();
 
     try {
-        await pool.query('BEGIN');
+        await client.query('BEGIN');
 
         for (const estudiante of estudiantes) {
             console.log('Procesando estudiante:', estudiante);
@@ -148,7 +149,7 @@ export const procesarEstudiantes = async (req, res) => {
                 edad: 'number',
                 genero: 'string',
                 //idnacionalidad: 'number',
-                //idetnia: 'number',  // Nombre correcto del campo
+                //idetnia: 'number',  
                 //idniveleducativo: 'number',
                 //idgradoacademico: 'number',
                 estudianoformal: 'number',
@@ -169,10 +170,11 @@ export const procesarEstudiantes = async (req, res) => {
             // Verificar campos requeridos
             for (const [campo, tipo] of Object.entries(camposRequeridos)) {
                 if (estudiante[campo] === undefined || estudiante[campo] === null) {
-                    await pool.query('ROLLBACK');
-                    //pool.release();
+                    await client.query('ROLLBACK');
+                    console.log(`El campo ${campo} es obligatorio del estudiante ${estudiante.nombre}`),
+                    client.release();
                     return res.status(400).json({ 
-                        error: `El campo ${campo} es obligatorio`,
+                        error: `El campo ${campo} es obligatorio del estudiante ${estudiante.nombre}`,
                         estudiante: estudiante,
                         campoFaltante: campo
                     });
@@ -181,8 +183,8 @@ export const procesarEstudiantes = async (req, res) => {
                 // Validar tipo de dato
                 const errorTipo = tipoDeDato(estudiante[campo], tipo);
                 if (errorTipo) {
-                    await pool.query('ROLLBACK');
-                    //pool.release();
+                    await client.query('ROLLBACK');
+                    client.release();
                     return res.status(400).json({ 
                         error: errorTipo,
                         estudiante: estudiante,
@@ -199,7 +201,7 @@ export const procesarEstudiantes = async (req, res) => {
 
             try {
                 // Insertar estudiante
-                const result = await postEstudianteM(
+                const result = await postEstudianteExternoM(
                     datosEstudiante.identificacion,
                     datosEstudiante.nombre,
                     datosEstudiante.fechanacimiento,
@@ -233,38 +235,43 @@ export const procesarEstudiantes = async (req, res) => {
                     datosEstudiante.familiarmigranteretornado,
                     datosEstudiante.miembrosalioynoregreso,
                     datosEstudiante.volveriaamigrar,
-                    datosEstudiante.creadopor
+                    datosEstudiante.creadopor,
+                    client
                 );
 
                 // Insertar educación no formal
                 if (datosEstudiante.educacionNoFormal && Array.isArray(datosEstudiante.educacionNoFormal)) {
                     const idestudiante = result[0].id;
                     for (const curso of datosEstudiante.educacionNoFormal) {
-                        await postEducacionNoFormalM(curso, idestudiante);
+                        await postEducacionNoFormalEExternoM(curso, idestudiante, client);
                     }
                 }
             } catch (error) {
-                console.error('Error al insertar estudiante:', error);
-                await pool.query('ROLLBACK');
-                //pool.release();
+                console.log(`Error al insertar el estudiante ${estudiante.nombre}:`, error.message);
+                await client.query('ROLLBACK');
+                client.release();
                 return res.status(500).json({ 
-                    error: 'Error al insertar el estudiante',
+                    error: `Error al insertar el estudiante  ${estudiante.nombre}:`,
                     detalle: error.message,
                     estudiante: datosEstudiante
                 });
             }
         }
 
-        await pool.query('COMMIT');
-        //pool.release();
+        await client.query('COMMIT');
+        console.log('Transacción completada con éxito');
+        
+        client.release();
         return res.status(200).json({ 
             mensaje: 'Estudiantes procesados correctamente',
             total: estudiantes.length 
         });
 
     } catch (error) {
-        await pool.query('ROLLBACK');
-        //pool.release();
+        await client.query('ROLLBACK');
+        console.log('Error en la transacción:', error);
+        
+        client.release();
         console.error('Error en la transacción:', error);
         return res.status(500).json({ 
             error: 'Error en la transacción de los estudiantes',
