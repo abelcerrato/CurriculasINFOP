@@ -150,13 +150,18 @@ export const procesarEstudiantes = async (req, res) => {
                 genero: 'string',
                 //idnacionalidad: 'number',
                 //idetnia: 'number',  
+                telefono: 'string',
+                estadocivil: 'string',
                 //idniveleducativo: 'number',
                 //idgradoacademico: 'number',
                 estudianoformal: 'number',
                 trabajaactualmente: 'number',
+                //iddiscapacidad: 'number',
+                //detallediscapacidad: 'string',
                 //iddepartamento: 'number',
                 //idmunicipio: 'number',
                 //idaldea: 'number',
+                //caserio: 'string',
                 //direccion: 'string',
                 sabecomputacion: 'string',
                 manejaprogramas: 'string',
@@ -164,12 +169,19 @@ export const procesarEstudiantes = async (req, res) => {
                 plataformasvirtuales: 'string',
                 estudioencasa: 'number',
                 pasarsindistraccion: 'number',
-                migranteretornado: 'number'
+                migranteretornado: 'number',
+                //motivomigracion: 'string',
+                //otromotivomigracion: 'string',
+                //llegousa: 'number',
+                //familiarmigranteretornado: 'number',
+                //miembrosalioynoregreso: 'number',
+                //volveriaamigrar: 'number',
+                //creadopor: 'number',
             };
 
             // Verificar campos requeridos
             for (const [campo, tipo] of Object.entries(camposRequeridos)) {
-                if (estudiante[campo] === undefined || estudiante[campo] === null) {
+                if (estudiante[campo] === undefined || estudiante[campo] === null || estudiante[campo] === '') {
                     await client.query('ROLLBACK');
                     console.log(`El campo ${campo} es obligatorio del estudiante ${estudiante.nombre}`),
                     client.release();
@@ -183,6 +195,8 @@ export const procesarEstudiantes = async (req, res) => {
                 // Validar tipo de dato
                 const errorTipo = tipoDeDato(estudiante[campo], tipo);
                 if (errorTipo) {
+                    //console.log(`El campo ${campo} tiene un valor de tipo ${typeof estudiante[campo]}, se esperaba tipo ${tipo}`);
+                    console.log(`Error en el campo ${campo} del estudiante ${estudiante.nombre}: ${errorTipo}`);
                     await client.query('ROLLBACK');
                     client.release();
                     return res.status(400).json({ 
