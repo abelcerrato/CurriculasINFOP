@@ -7,7 +7,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
-
+import { useUser } from "../Components/UserContext";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
@@ -20,6 +20,7 @@ import Swal from 'sweetalert2'
 
 
 const DataTable = () => {
+  const { user } = useUser();
   const [rows, setRows] = useState([]);
   const [editRowId, setEditRowId] = useState(null);
   const [editRowData, setEditRowData] = useState({});
@@ -60,47 +61,54 @@ const DataTable = () => {
     setIsAdding(false);
   };
 
+
+
   const handleSaveClick = async () => {
     try {
+      // Prepara el payload base (compartido entre INSERT y UPDATE)
+      const payload = {
+        id: editRowData.id,
+        departamento: editRowData.departamento
+      };
+
       if (isAdding) {
-        // Lógica para INSERT
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/departamentos`,
-          { departamento: editRowData.departamento }
-        );
-        fetchData();
-        Swal.fire({
-          title: "Registro Creado",
-          text: "El departamento ha sido creado exitosamente.",
-          icon: "success",
-          timer: 6000,
+        // INSERT: Agrega 'creadopor'
+
+        await axios.post(`${process.env.REACT_APP_API_URL}/departamentos`, {
+          ...payload,
+          creadopor: user?.id, // Asegúrate de que 'user' esté definido
         });
       } else {
-        // Lógica para UPDATE
-        const payload = {
-          id: editRowData.id,
-          departamento: editRowData.departamento
-        };
-
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/departamentos/${editRowId}`,
-          payload
-        );
-        fetchData();
-        Swal.fire({
-          title: "Registro Actualizado",
-          text: "El departamento ha sido actualizado exitosamente.",
-          icon: "success",
-          timer: 6000,
+        // UPDATE: Agrega 'modificadopor'
+        await axios.put(`${process.env.REACT_APP_API_URL}/departamentos/${editRowId}`, {
+          ...payload,
+          modificadopor: user?.id,
         });
       }
 
+      // Éxito
+      Swal.fire({
+        title: isAdding ? "Registro Creado" : "Registro Actualizado",
+        text: `El departamento ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+        icon: "success",
+        timer: 6000,
+      });
+
+      fetchData(); // Recarga los datos
       setEditRowId(null);
       setIsAdding(false);
     } catch (error) {
-      console.error("Error al guardar el departamento:", error);
+      console.error("Error al guardar:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error al guardar los datos.",
+        icon: "error",
+        timer: 6000,
+      });
     }
   };
+
+
 
   const handleEditRowChange = (e) => {
     const { name, value } = e.target;
@@ -168,6 +176,7 @@ const DataTable = () => {
               name="departamento"
               value={editRowData.departamento || ''}
               onChange={handleEditRowChange}
+              onKeyDown={(e) => e.stopPropagation()}
               fullWidth
               autoFocus
             />

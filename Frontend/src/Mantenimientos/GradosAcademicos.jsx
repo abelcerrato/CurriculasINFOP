@@ -17,9 +17,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
-
+import { useUser } from "../Components/UserContext";
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editRowData, setEditRowData] = useState({ gradoacademico: '', idnivelacademico: '' });
@@ -42,27 +43,20 @@ const DataTable = () => {
     }, []);
 
     // Obtener lista de gradoacademicos
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/gradosAcademicos`);
+
+            setRows(response.data);
+        } catch (error) {
+            console.error("Hubo un error al obtener los datos:", error);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/gradosAcademicos`);
-                const data = Array.isArray(response.data) ? response.data : [];
-
-                // Mapear los datos para incluir el nombre del nivelacademico
-                const formattedData = data.map(item => ({
-                    id: item.id,
-                    gradoacademico: item.gradoacademico,
-                    idnivelacademico: item.idnivelacademico,
-                    nivelacademico: item.nivelacademico,
-                }));
-
-                setRows(formattedData);
-            } catch (error) {
-                console.error("Hubo un error al obtener los datos:", error);
-            }
-        };
         fetchData();
-    }, [nivelacademicos]); // Se ejecuta cuando cambian los nivelacademicos
+    }, []);
+
 
     const handleAddClick = () => {
         setEditRowData({ gradoacademico: '', idnivelacademico: '' });
@@ -85,63 +79,48 @@ const DataTable = () => {
         setEditRowId(null);
         setIsAdding(false);
     };
-
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                gradoacademico: editRowData.gradoacademico,
+                idnivelacademico: editRowData.idnivelacademico
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/gradoAcademico`,
-                    {
-                        gradoacademico: editRowData.gradoacademico,
-                        idnivelacademico: editRowData.idnivelacademico
-                    }
-                );
+                // INSERT: Agrega 'creadopor'
 
-
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "El grado académico ha sido creado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                await axios.post(`${process.env.REACT_APP_API_URL}/gradoAcademico`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    gradoacademico: editRowData.gradoacademico,
-                    idnivelacademico: editRowData.idnivelacademico
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/gradoAcademico/${editRowId}`,
-                    payload
-                );
-
-                // Obtener el nivelacademico seleccionado
-                const deptoSeleccionado = nivelacademicos.find(dep => dep.id === editRowData.idnivelacademico);
-
-                // Actualizar el registro existente
-                setRows(rows.map(row =>
-                    row.id === editRowId ? {
-                        ...row,
-                        gradoacademico: editRowData.gradoacademico,
-                        idnivelacademico: editRowData.idnivelacademico,
-                        nivelacademico: deptoSeleccionado?.nivelacademico || ''
-                    } : row
-                ));
-
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "El grado académico ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/gradoAcademico/${editRowId}`, {
+                    ...payload,
+                    modificadopor: user?.id,
                 });
             }
 
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `El grado académico ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData(); // Recarga los datos
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el gradoacademico:", error);
+            console.error("Error al guardar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al guardar los datos.",
+                icon: "error",
+                timer: 6000,
+            });
         }
     };
 

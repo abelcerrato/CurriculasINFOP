@@ -7,7 +7,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
-
+import { useUser } from "../Components/UserContext";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
@@ -20,6 +20,7 @@ import Swal from 'sweetalert2'
 
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editRowData, setEditRowData] = useState({});
@@ -63,45 +64,50 @@ const DataTable = () => {
 
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                id: editRowData.id,
+                areaformacion: editRowData.areaformacion
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/areasFormacion`,
-                    { areaformacion: editRowData.areaformacion }
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "La área de formación a sido rigistrado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // INSERT: Agrega 'creadopor'
+
+                await axios.post(`${process.env.REACT_APP_API_URL}/areasFormacion`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    id: editRowData.id,
-                    areaformacion: editRowData.areaformacion
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/areasFormacion/${editRowId}`,
-                    payload
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "La área de formación ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/areasFormacion/${editRowId}`, {
+                    ...payload,
+                    modificadopor: user?.id,
                 });
             }
 
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `La área de formación a sido ${isAdding ? "creada" : "actualizada"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData(); // Recarga los datos
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el etnia:", error);
+            console.error("Error al guardar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al guardar los datos.",
+                icon: "error",
+                timer: 6000,
+            });
         }
     };
+
+
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;
@@ -180,11 +186,12 @@ const DataTable = () => {
                             onChange={handleEditRowChange}
                             fullWidth
                             autoFocus
-                            onKeyDown={(e) => {
-                                if (e.key === ' ') {
-                                    e.stopPropagation(); // Evita que el DataGrid maneje el espacio
-                                }
-                            }}
+                            onKeyDown={(e) => e.stopPropagation()}
+                        // onKeyDown={(e) => {
+                        //     if (e.key === ' ') {
+                        //         e.stopPropagation(); // Evita que el DataGrid maneje el espacio
+                        //     }
+                        // }}
                         />
                     );
                 }

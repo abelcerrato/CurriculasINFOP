@@ -17,8 +17,11 @@ import MenuItem from '@mui/material/MenuItem';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
+import { useUser } from "../Components/UserContext";
+
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editRowData, setEditRowData] = useState({ municipio: '', iddepartamento: '' });
@@ -39,27 +42,21 @@ const DataTable = () => {
     }, []);
 
     // Obtener lista de municipios
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/municipios`);
+
+            setRows(response.data);
+        } catch (error) {
+            console.error("Hubo un error al obtener los datos:", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/municipios`);
-                const data = Array.isArray(response.data) ? response.data : [];
-
-                // Mapear los datos para incluir el nombre del departamento
-                const formattedData = data.map(item => ({
-                    id: item.id,
-                    municipio: item.municipio,
-                    iddepartamento: item.iddepartamento,
-                    departamento: departamentos.find(dep => dep.id === item.iddepartamento)?.departamento || ''
-                }));
-
-                setRows(formattedData);
-            } catch (error) {
-                console.error("Hubo un error al obtener los datos:", error);
-            }
-        };
         fetchData();
-    }, [departamentos]); // Se ejecuta cuando cambian los departamentos
+    }, []);
+
 
     const handleAddClick = () => {
         setEditRowData({ municipio: '', iddepartamento: '' });
@@ -83,64 +80,52 @@ const DataTable = () => {
         setIsAdding(false);
     };
 
+
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                municipio: editRowData.municipio,
+                iddepartamento: editRowData.iddepartamento
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/municipios`,
-                    {
-                        municipio: editRowData.municipio,
-                        iddepartamento: editRowData.iddepartamento
-                    }
-                );
+                // INSERT: Agrega 'creadopor'
 
-
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "El municipio ha sido creado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                await axios.post(`${process.env.REACT_APP_API_URL}/municipios`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    municipio: editRowData.municipio,
-                    iddepartamento: editRowData.iddepartamento
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/municipios/${editRowId}`,
-                    payload
-                );
-
-                // Obtener el departamento seleccionado
-                const deptoSeleccionado = departamentos.find(dep => dep.id === editRowData.iddepartamento);
-
-                // Actualizar el registro existente
-                setRows(rows.map(row =>
-                    row.id === editRowId ? {
-                        ...row,
-                        municipio: editRowData.municipio,
-                        iddepartamento: editRowData.iddepartamento,
-                        departamento: deptoSeleccionado?.departamento || ''
-                    } : row
-                ));
-
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "El municipio ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/municipios/${editRowId}`, {
+                    ...payload,
+                    modificadopor: user?.id,
                 });
             }
 
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `El municipio ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData();
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el municipio:", error);
+            console.error("Error al guardar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al guardar los datos.",
+                icon: "error",
+                timer: 6000,
+            });
         }
     };
+
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;
@@ -208,6 +193,7 @@ const DataTable = () => {
                             name="municipio"
                             value={editRowData.municipio || ''}
                             onChange={handleEditRowChange}
+                            onKeyDown={(e) => e.stopPropagation()}
                             fullWidth
                             autoFocus
                         />

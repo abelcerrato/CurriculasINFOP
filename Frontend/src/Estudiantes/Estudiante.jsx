@@ -13,11 +13,20 @@ import {
     Paper, Box, Typography, TextField, Button, IconButton,
     FormControl, Select, MenuItem, Dialog, DialogTitle,
     DialogContent, DialogActions, InputLabel, Tooltip, TextareaAutosize, FormLabel,
-    Grid, FormControlLabel, Checkbox
+    Grid, FormControlLabel, Checkbox, Chip, OutlinedInput,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
-
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
 
 const DataTable = () => {
     const { user } = useUser();
@@ -76,57 +85,119 @@ const DataTable = () => {
     const [discapacidad, setDiscapacidad] = useState([]);
 
 
+    // Obtener lista de departamentos para el Select
     useEffect(() => {
-        const obtenerDatosIniciales = async () => {
+        const obtenerDepartamentos = async () => {
             try {
-                // Llamadas que no dependen de selección previa
-                const [
-                    departamentosRes,
-                    nivelesRes,
-                    etniaRes,
-                    nacionalidadRes,
-                    discapacidadRes
-                ] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/departamentos`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/nivelesAcademicos`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/etnia`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/nacionalidad`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/discapacidades`)
-                ]);
-
-                setDepartamentos(departamentosRes.data);
-                setNiveles(nivelesRes.data);
-                setEtnia(etniaRes.data);
-                setNacionalidad(nacionalidadRes.data);
-                setDiscapacidad(discapacidadRes.data);
-
-                // Llamadas dependientes (departamento, municipio, nivel educativo)
-                if (editRowData.iddepartamento) {
-                    const municipiosRes = await axios.get(`${process.env.REACT_APP_API_URL}/municipios/${editRowData.iddepartamento}`);
-                    setMunicipios(municipiosRes.data);
-                }
-
-                if (editRowData.idmunicipio) {
-                    const aldeasRes = await axios.get(`${process.env.REACT_APP_API_URL}/aldea/${editRowData.idmunicipio}`);
-                    setAldeas(aldeasRes.data);
-                }
-
-                if (editRowData.idniveleducativo) {
-                    const gradosRes = await axios.get(`${process.env.REACT_APP_API_URL}/gradoAcademicoNivel/${editRowData.idniveleducativo}`);
-                    setGrados(gradosRes.data);
-                }
-
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/departamentos`);
+                setDepartamentos(response.data);
             } catch (error) {
-                console.error("Error al obtener los datos iniciales", error);
+                console.error("Error al obtener los departamentos", error);
+            }
+        };
+        obtenerDepartamentos();
+    }, []);
+
+    // Obtener lista de municipios segun el departamento selecionado para el Select
+    useEffect(() => {
+        const obtenerMunicipios = async () => {
+            if (!editRowData.iddepartamento) return;
+
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/municipios/${editRowData.iddepartamento}`);
+                setMunicipios(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Municipios", error);
             }
         };
 
-        obtenerDatosIniciales();
-    }, [
-        editRowData.iddepartamento,
-        editRowData.idmunicipio,
-        editRowData.idniveleducativo
-    ]);
+        obtenerMunicipios();
+    }, [editRowData.iddepartamento]);
+
+    // Obtener lista de aldeas segun el municipio selecionado para el Select
+    useEffect(() => {
+        const obtenerAldeas = async () => {
+            if (!editRowData.idmunicipio) return;
+
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/aldea/${editRowData.idmunicipio}`);
+                setAldeas(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Aldeas", error);
+            }
+        };
+
+        obtenerAldeas();
+    }, [editRowData.idmunicipio]);
+
+    // Obtener lista de niveles educativo para el Select
+    useEffect(() => {
+        const obtenerNiveles = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/nivelesAcademicos`);
+                setNiveles(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Niveles", error);
+            }
+        };
+        obtenerNiveles();
+    }, []);
+
+    // Obtener lista de gradoas académicos segun el nivel educativo selecionado para el Select
+    useEffect(() => {
+        const obtenerGrados = async () => {
+            if (!editRowData.idniveleducativo) return;
+
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/gradoAcademicoNivel/${editRowData.idniveleducativo}`);
+                setGrados(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Grados", error);
+            }
+        };
+
+        obtenerGrados();
+    }, [editRowData.idniveleducativo]);
+
+    // Obtener lista de tipo de educador para el Select
+    useEffect(() => {
+        const obtenerTEducador = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/etnia`);
+                setEtnia(response.data);
+            } catch (error) {
+                console.error("Error al obtener los tipo educador", error);
+            }
+        };
+        obtenerTEducador();
+    }, []);
+
+    // Obtener lista de nacionalidad para el Select
+    useEffect(() => {
+        const obtenerNacionalidad = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/nacionalidades`);
+                setNacionalidad(response.data);
+            } catch (error) {
+                console.error("Error al obtener los nacionalidad", error);
+            }
+        };
+        obtenerNacionalidad();
+    }, []);
+
+    // Obtener lista de discapacidades para el Select
+    useEffect(() => {
+        const obtenerDiscapacidad = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/discapacidades`);
+                setDiscapacidad(response.data);
+            } catch (error) {
+                console.error("Error al obtener los Discapacidad", error);
+            }
+        };
+        obtenerDiscapacidad();
+    }, []);
+
 
     // Obtener lista de usuarios
     const fetchData = async () => {
@@ -207,12 +278,12 @@ const DataTable = () => {
 
     const handleEditClick = (id) => {
         const rowToEdit = rows.find((row) => row.id === id);
+        console.log("Fecha original:", rowToEdit.fechanacimiento);
+
         setEditRowData({
             identificacion: rowToEdit.identificacion || null,
             nombre: rowToEdit.nombre || null,
-            fechanacimiento: isAdding
-                ? editRowData.fechanacimiento
-                : formatearFechaParaInput(editRowData.fechanacimiento),
+            fechanacimiento: formatearFechaParaInput(rowToEdit.fechanacimiento) || '',
             edad: rowToEdit.edad || null,
             genero: rowToEdit.genero || null,
             idnacionalidad: rowToEdit.idnacionalidad || null,
@@ -289,8 +360,12 @@ const DataTable = () => {
                 direccion: editRowData.direccion || null,
                 sabecomputacion: editRowData.sabecomputacion || null,
                 manejaprogramas: editRowData.manejaprogramas || null,
-                dispositivostecnologicos: editRowData.dispositivostecnologicos || null,
-                plataformasvirtuales: editRowData.plataformasvirtuales || null,
+                dispositivostecnologicos: Array.isArray(editRowData.dispositivostecnologicos)
+                    ? editRowData.dispositivostecnologicos.join(', ')
+                    : editRowData.dispositivostecnologicos || null,
+                plataformasvirtuales: Array.isArray(editRowData.plataformasvirtuales)
+                    ? editRowData.plataformasvirtuales.join(', ')
+                    : editRowData.plataformasvirtuales || null,
                 estudioencasa: editRowData.estudioencasa || false,
                 pasarsindistraccion: editRowData.pasarsindistraccion || false,
                 migranteretornado: editRowData.migranteretornado || false,
@@ -301,13 +376,14 @@ const DataTable = () => {
                 miembrosalioynoregreso: editRowData.miembrosalioynoregreso || null,
                 volveriaamigrar: editRowData.volveriaamigrar || null,
                 // Convierte el texto del textarea en un array
-                educacionNoFormal: editRowData.educacionNoFormal
-                    ? editRowData.educacionNoFormal.split(/[\n,]+/).map(item => item.trim()).filter(item => item)
+                educacionnoformal: editRowData.educacionnoformal
+                    ? editRowData.educacionnoformal.split(/[\n,]+/).map(item => item.trim()).filter(item => item)
                     : [],
             };
 
             if (isAdding) {
                 // INSERT: Agrega 'creadopor'
+
                 await axios.post(`${process.env.REACT_APP_API_URL}/estudiantes`, {
                     ...payload,
                     creadopor: user?.id, // Asegúrate de que 'user' esté definido
@@ -323,7 +399,7 @@ const DataTable = () => {
             // Éxito
             Swal.fire({
                 title: isAdding ? "Registro Creado" : "Registro Actualizado",
-                text: `El maestro ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                text: `El estudiante ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
                 icon: "success",
                 timer: 6000,
             });
@@ -459,9 +535,9 @@ const DataTable = () => {
         { field: 'discapacidad', headerName: 'Discapacidad', width: 110 },
         { field: 'detallediscapacidad', headerName: 'Detalle de Discapacidad', width: 180 },
         { field: 'sabecomputacion', headerName: 'Sabe Computación', width: 150 },
-        { field: 'manejaprogramas', headerName: 'Manejo de Programas', width: 170 },
-        { field: 'dispositivostecnologicos', headerName: 'Dispositivos Tecnológicos', width: 200 },
-        { field: 'plataformasvirtuales', headerName: 'Plataformas Virtuales', width: 170 },
+        { field: 'manejaprogramas', headerName: 'Manejo de Programas', width: 400 },
+        { field: 'dispositivostecnologicos', headerName: 'Dispositivos Tecnológicos', width: 400 },
+        { field: 'plataformasvirtuales', headerName: 'Plataformas Virtuales', width: 400 },
         {
             field: 'estudioencasa',
             headerName: 'Estudia en Casa',
@@ -492,11 +568,11 @@ const DataTable = () => {
                 </span>
             )
         },
-        { field: 'motivomigracion', headerName: 'Motivo de Migración', width: 150 },
+        { field: 'motivomigracion', headerName: '¿Qué lo motivóa migrar de su país', width: 150 },
         { field: 'otromotivomigracion', headerName: 'Otro Motivo de Migración', width: 200 },
-        { field: 'llegousa', headerName: 'Llegó a USA', width: 150 },
-        { field: 'familiaretornado', headerName: 'Familia Migrante Retornado', width: 210 },
-        { field: 'miembrosalioynoregreso', headerName: 'Miembros Salió y No Regresó', width: 230 },
+        { field: 'llegousa', headerName: 'En su experiencia migratoria, puede indicar si llegó a:', width: 150 },
+        { field: 'familiaretornado', headerName: '¿Tiene familiares que se identifican como migrantes retornados?', width: 250 },
+        { field: 'miembrosalioynoregreso', headerName: '¿Algún miembro de su hogar salió de Honduras y no regreso?', width: 250 },
         { field: 'volveriaamigrar', headerName: 'Volvería a Migrar', width: 150 },
     ];
 
@@ -631,15 +707,15 @@ const DataTable = () => {
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel id="demo-simple-select-label">Nacionalidad</InputLabel>
                                         <Select
-                                            name="nacionalidad"
-                                            value={editRowData.nacionalidad || ''}
+                                            name="idnacionalidad"
+                                            value={editRowData.idnacionalidad || ''}
                                             onChange={handleEditRowChange}
                                             label="Nivel Educativo"
                                         >
                                             <MenuItem value="">Seleccionar nacionalidad</MenuItem>
                                             {nacionalidad.map(niv => (
                                                 <MenuItem key={niv.id} value={niv.id}>
-                                                    {niv.nivelacademico}
+                                                    {niv.nacionalidad}
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -895,12 +971,29 @@ const DataTable = () => {
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel id="demo-simple-select-label">Dispositivos Tecnológicos</InputLabel>
                                         <Select
+                                            value={
+                                                typeof editRowData.dispositivostecnologicos === 'string'
+                                                    ? editRowData.dispositivostecnologicos
+                                                        .split(',')
+                                                        .map(v => v.trim())
+                                                        .filter(v => v !== '')
+                                                    : editRowData.dispositivostecnologicos || []
+                                            }
                                             name="dispositivostecnologicos"
-                                            value={editRowData.dispositivostecnologicos || ''}
                                             onChange={handleEditRowChange}
-                                            label="Dispositivos Tecnológicos"
+                                            labelId="demo-multiple-chip-label"
+                                            id="demo-multiple-chip"
+                                            multiple
+                                            renderValue={(selected) => (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {selected.map((value) => (
+                                                        <Chip key={value} label={value} />
+                                                    ))}
+                                                </Box>
+                                            )}
+                                            MenuProps={MenuProps}
                                         >
-                                            <MenuItem value="Teléfono inteligente">Teléfono inteligente </MenuItem>
+                                            <MenuItem value="Teléfono inteligente">Teléfono inteligente</MenuItem>
                                             <MenuItem value="Computadora">Computadora</MenuItem>
                                             <MenuItem value="Tablet">Tablet</MenuItem>
                                             <MenuItem value="Smartwatch">Smartwatch</MenuItem>
@@ -908,13 +1001,33 @@ const DataTable = () => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Plataformas Virtuales</InputLabel>
+
+                                    <FormControl fullWidth variant="standard" >
+                                        <InputLabel id="demo-multiple-chip-label">Plataformas Virtuales</InputLabel>
                                         <Select
                                             name="plataformasvirtuales"
-                                            value={editRowData.plataformasvirtuales || ''}
+                                            value={
+                                                typeof editRowData.plataformasvirtuales === 'string'
+                                                    ? editRowData.plataformasvirtuales
+                                                        .split(',')
+                                                        .map(v => v.trim())
+                                                        .filter(v => v !== '')
+                                                    : editRowData.plataformasvirtuales || []
+                                            }
+
                                             onChange={handleEditRowChange}
                                             label="Plataformas Virtuales"
+                                            labelId="demo-multiple-chip-label"
+                                            id="demo-multiple-chip"
+                                            multiple
+                                            renderValue={(selected) => (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {selected.map((value) => (
+                                                        <Chip key={value} label={value} />
+                                                    ))}
+                                                </Box>
+                                            )}
+                                            MenuProps={MenuProps}
                                         >
                                             <MenuItem value="Whatsapp">Whatsapp</MenuItem>
                                             <MenuItem value="Facebook">Facebook</MenuItem>
@@ -925,7 +1038,9 @@ const DataTable = () => {
                                             <MenuItem value="Microsoft Teams">Microsoft Teams</MenuItem>
                                             <MenuItem value="Google Meets">Google Meets</MenuItem>
                                         </Select>
+
                                     </FormControl>
+
                                 </Grid>
                                 <Grid item size={6}>
                                     <FormControlLabel
@@ -965,7 +1080,7 @@ const DataTable = () => {
                                 {editRowData.migranteretornado && (
                                     <Grid item size={6}>
                                         <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">¿Que le motivó a migrar de su país?</InputLabel>
+                                            <InputLabel id="demo-simple-select-label">¿Qué le motivó a migrar de su país?</InputLabel>
                                             <Select
                                                 name="motivomigracion"
                                                 value={editRowData.motivomigracion || ''}
@@ -1046,7 +1161,7 @@ const DataTable = () => {
                                 {editRowData.migranteretornado && (
                                     <Grid item size={6}>
                                         <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">¿Tiene usted intenciones de volver a migrar?</InputLabel>
+                                            <InputLabel id="demo-simple-select-label">Volvería a Migrar</InputLabel>
                                             <Select
                                                 name="volveriaamigrar"
                                                 value={editRowData.volveriaamigrar || ''}

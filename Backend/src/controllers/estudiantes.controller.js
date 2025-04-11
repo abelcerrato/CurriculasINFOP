@@ -40,7 +40,7 @@ export const postEstudianteC = async (req, res) => {
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
             estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
             llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, creadopor,
-            educacionNoFormal
+            educacionnoformal
         } = req.body
         console.log(req.body);
 
@@ -57,8 +57,8 @@ export const postEstudianteC = async (req, res) => {
         //console.log("id del estudiante: ", idestudiante);
 
         let cursosInsertados = [];
-        if (Array.isArray(educacionNoFormal)) {
-            for (const curso of educacionNoFormal) {
+        if (Array.isArray(educacionnoformal)) {
+            for (const curso of educacionnoformal) {
                 const result = await postEducacionNoFormalM(curso, idestudiante);
                 cursosInsertados.push(result);
             }
@@ -68,7 +68,7 @@ export const postEstudianteC = async (req, res) => {
         res.json({
             message: "Estudiante agregado exitosamente",
             Estudiantes,
-            EducacionNoFormal: cursosInsertados
+            educacionnoformal: cursosInsertados
         });
 
     } catch (error) {
@@ -87,7 +87,7 @@ export const putEstudianteC = async (req, res) => {
             iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
             direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
             estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
-            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, modificadopor, educacionNoFormal
+            llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, modificadopor, educacionnoformal
         } = req.body
         console.log(req.body);
 
@@ -104,8 +104,8 @@ export const putEstudianteC = async (req, res) => {
 
         //registra la nueva educacion no formal
         let cursosActualizados = [];
-        if (Array.isArray(educacionNoFormal)) {
-            for (const curso of educacionNoFormal) {
+        if (Array.isArray(educacionnoformal)) {
+            for (const curso of educacionnoformal) {
                 const result = await postEducacionNoFormalM(curso, id);
                 cursosActualizados.push(result);
             }
@@ -115,7 +115,7 @@ export const putEstudianteC = async (req, res) => {
         res.json({
             message: "Estudiante actualizado exitosamente",
             Estudiantes,
-            EducacionNoFormal: cursosActualizados
+            educacionnoformal: cursosActualizados
         });
     } catch (error) {
         console.error('Error al actualizar', error);

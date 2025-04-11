@@ -35,6 +35,8 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlined';
 
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import EmojiFlagsOutlinedIcon from '@mui/icons-material/EmojiFlagsOutlined';
+
 import { useUser } from "../Components/UserContext";
 import { color } from "../Components/style/Color";
 import { styled } from '@mui/material/styles';
@@ -103,7 +105,8 @@ const ProjectDrawer = ({ open }) => {
     isActive("/Mantenimiento/Tipo-Educador") ||
     isActive("/Mantenimiento/Discapacidades") ||
     isActive("/Mantenimiento/Niveles-Académicos") ||
-    isActive("/Mantenimiento/Grados-Académicos")
+    isActive("/Mantenimiento/Grados-Académicos") ||
+    isActive("/Mantenimiento/Nacionalidades")
     ;
 
   const isSeguridadActive =
@@ -334,6 +337,13 @@ const ProjectDrawer = ({ open }) => {
                     onClick={() => navigate("/Mantenimiento/Grados-Académicos")}
                   />
 
+
+                  <MenuItem
+                    path="/Mantenimiento/Nacionalidades"
+                    icon={<EmojiFlagsOutlinedIcon />}
+                    text="Nacionalidades"
+                    onClick={() => navigate("/Mantenimiento/Nacionalidades")}
+                  />
                 </List>
               </Collapse>
             )}
@@ -513,6 +523,24 @@ const ProjectDrawer = ({ open }) => {
                   />
                 </MuiMenuItem>
               )}
+
+              <MuiMenuItem
+                onClick={() => handleItemClick("/Mantenimiento/Nacionalidades")}
+
+              >
+                <ListItemIcon>
+                  <EmojiFlagsOutlinedIcon
+                    fontSize="small"
+                    color={isActive("/Mantenimiento/Nacionalidades") ? "error" : "inherit"}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Nacionalidades"
+                  primaryTypographyProps={{
+                    color: isActive("/Mantenimiento/Nacionalidades") ? "error" : "inherit",
+                  }}
+                />
+              </MuiMenuItem>
             </Menu>
           </List>
         </>

@@ -7,10 +7,13 @@ import Dashboard from '../Dashboard/Dashboard';
 import axios from 'axios';
 import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
+
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+
+
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
@@ -27,8 +30,7 @@ const DataTable = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/tipoEducador`);
-
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/nacionalidades`);
             setRows(response.data)
         } catch (error) {
             console.error("Hubo un error al obtener los datos:", error);
@@ -39,7 +41,7 @@ const DataTable = () => {
     }, []);
 
     const handleAddClick = () => {
-        setEditRowData({ id: 'temp', tipoeducador: '' });
+        setEditRowData({ id: 'temp', discapacidad: '' });
         setEditRowId('temp');
         setIsAdding(true);
     };
@@ -62,19 +64,19 @@ const DataTable = () => {
             // Prepara el payload base (compartido entre INSERT y UPDATE)
             const payload = {
                 id: editRowData.id,
-                tipoeducador: editRowData.tipoeducador
+                nacionalidad: editRowData.nacionalidad
             };
 
             if (isAdding) {
                 // INSERT: Agrega 'creadopor'
 
-                await axios.post(`${process.env.REACT_APP_API_URL}/tipoEducador`, {
+                await axios.post(`${process.env.REACT_APP_API_URL}/nacionalidades`, {
                     ...payload,
                     creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
                 // UPDATE: Agrega 'modificadopor'
-                await axios.put(`${process.env.REACT_APP_API_URL}/tipoEducador/${editRowId}`, {
+                await axios.put(`${process.env.REACT_APP_API_URL}/nacionalidad/${editRowId}`, {
                     ...payload,
                     modificadopor: user?.id,
                 });
@@ -83,7 +85,7 @@ const DataTable = () => {
             // Éxito
             Swal.fire({
                 title: isAdding ? "Registro Creado" : "Registro Actualizado",
-                text: `El tipo educador ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                text: `La nacionalidad ha sido ${isAdding ? "creada" : "actualizada"} exitosamente.`,
                 icon: "success",
                 timer: 6000,
             });
@@ -101,7 +103,6 @@ const DataTable = () => {
             });
         }
     };
-
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;
@@ -167,20 +168,24 @@ const DataTable = () => {
             }
         },
         {
-            field: 'tipoeducador',
-            headerName: 'Tipo Educador',
+            field: 'nacionalidad',
+            headerName: 'Nacionalidad',
             width: 250,
             renderCell: (params) => {
                 if (editRowId === params.id) {
                     return (
                         <TextField
                             variant="standard"
-                            name="tipoeducador"
-                            value={editRowData.tipoeducador || ''}
+                            name="nacionalidad"
+                            value={editRowData.nacionalidad || ''}
                             onChange={handleEditRowChange}
                             fullWidth
                             autoFocus
-                            onKeyDown={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ') {
+                                    e.stopPropagation(); // Evita que el DataGrid maneje el espacio
+                                }
+                            }}
                         />
                     );
                 }
@@ -190,7 +195,7 @@ const DataTable = () => {
     ];
 
     // Filas para el DataGrid (incluyendo la temporal si está en modo añadir)
-    const gridRows = isAdding ? [{ id: 'temp', tipoeducador: '' }, ...rows] : rows;
+    const gridRows = isAdding ? [{ id: 'temp', nacionalidad: '' }, ...rows] : rows;
 
     return (
         <Dashboard>
@@ -199,7 +204,7 @@ const DataTable = () => {
                     <Typography variant="h3" component="h2" sx={{
                         fontWeight: 'bold', color: color.azul
                     }}>
-                        Tipo Educador
+                        Nacionalidades
                     </Typography>
                     <Button
                         variant="contained"

@@ -113,13 +113,13 @@ export const postEstudianteM = async (identificacion, nombre, fechanacimiento, e
 }
 
 
-export const postEducacionNoFormalM = async (educacionNoFormal, idestudiante) => {
+export const postEducacionNoFormalM = async (educacionnoformal, idestudiante) => {
     try {
         const { rows } = await pool.query(`
             INSERT INTO educacionNoFormal 
                         (educacionNoFormal, idestudiante) 
             VALUES ($1, $2) RETURNING *`,
-            [educacionNoFormal, idestudiante]);
+            [educacionnoformal, idestudiante]);
         return rows;
     } catch (error) {
         throw error;

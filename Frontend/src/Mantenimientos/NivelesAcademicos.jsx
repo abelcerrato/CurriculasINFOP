@@ -14,10 +14,11 @@ import Button from '@mui/material/Button';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
-
+import { useUser } from "../Components/UserContext";
 
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editRowData, setEditRowData] = useState({});
@@ -28,10 +29,7 @@ const DataTable = () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/nivelesAcademicos`);
 
-            setRows(response.data.map(item => ({
-                id: item.id,
-                nivelacademico: item.nivelacademico
-            })));
+            setRows(response.data)
         } catch (error) {
             console.error("Hubo un error al obtener los datos:", error);
         }
@@ -58,47 +56,52 @@ const DataTable = () => {
         setIsAdding(false);
     };
 
+
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                id: editRowData.id,
+                nivelacademico: editRowData.nivelacademico
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/nivelAcademico`,
-                    { nivelacademico: editRowData.nivelacademico }
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "El nivel académico ha sido creado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // INSERT: Agrega 'creadopor'
+
+                await axios.post(`${process.env.REACT_APP_API_URL}/nivelAcademico`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    id: editRowData.id,
-                    nivelacademico: editRowData.nivelacademico
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/nivelAcademico/${editRowId}`,
-                    payload
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "El nivel académico ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/nivelAcademico/${editRowId}`, {
+                    ...payload,
+                    modificadopor: user?.id,
                 });
             }
 
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `El nivel académico ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData();
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el nivelesacademicos:", error);
+            console.error("Error al guardar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al guardar los datos.",
+                icon: "error",
+                timer: 6000,
+            });
         }
     };
+
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;

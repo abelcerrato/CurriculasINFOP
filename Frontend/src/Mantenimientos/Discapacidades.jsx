@@ -17,10 +17,11 @@ import Button from '@mui/material/Button';
 import { color } from '../Components/style/Color';
 import Swal from 'sweetalert2'
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
-
+import { useUser } from "../Components/UserContext";
 
 
 const DataTable = () => {
+    const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
     const [editRowData, setEditRowData] = useState({});
@@ -30,12 +31,7 @@ const DataTable = () => {
     const fetchData = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/discapacidades`);
-            console.log("areas de formacion", response.data);
-
-            setRows(response.data.map(item => ({
-                id: item.id,
-                discapacidad: item.discapacidad
-            })));
+            setRows(response.data)
         } catch (error) {
             console.error("Hubo un error al obtener los datos:", error);
         }
@@ -62,45 +58,49 @@ const DataTable = () => {
         setIsAdding(false);
     };
 
+
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                id: editRowData.id,
+                discapacidad: editRowData.discapacidad
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/discapacidades`,
-                    { discapacidad: editRowData.discapacidad }
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "El discapacidad sido rigistrado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // INSERT: Agrega 'creadopor'
+
+                await axios.post(`${process.env.REACT_APP_API_URL}/discapacidades`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    id: editRowData.id,
-                    discapacidad: editRowData.discapacidad
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/discapacidades/${editRowId}`,
-                    payload
-                );
-                fetchData();
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "La discapacidad ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/discapacidades/${editRowId}`, {
+                    ...payload,
+                    modificadopor: user?.id,
                 });
             }
 
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `La discapacidad ha sido ${isAdding ? "creada" : "actualizada"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData(); // Recarga los datos
             setEditRowId(null);
             setIsAdding(false);
         } catch (error) {
-            console.error("Error al guardar el etnia:", error);
+            console.error("Error al guardar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "Ocurrió un error al guardar los datos.",
+                icon: "error",
+                timer: 6000,
+            });
         }
     };
 
