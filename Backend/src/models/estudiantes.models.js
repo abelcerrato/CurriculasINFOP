@@ -86,9 +86,9 @@ export const postEstudianteM = async (identificacion, nombre, fechanacimiento, e
     iddiscapacidad, detallediscapacidad, iddepartamento, idmunicipio, idaldea, caserio,
     direccion, sabecomputacion, manejaprogramas, dispositivostecnologicos, plataformasvirtuales,
     estudioencasa, pasarsindistraccion, migranteretornado, motivomigracion, otromotivomigracion,
-    llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, creadopor) => {
+    llegousa, familiarmigranteretornado, miembrosalioynoregreso, volveriaamigrar, creadopor, client) => {
     try {
-        const { rows } = await pool.query(
+        const { rows } = await client.query(
             `INSERT INTO estudiantes 
                 (identificacion, nombre, fechanacimiento, edad, genero, idnacionalidad, idetnia, telefono,
                 estadocivil, idniveleducativo, idgradoacademico, estudianoformal, trabajaactualmente,
@@ -113,9 +113,9 @@ export const postEstudianteM = async (identificacion, nombre, fechanacimiento, e
 }
 
 
-export const postEducacionNoFormalM = async (educacionNoFormal, idestudiante) => {
+export const postEducacionNoFormalM = async (educacionNoFormal, idestudiante, client) => {
     try {
-        const { rows } = await pool.query(`
+        const { rows } = await client.query(`
             INSERT INTO educacionNoFormal 
                         (educacionNoFormal, idestudiante) 
             VALUES ($1, $2) RETURNING *`,

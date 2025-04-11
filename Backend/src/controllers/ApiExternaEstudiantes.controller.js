@@ -132,10 +132,10 @@ export const procesarEstudiantes = async (req, res) => {
         return res.status(403).json({ error: permisosValidados.error || 'El usuario no tiene permisos para insertar estudiantes' });
     }
 
-    const client = await pool.connect();
+    //const pool = await pool.connect();
 
     try {
-        await client.query('BEGIN');
+        await pool.query('BEGIN');
 
         for (const estudiante of estudiantes) {
             console.log('Procesando estudiante:', estudiante);
@@ -169,8 +169,8 @@ export const procesarEstudiantes = async (req, res) => {
             // Verificar campos requeridos
             for (const [campo, tipo] of Object.entries(camposRequeridos)) {
                 if (estudiante[campo] === undefined || estudiante[campo] === null) {
-                    await client.query('ROLLBACK');
-                    client.release();
+                    await pool.query('ROLLBACK');
+                    //pool.release();
                     return res.status(400).json({ 
                         error: `El campo ${campo} es obligatorio`,
                         estudiante: estudiante,
@@ -181,8 +181,8 @@ export const procesarEstudiantes = async (req, res) => {
                 // Validar tipo de dato
                 const errorTipo = tipoDeDato(estudiante[campo], tipo);
                 if (errorTipo) {
-                    await client.query('ROLLBACK');
-                    client.release();
+                    await pool.query('ROLLBACK');
+                    //pool.release();
                     return res.status(400).json({ 
                         error: errorTipo,
                         estudiante: estudiante,
@@ -245,8 +245,8 @@ export const procesarEstudiantes = async (req, res) => {
                 }
             } catch (error) {
                 console.error('Error al insertar estudiante:', error);
-                await client.query('ROLLBACK');
-                client.release();
+                await pool.query('ROLLBACK');
+                //pool.release();
                 return res.status(500).json({ 
                     error: 'Error al insertar el estudiante',
                     detalle: error.message,
@@ -255,16 +255,16 @@ export const procesarEstudiantes = async (req, res) => {
             }
         }
 
-        await client.query('COMMIT');
-        client.release();
+        await pool.query('COMMIT');
+        //pool.release();
         return res.status(200).json({ 
             mensaje: 'Estudiantes procesados correctamente',
             total: estudiantes.length 
         });
 
     } catch (error) {
-        await client.query('ROLLBACK');
-        client.release();
+        await pool.query('ROLLBACK');
+        //pool.release();
         console.error('Error en la transacción:', error);
         return res.status(500).json({ 
             error: 'Error en la transacción de los estudiantes',
