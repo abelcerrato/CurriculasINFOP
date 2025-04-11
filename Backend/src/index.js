@@ -1,6 +1,7 @@
 import express from "express";
 import {PORT} from './config.js'
 import userRoutes from './routes/ms_usuarios.routes.js'
+import nacionalidadesRoutes from './routes/nacionalidades.routes.js'
 import aldeasRoutes from './routes/aldeas.routes.js'
 import municipiosRoutes from "./routes/municipios.routes.js";
 import deptoRoutes from "./routes/departamentos.routes.js";
@@ -37,6 +38,8 @@ const app = express()
 app.use(cors());
 app.use(express.json())
 app.use(userRoutes)
+
+app.use(nacionalidadesRoutes)
 app.use(aldeasRoutes)
 app.use(municipiosRoutes)
 app.use(deptoRoutes)
