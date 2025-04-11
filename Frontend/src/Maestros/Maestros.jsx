@@ -195,6 +195,7 @@ const DataTable = () => {
 
     const handleEditClick = (id) => {
         const rowToEdit = rows.find((row) => row.id === id);
+
         setEditRowData({
             nombre: rowToEdit.nombre || '',
             identificacion: rowToEdit.identificacion || '',
@@ -224,83 +225,55 @@ const DataTable = () => {
         setEditRowId(null);
     };
 
+
     const handleSaveClick = async () => {
         try {
+            // Prepara el payload base (compartido entre INSERT y UPDATE)
+            const payload = {
+                nombre: editRowData.nombre || null,
+                identificacion: editRowData.identificacion || null,
+                correo: editRowData.correo || null,
+                telefono: editRowData.telefono || null,
+                genero: editRowData.genero || null,
+                fechanacimiento: editRowData.fechanacimiento || null,
+                edad: editRowData.edad || null,
+                idniveleducativo: editRowData.idniveleducativo || null,
+                idgradoacademico: editRowData.idgradoacademico || null,
+                iddepartamento: editRowData.iddepartamento || null,
+                idmunicipio: editRowData.idmunicipio || null,
+                idaldea: editRowData.idaldea || null,
+                caserio: editRowData.caserio || null,
+                direccion: editRowData.direccion || null,
+                idtipoeducador: editRowData.idtipoeducador || null,
+            };
+
             if (isAdding) {
-                // Lógica para INSERT
-                const response = await axios.post(
-                    `${process.env.REACT_APP_API_URL}/maestros`,
-                    {
-                        nombre: editRowData.nombre || null,
-                        identificacion: editRowData.identificacion || null,
-                        correo: editRowData.correo || null,
-                        telefono: editRowData.telefono || null,
-                        genero: editRowData.genero || null,
-                        fechanacimiento: editRowData.fechanacimiento || null,
-                        edad: editRowData.edad || null,
-                        idniveleducativo: editRowData.idniveleducativo || null,
-                        idgradoacademico: editRowData.idgradoacademico || null,
-                        iddepartamento: editRowData.iddepartamento || null,
-                        idmunicipio: editRowData.idmunicipio || null,
-                        idaldea: editRowData.idaldea || null,
-                        caserio: editRowData.caserio || null,
-                        direccion: editRowData.direccion || null,
-                        idtipoeducador: editRowData.idtipoeducador || null,
+                // INSERT: Agrega 'creadopor'
 
-                        creadopor: user?.id,
-                    }
-                );
-
-                fetchData();
-                Swal.fire({
-                    title: "Registro Creado",
-                    text: "El maestro ha sido creado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
+                await axios.post(`${process.env.REACT_APP_API_URL}/maestros`, {
+                    ...payload,
+                    creadopor: user?.id, // Asegúrate de que 'user' esté definido
                 });
             } else {
-                // Lógica para UPDATE
-                const payload = {
-                    nombre: editRowData.nombre || null,
-                    identificacion: editRowData.identificacion || null,
-                    correo: editRowData.correo || null,
-                    telefono: editRowData.telefono || null,
-                    genero: editRowData.genero || null,
-                    fechanacimiento: editRowData.fechanacimiento || null,
-                    edad: editRowData.edad || null,
-                    idniveleducativo: editRowData.idniveleducativo || null,
-                    idgradoacademico: editRowData.idgradoacademico || null,
-                    iddepartamento: editRowData.iddepartamento || null,
-                    idmunicipio: editRowData.idmunicipio || null,
-                    idaldea: editRowData.idaldea || null,
-                    caserio: editRowData.caserio || null,
-                    direccion: editRowData.direccion || null,
-                    idtipoeducador: editRowData.idtipoeducador || null,
+                // UPDATE: Agrega 'modificadopor'
+                await axios.put(`${process.env.REACT_APP_API_URL}/maestro/${editRowId}`, {
+                    ...payload,
                     modificadopor: user?.id,
-                };
-
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/maestro/${editRowId}`,
-                    payload,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-
-                fetchData();
-                Swal.fire({
-                    title: "Registro Actualizado",
-                    text: "El maestro ha sido actualizado exitosamente.",
-                    icon: "success",
-                    timer: 6000,
                 });
             }
 
-            handleCloseModal();
+            // Éxito
+            Swal.fire({
+                title: isAdding ? "Registro Creado" : "Registro Actualizado",
+                text: `El maestro ha sido ${isAdding ? "creado" : "actualizado"} exitosamente.`,
+                icon: "success",
+                timer: 6000,
+            });
+
+            fetchData(); // Recarga los datos
+            handleCloseModal(); // Cierra el modal
         } catch (error) {
-            console.error("Error al guardar el usuario:", error);
+            console.error("Error al guardar:", error);
             Swal.fire({
                 title: "Error",
                 text: "Ocurrió un error al guardar los datos.",
@@ -309,6 +282,8 @@ const DataTable = () => {
             });
         }
     };
+
+
 
     const handleEditRowChange = (e) => {
         const { name, value } = e.target;
