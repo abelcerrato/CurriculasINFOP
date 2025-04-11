@@ -389,7 +389,7 @@ const DataTable = () => {
             <Box component={Paper} sx={{ p: 5 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                     <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', color: color.azul }}>
-                        Maestros
+                        Instructores
                     </Typography>
                     <Button
                         variant="contained"
@@ -609,7 +609,7 @@ const DataTable = () => {
                                     aria-label="Dirección"
                                     minRows={3}
                                     //placeholder="Escribe algo aquí..."
-                                    style={{ width: '100%', padding: '8px', fontFamily: 'inherit', fontSize: '1rem' }}
+                                    style={{ padding: '8px' }}
                                 />
                             </FormControl>
 

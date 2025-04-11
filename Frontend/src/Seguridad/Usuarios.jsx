@@ -250,12 +250,13 @@ const DataTable = () => {
                     </Tooltip>
                     <Tooltip title="Restablecer Contraseña" arrow>
                         <IconButton
-                            onClick={() => handleResetearContra()}
+                            onClick={() => handleResetearContra(params.row.usuario)}
                             sx={{ color: color.azul }}
                         >
                             <VpnKeyOutlinedIcon />
                         </IconButton>
                     </Tooltip>
+
                 </>
 
             ),
@@ -272,10 +273,10 @@ const DataTable = () => {
         { field: 'estado', headerName: 'Estado' },
     ];
 
-    const handleResetearContra = async () => {
+    const handleResetearContra = async (usuario) => {
         try {
 
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/putPassword/${user.usuario}`);
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/putPassword/${usuario}`);
 
             Swal.fire({
                 title: "Contraseña Restablecida",

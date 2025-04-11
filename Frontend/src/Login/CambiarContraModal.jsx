@@ -13,9 +13,9 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { color } from "../Components/style/Color";
 import axios from "axios";
 import { useUser } from "../Components/UserContext";
-import Swal
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
-    from "sweetalert2";
 const style = {
     position: "absolute",
     top: "50%",
@@ -31,6 +31,7 @@ const style = {
 
 const CambiarContraModal = ({ open, onClose, mandatory = false, onSuccess }) => {
     const { user } = useUser();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState({ new: false, confirm: false });
     const [passwords, setPasswords] = useState({ newPassword: "", confirmPassword: "" });
 
@@ -85,14 +86,14 @@ const CambiarContraModal = ({ open, onClose, mandatory = false, onSuccess }) => 
             if (response.status === 200) {
                 Swal.fire({
                     title: "Contraseña Actualizada",
-                    text: "Su contraseña ha sido actualizada exitosamente.",
+                    text: "Su contraseña ha sido actualizada exitosamente, sera rederigido/a al inicio de sección con su contraseña nueva.",
                     icon: "success",
-                    timer: 6000,
+                    timer: 8000,
                 });
 
                 setPasswords({ newPassword: "", confirmPassword: "" });
                 setErrors({ newPassword: "", confirmPassword: "" });
-
+                navigate("/");
                 if (onSuccess) {
                     onSuccess(); // <- Aquí llamás la función del dashboard
                 } else {
