@@ -28,6 +28,8 @@ import ms_permisosRoutes from "./routes/ms_permisos.routes.js"
 import estudiantesExternos from "./routes/ApiExternaEstudiantes.routes.js"
 import programasRouter from './routes/programas.routes.js'
 import seguimientoRouter from './routes/seguimiento.routes.js'
+import matriculas from './routes/matriculas.routes.js'
+import calificaciones from './routes/calificaciones.routes.js'
 
 import cors from "cors"
 
@@ -71,6 +73,8 @@ app.use(estudiantesExternos)
 
 app.use(programasRouter)
 app.use(seguimientoRouter)
+app.use(matriculas)
+app.use(calificaciones)
 
 console.log("DB_USER:", process.env.DB_USER); // Prueba si se está cargando correctamente
 
