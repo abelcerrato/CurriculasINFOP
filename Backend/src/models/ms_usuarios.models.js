@@ -35,7 +35,7 @@ export const getUsuarioIdM = async (usuario) => {
     console.log('Usuario enviado:', usuario);
     try {
         const { rows } = await pool.query(`
-            SELECT id, nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, estado, fechacreacion, creadopor, fechamodificacion, modificadopor 
+            SELECT id, nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña, estado, fechacreacion, creadopor, fechamodificacion, modificadopor 
             FROM ms_usuarios 
             WHERE usuario=$1`, 
             [usuario]);
@@ -52,7 +52,7 @@ export const getUsuarioIdM = async (usuario) => {
 export const getUserIdM = async (id) => {
     try {
         const { rows } = await pool.query(`
-            SELECT nombre, cecap, correo, rol, iddepartamento, idmunicipio, contraseña, 
+            SELECT nombre, cecap, correo, idrol, iddepartamento, idmunicipio, contraseña, 
             estado, fechacreacion, creadopor, fechamodificacion, modificadopor, usuario
             FROM ms_usuarios WHERE id=$1`, [id])
 
@@ -84,7 +84,6 @@ export const verificarUsuarioM = async (usuario) => {
     } catch (error) {
         throw error; // Si ocurre algún error en la consulta, se lanza el error.
     }
-    usuariusuarioz
 };
 
 
