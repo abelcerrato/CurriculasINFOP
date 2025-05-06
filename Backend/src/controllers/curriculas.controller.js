@@ -123,10 +123,10 @@ export const postCurriculaModulosClasesC = async (req, res) => {
         const insertedClasses = [];
 
         for (const moduloData of modulosData) {
-            const { modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo, creadoporModulo, clases } = moduloData;
+            const { modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo, creadopor, clases } = moduloData;
 
             const newModulo = await postModulosCurriculaM(
-                modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo, curriculaId, creadoporModulo
+                modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo, curriculaId, creadopor
             );
 
             const moduloId = newModulo.id;
@@ -134,11 +134,10 @@ export const postCurriculaModulosClasesC = async (req, res) => {
             insertedModules.push(moduloId);
 
             for (const claseData of clases) {
-                const { clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, creadoporClase } = claseData;
+                const { clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, creadopor } = claseData;
 
                 const newClase = await postClasesModulosCurriculasM(
-                    clase, duracionteoricaClase, duracionpracticaClase,
-                    duraciontotalClase, curriculaId, moduloId, creadoporClase
+                    clase, duracionteoricaClase, duracionpracticaClase,duraciontotalClase, curriculaId, moduloId, creadopor
                 );
 
                 const claseId = newClase.id;
