@@ -4,7 +4,6 @@ import Swal from 'sweetalert2';
 import { useUser } from "../Components/UserContext";
 import { color } from '../Components/style/Color';
 import Dashboard from '../Dashboard/Dashboard';
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 
 
 // Material-UI
@@ -16,6 +15,7 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 
 import { EditOutlined as EditOutlinedIcon, Add as AddIcon } from '@mui/icons-material';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 
 
 const DataTable = () => {
@@ -371,7 +371,7 @@ const DataTable = () => {
                                             name="idrol"
                                             value={editRowData.idrol || ''}
                                             onChange={handleEditRowChange}
-                                            label="Departamento"
+                                            label="Rol"
                                         >
                                             <MenuItem value="">Seleccionar rol</MenuItem>
                                             {roles.map(dep => (

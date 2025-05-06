@@ -394,7 +394,7 @@ const DataTable = () => {
                 {/* Modal para edición/creación */}
                 <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
                     <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
-                        {isAdding ? 'Nuevo Maestro' : 'Actualizar Maestro'}
+                        {isAdding ? 'Nuevo Instructor' : 'Actualizar Instructor'}
                     </DialogTitle>
                     <DialogContent dividers>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pl: 5, pr: 5 }}>

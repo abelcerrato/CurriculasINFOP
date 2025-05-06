@@ -163,7 +163,7 @@ const DataTable = () => {
     useEffect(() => {
         const obtenerTEducador = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/etnia`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/etnias`);
                 setEtnia(response.data);
             } catch (error) {
                 console.error("Error al obtener los tipo educador", error);

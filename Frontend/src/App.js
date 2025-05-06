@@ -2,6 +2,7 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import SignIn from './Login/Sign-in';
+import Programas from './Programas/Programas';
 import Dashboard from './Dashboard/Dashboard';
 import Departamentos from './Mantenimientos/Departamentos';
 import Municipios from './Mantenimientos/Municipios';
@@ -82,14 +83,17 @@ function App() {
         <Routes>
           {/* Ruta pública */}
           <Route path="/" element={<SignIn />} />
-          
+
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            {/* Programas */}
+            <Route path="/Programas" element={<Programas />} />
+
             {/* Instructores */}
             <Route path="/Instructores" element={<Instructores />} />
-            
-            {/* Estudiantes */} 
+
+            {/* Estudiantes */}
             <Route path="/Estudiantes" element={<Estudiantes />} />
 
 

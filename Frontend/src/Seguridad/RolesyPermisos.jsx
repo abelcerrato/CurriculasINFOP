@@ -533,7 +533,6 @@ const DataTable = () => {
                                 onChange={handleChange}
                                 margin="normal"
                             />
-
                             <FormControl fullWidth variant="standard" sx={{ mt: 2 }}>
                                 <InputLabel>Estado</InputLabel>
                                 <Select

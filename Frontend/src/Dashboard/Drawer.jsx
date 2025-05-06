@@ -17,6 +17,9 @@ import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import LocalLibraryOutlinedIcon from "@mui/icons-material/LocalLibraryOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+
 import Groups3OutlinedIcon from '@mui/icons-material/Groups3Outlined';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 import RoomOutlinedIcon from '@mui/icons-material/RoomOutlined';
@@ -211,6 +214,38 @@ const ProjectDrawer = ({ open }) => {
           onClick={() => navigate("/dashboard")}
         />
       </List>
+      {open && <Divider />}
+      {/* Currículas */}
+      <List>
+
+        <LightTooltip title="Currículas" placement="right" disableHoverListener={open} >
+          <div>
+            <MenuItem
+              path="/Currículas"
+              icon={<CreateNewFolderOutlinedIcon />}
+              text="Currículas"
+              onClick={() => navigate("/Currículas")}
+            />
+          </div>
+        </LightTooltip >
+
+      </List>
+      {open && <Divider />}
+      {/* Programas */}
+      <List>
+
+        <LightTooltip title="Programas" placement="right" disableHoverListener={open} >
+          <div>
+            <MenuItem
+              path="/Programas"
+              icon={<Inventory2OutlinedIcon />}
+              text="Programas"
+              onClick={() => navigate("/Programas")}
+            />
+          </div>
+        </LightTooltip >
+
+      </List>
 
       {open && <Divider />}
       {/* Instructores */}
@@ -363,7 +398,7 @@ const ProjectDrawer = ({ open }) => {
               }}
               PaperProps={{
                 sx: {
-                  marginTop: 35,
+                  marginTop: 43,
                   ml: 10,
                   boxShadow: 3,
                   minWidth: 200,
@@ -599,7 +634,7 @@ const ProjectDrawer = ({ open }) => {
           }}
           PaperProps={{
             sx: {
-              marginTop: 43,
+              marginTop: 59,
               ml: 10,
               boxShadow: 3,
               minWidth: 200,
