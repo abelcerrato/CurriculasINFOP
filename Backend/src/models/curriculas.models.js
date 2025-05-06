@@ -46,10 +46,10 @@ export const postCurriculaM = async (curricula, sector, duracionteorica, duracio
             INSERT INTO curriculas 
                 (curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida, objetivo, 
                 versioncurricula, educaciontemprana, idareaformacion, fechacreacion, creadopor, fechamodificacion, modificadopor) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, $11, null, null) RETURNING *`, 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, $11, null, null) RETURNING id`, 
             [curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida, objetivo, 
             versioncurricula, educaciontemprana, idareaformacion, creadopor]);
-        return rows;
+        return rows[0];
     } catch (error) {
         throw error;
     }
