@@ -2,6 +2,8 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import SignIn from './Login/Sign-in';
+import TablaCurriculas from './Curriculas/TablaCurriculas';
+import Curriculas from './Curriculas/Curriculas';
 import Programas from './Programas/Programas';
 import Dashboard from './Dashboard/Dashboard';
 import Departamentos from './Mantenimientos/Departamentos';
@@ -87,6 +89,10 @@ function App() {
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            {/* Curriculas */}
+            <Route path="/Currículas" element={<TablaCurriculas />} />
+            <Route path="/Currículas/Registro" element={<Curriculas />} />
+
             {/* Programas */}
             <Route path="/Programas" element={<Programas />} />
 
