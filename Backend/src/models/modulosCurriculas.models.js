@@ -10,8 +10,8 @@ export const getModulosCurriculasM = async () => {
                     ump.nombre as modificadopor, mc.fechamodificacion
             FROM moduloscurriculas as mc
             left join curriculas c on mc.idcurricula =c.id 
-            left join usuarios ucp on mc.creadopor = ucp.id 
-            left join usuarios ump on mc.modificadopor = ump.id 
+            left join ms_usuarios ucp on mc.creadopor = ucp.id 
+            left join ms_usuarios ump on mc.modificadopor = ump.id 
             `)
         console.log(rows);
         return rows;
@@ -31,8 +31,8 @@ export const getModulosCurriculaIdM = async (id) => {
                 ump.nombre as modificadopor, mc.fechamodificacion
         FROM moduloscurriculas as mc
         left join curriculas c on mc.idcurricula =c.id 
-        left join usuarios ucp on mc.creadopor = ucp.id 
-        left join usuarios ump on mc.modificadopor = ump.id 
+        left join ms_usuarios ucp on mc.creadopor = ucp.id 
+        left join ms_usuarios ump on mc.modificadopor = ump.id 
         where mc.id=$1`, [id]);
         console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;
@@ -53,8 +53,8 @@ export const getModulosIdCurriculaM = async (id) => {
                 ump.nombre as modificadopor, mc.fechamodificacion
         FROM moduloscurriculas as mc
         left join curriculas c on mc.idcurricula =c.id 
-        left join usuarios ucp on mc.creadopor = ucp.id 
-        left join usuarios ump on mc.modificadopor = ump.id 
+        left join ms_usuarios ucp on mc.creadopor = ucp.id 
+        left join ms_usuarios ump on mc.modificadopor = ump.id 
         where c.id=$1`, [id]);
         console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;

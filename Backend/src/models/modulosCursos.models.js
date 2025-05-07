@@ -12,8 +12,8 @@ export const getModulosCursosM = async () => {
             FROM moduloscursos as mc
             left join curriculas c on mc.idcurricula =c.id 
             left join cursos cu on mc.idcurso=cu.id
-            left join usuarios ucp on mc.creadopor = ucp.id 
-            left join usuarios ump on mc.modificadopor = ump.id  
+            left join ms_usuarios ucp on mc.creadopor = ucp.id 
+            left join ms_usuarios ump on mc.modificadopor = ump.id  
             `)
         console.log(rows);
         return rows;
@@ -36,8 +36,8 @@ export const getModulosCursosIdM = async (id) => {
             FROM moduloscursos as mc
             left join curriculas c on mc.idcurricula =c.id 
             left join cursos cu on mc.idcurso=cu.id
-            left join usuarios ucp on mc.creadopor = ucp.id 
-            left join usuarios ump on mc.modificadopor = ump.id  
+            left join ms_usuarios ucp on mc.creadopor = ucp.id 
+            left join ms_usuarios ump on mc.modificadopor = ump.id  
             where mc.id=$1`,[id]);
         console.log(rows);
         return rows;
@@ -60,8 +60,8 @@ export const getModulosCursosIdCurriculaM = async (id) => {
             FROM moduloscursos as mc
             left join curriculas c on mc.idcurricula =c.id 
             left join cursos cu on mc.idcurso=cu.id
-            left join usuarios ucp on mc.creadopor = ucp.id 
-            left join usuarios ump on mc.modificadopor = ump.id 
+            left join ms_usuarios ucp on mc.creadopor = ucp.id 
+            left join ms_usuarios ump on mc.modificadopor = ump.id 
         where c.id=$1`, [id]);
         console.log('Resultado de la consulta de los modulos de la Curricula:', rows);
         return rows;

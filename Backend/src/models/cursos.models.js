@@ -11,8 +11,8 @@ export const getCursosM = async () => {
             left join curriculas c2 on c.idcurricula = c2.id 
             left join departamentos d  on c.iddepartamento = d.id 
             left join municipios m on c.idmunicipio = m.id 
-            left join usuarios ucp on c.creadopor = ucp.id 
-            left join usuarios ump on c.modificadopor = ump.id 
+            left join ms_usuarios ucp on c.creadopor = ucp.id 
+            left join ms_usuarios ump on c.modificadopor = ump.id 
             `)
         console.log(rows);
         return rows;
@@ -34,8 +34,8 @@ export const getCursoIdM = async (id) => {
             left join curriculas c2 on c.idcurricula = c2.id 
             left join departamentos d  on c.iddepartamento = d.id 
             left join municipios m on c.idmunicipio = m.id 
-            left join usuarios ucp on c.creadopor = ucp.id 
-            left join usuarios ump on c.modificadopor = ump.id 
+            left join ms_usuarios ucp on c.creadopor = ucp.id 
+            left join ms_usuarios ump on c.modificadopor = ump.id 
             WHERE c.id=$1`, [id]);
         console.log('Resultado de la consulta del curso:', rows);
         return rows;

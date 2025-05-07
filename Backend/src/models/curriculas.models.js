@@ -8,8 +8,8 @@ export const getCurriculasM = async () => {
                 c.fechacreacion, ucp.nombre as creadopor, c.fechamodificacion, ump.nombre as modificadopor 
             FROM curriculas as c
             left join areasformacion a on c.idareaformacion= a.id 
-            left join usuarios ucp on c.creadopor = ucp.id 
-            left join usuarios ump on c.modificadopor = ump.id 
+            left join ms_usuarios ucp on c.creadopor = ucp.id 
+            left join ms_usuarios ump on c.modificadopor = ump.id 
         `)
         console.log(rows);
         return rows;
@@ -28,8 +28,8 @@ export const getCurriculaIdM = async (id) => {
                     c.fechacreacion, ucp.nombre as creadopor, c.fechamodificacion, ump.nombre as modificadopor 
             FROM curriculas as c
             left join areasformacion a on c.idareaformacion= a.id 
-            left join usuarios ucp on c.creadopor = ucp.id 
-            left join usuarios ump on c.modificadopor = ump.id 
+            left join ms_usuarios ucp on c.creadopor = ucp.id 
+            left join ms_usuarios ump on c.modificadopor = ump.id 
             WHERE c.id=$1`, [id]);
         console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;

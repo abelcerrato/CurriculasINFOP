@@ -5,18 +5,81 @@ import { pool } from '../db.js'
 export const getClasesModulosCursosM = async () => {
     try {
         const { rows } = await pool.query(`
-            SELECT cc.id, cc.clase, cc.duracionteorica, cc.duracionpractica, cc.duraciontotal, 
-                    cc.idcurricula, c.curricula,
-                    cc.idmodulo, m.modulo,
-                    cc.idcurso, cu.curso,
-                    ucp.nombre as creadopor, cc.fechacreacion,  
-                    ump.nombre as modificadopor, cc.fechamodificacion
-            FROM clasescursos cc
-            left join curriculas c on cc.idcurricula = c.id
-            left join moduloscursos m on cc.idmodulo = m.id 
-            left join cursos cu on cc.idcurso=cu.id
-            left join usuarios ucp on cc.creadopor = ucp.id 
-            left join usuarios ump on cc.modificadopor = ump.id  
+           SELECT
+    c.id AS idcurricula,
+    c.curricula,
+    c.sector,
+    c.duracionteorica,
+    c.duracionpractica,
+    c.duraciontotal,
+    c.nombresalida,
+    c.objetivo,
+    c.versioncurricula,
+    c.educaciontemprana,
+    c.idareaformacion,
+
+    -- 🔽 Cursos asociados a la currícula
+    (
+        SELECT json_agg(
+            json_build_object(
+                'idcurso', cu.id,
+                'curso', cu.curso,
+                'fechainicio', cu.fechainicio,
+                'fechafinalizacion', cu.fechafinalizacion,
+                'nombresalida', cu.nombresalida,
+                'iddepartamento', cu.iddepartamento,
+                'idmunicipio', cu.idmunicipio,
+                'lugardesarrollo', cu.lugardesarrollo,
+                'duracionteorica', cu.duracionteorica,
+                'duracionpractia', cu.duracionpractia,
+                'duraciontotal', cu.duraciontotal,
+                'metodologia', cu.metodologia,
+                'tipomaterial', cu.tipomaterial,
+                'modalidad', cu.modalidad,
+
+                -- Módulos del curso
+                'modulos', (
+                    SELECT json_agg(
+                        json_build_object(
+                            'idmodulo', m.id,
+                            'modulo', m.modulo,
+                            'duracionteorica', m.duracionteorica,
+                            'duracionpractia', m.duracionpractia,
+                            'duraciontotal', m.duraciontotal,
+
+                            -- Clases del módulo y curso
+                            'clases', (
+                                SELECT json_agg(
+                                    json_build_object(
+                                        'idclase', cc.id,
+                                        'clase', cc.clase,
+                                        'duracionteorica', cc.duracionteorica,
+                                        'duracionpractica', cc.duracionpractica,
+                                        'duraciontotal', cc.duraciontotal,
+                                        'creadopor', ucp.nombre,
+                                        'fechacreacion', cc.fechacreacion,
+                                        'modificadopor', ump.nombre,
+                                        'fechamodificacion', cc.fechamodificacion
+                                    )
+                                )
+                                FROM clasescursos cc
+                                LEFT JOIN ms_usuarios ucp ON cc.creadopor = ucp.id
+                                LEFT JOIN ms_usuarios ump ON cc.modificadopor = ump.id
+                                WHERE cc.idmodulo = m.id AND cc.idcurso = cu.id
+                            )
+                        )
+                    )
+                    FROM moduloscursos m
+                    WHERE m.idcurso = cu.id AND m.idcurricula = c.id
+                )
+            )
+        )
+        FROM cursos cu
+        WHERE cu.idcurricula = c.id
+    ) AS cursos
+
+FROM curriculas c;
+
             `)
         console.log(rows);
         return rows;
@@ -39,8 +102,8 @@ export const getIdClasesModulosCursosM = async (id) => {
             left join curriculas c on cc.idcurricula = c.id
             left join moduloscursos m on cc.idmodulo = m.id 
             left join cursos cu on cc.idcurso=cu.id
-            left join usuarios ucp on cc.creadopor = ucp.id 
-            left join usuarios ump on cc.modificadopor = ump.id 
+            left join ms_usuarios ucp on cc.creadopor = ucp.id 
+            left join ms_usuarios ump on cc.modificadopor = ump.id 
             where cc.id=$1
             `, [id])
         console.log(rows);
@@ -65,8 +128,8 @@ export const getClasesIdModulosCursoM = async (id) => {
             left join curriculas c on cc.idcurricula = c.id
             left join moduloscursos m on cc.idmodulo = m.id 
             left join cursos cu on cc.idcurso=cu.id
-            left join usuarios ucp on cc.creadopor = ucp.id 
-            left join usuarios ump on cc.modificadopor = ump.id 
+            left join ms_usuarios ucp on cc.creadopor = ucp.id 
+            left join ms_usuarios ump on cc.modificadopor = ump.id 
             where m.id=$1
             `, [id])
         console.log(rows);
@@ -91,8 +154,8 @@ export const getClasesModulosIdCursoM = async (id) => {
             left join curriculas c on cc.idcurricula = c.id
             left join moduloscursos m on cc.idmodulo = m.id 
             left join cursos cu on cc.idcurso=cu.id
-            left join usuarios ucp on cc.creadopor = ucp.id 
-            left join usuarios ump on cc.modificadopor = ump.id  
+            left join ms_usuarios ucp on cc.creadopor = ucp.id 
+            left join ms_usuarios ump on cc.modificadopor = ump.id  
             where cu.id=$1
             `, [id])
         console.log(rows);
@@ -116,8 +179,8 @@ export const getClasesModulosCursoIdCurriculaM = async (id) => {
             left join curriculas c on cc.idcurricula = c.id
             left join moduloscursos m on cc.idmodulo = m.id 
             left join cursos cu on cc.idcurso=cu.id
-            left join usuarios ucp on cc.creadopor = ucp.id 
-            left join usuarios ump on cc.modificadopor = ump.id 
+            left join ms_usuarios ucp on cc.creadopor = ucp.id 
+            left join ms_usuarios ump on cc.modificadopor = ump.id 
             where c.id=$1
             `, [id])
         console.log(rows);
