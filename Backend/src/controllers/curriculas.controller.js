@@ -206,9 +206,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
 
             updatedModules.push(savedModulo);
 
-            if (!savedModulo || !savedModulo.id) {
-                throw new Error('No se pudo guardar el módulo correctamente');
-            }
+           
 
             const moduloIdFinal = savedModulo.id || savedModulo[0]?.id; // Manejar ambos casos de retorno
 
