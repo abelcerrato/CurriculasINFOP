@@ -33,16 +33,12 @@ export const getCalificacionesIdC = async (req, res) => {
 
 export const postCalificacionesC = async (req, res) => {
     try {
-        const { idclasecurso, idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor } = req.body;
+        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor } = req.body;
         console.log(req.body);
 
 
-        /*   if (!idclasecurso || !idclasecurricula || !calificacionteorica || !duracionteorica || !calificacionpractica || !duracionpractica || !duraciontotal ) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        } */
-
-        const newCalificacion = await postCalificacionesM(idclasecurso, idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor);
+    
+        const newCalificacion = await postCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor);
         res.json({ message: "Calificacion agregada exitosamente: ", newCalificacion });
 
     } catch (error) {
@@ -55,14 +51,9 @@ export const postCalificacionesC = async (req, res) => {
 export const putCalificacionesC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { idclasecurso, idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor } = req.body;
+        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor } = req.body;
 
-        /*  if (!idclasecurso || !idclasecurricula || !calificacionteorica || !duracionteorica || !calificacionpractica || !duracionpractica || !duraciontotal ) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        } */
-
-        const newCalificacion = await putCalificacionesM(idclasecurso, idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor, id);
+        const newCalificacion = await putCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor, id);
         res.json({ message: "Calificacion actualizada exitosamente: ", newCalificacion });
 
     } catch (error) {

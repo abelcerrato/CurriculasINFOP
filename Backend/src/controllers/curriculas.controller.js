@@ -1,6 +1,6 @@
-import { postClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
+import { postClasesModulosCurriculasM, putClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
 import { getCurriculaIdM, getCurriculasM, postCurriculaM, putCurriculaM } from '../models/curriculas.models.js';
-import { postModulosCurriculaM } from '../models/modulosCurriculas.models.js';
+import { postModulosCurriculaM, putModulosCurriculaM } from '../models/modulosCurriculas.models.js';
 
 export const getCurriculasC = async (req, res) => {
     try {
@@ -71,28 +71,7 @@ export const putCurriculaC = async (req, res) => {
 
 
 
-export const postCurriculaModClasesC = async (req, res) => {
-    try {
-        const { curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida, objetivo,
-            versioncurricula, educaciontemprana, idareaformacion, creadopor } = req.body;
-        console.log(req.body);
-
-
-        const newCurricula = await postCurriculaM(curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida,
-            objetivo, versioncurricula, educaciontemprana, idareaformacion, creadopor);
-
-        // Obtener el id de la curricula insertada
-        const curriculaId = newCurricula[0].id;  // Suponiendo que el id es 'id' en la tabla
-        res.json({ message: "Curricula agregada exitosamente", curriculaId });
-
-    } catch (error) {
-        console.error('Error al insertar la curricula:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
-}
-
-
-//---------------------------------------------------------------------------------------------------------------------------------------
+//##########################################################################################################################################
 
 export const postCurriculaModulosClasesC = async (req, res) => {
     const {
@@ -117,7 +96,7 @@ export const postCurriculaModulosClasesC = async (req, res) => {
         const curriculaId = newCurricula.id;
         console.log('ID de la curricula insertada:', curriculaId);  // Verificar el ID de la curricula insertada
 
-        //----------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------
         // 2. Insertar los módulos con el ID de la curricula
         const insertedModules = [];
         const insertedClasses = [];
@@ -133,6 +112,7 @@ export const postCurriculaModulosClasesC = async (req, res) => {
             console.log('ID del módulo insertado:', moduloId);
             insertedModules.push(moduloId);
 
+            //--------------------------------------------------------------------------------------------------------------------------------
             for (const claseData of clases) {
                 const { clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, creadopor } = claseData;
 
@@ -161,6 +141,77 @@ export const postCurriculaModulosClasesC = async (req, res) => {
 
     } catch (error) {
         console.error('Error al insertar curricula, módulo o clase:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+
+
+//##########################################################################################################################################
+
+
+
+export const putCurriculaModulosClasesC = async (req, res) => {
+    const {
+        curriculaData,    // Datos para la curricula
+        modulosData       // Cada módulo debe incluir su ID y sus clases con ID
+    } = req.body;
+
+    try {
+        //---------------------------------------------------------------------------------------------------------------------------------
+        // 1. Editar la Curricula
+        const {
+            id, curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
+            nombresalida, objetivo, versioncurricula, educaciontemprana,
+            idareaformacion, modificadopor
+        } = curriculaData;
+
+        const updatedCurricula = await putCurriculaM(
+            curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
+            nombresalida, objetivo, versioncurricula, educaciontemprana,
+            idareaformacion, modificadopor, id
+        );
+
+        //---------------------------------------------------------------------------------------------------------------------------------
+        // 2. Editar los módulos y sus clases
+        const updatedModules = [];
+        const updatedClasses = [];
+
+        for (const moduloData of modulosData) {
+            const {
+                id: moduloId, modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                modificadopor, clases
+            } = moduloData;
+
+            const updatedModulo = await putModulosCurriculaM(
+                modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,id, modificadopor, moduloId
+            );
+            updatedModules.push(updatedModulo[0]);
+
+            //-----------------------------------------------------------------------------------------------------------------------------
+            for (const claseData of clases) {
+                const {
+                    id: claseId, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor
+                } = claseData;
+
+                const updatedClase = await putClasesModulosCurriculasM(
+                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, id, moduloId, modificadopor, claseId
+                );
+                updatedClasses.push(updatedClase[0]);
+            }
+        }
+
+        res.json({
+            message: 'Curricula, módulos y clases actualizados exitosamente',
+            data: {
+                curricula: updatedCurricula[0],
+                modulos: updatedModules,
+                clases: updatedClasses
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al actualizar curricula, módulos o clases:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };

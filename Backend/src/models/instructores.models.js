@@ -117,7 +117,7 @@ export const putMaestroM = async (nombre, identificacion, correo, telefono, gene
 
 export const deleteEducacionNoFormalM = async ( idmaestro) => {
     try {
-        // Eliminar los cursos anteriores del estudiante
+       
         await pool.query(`DELETE FROM educacionNoFormal WHERE idmaestro=$1`, [idmaestro]);
     } catch (error) {
         throw error;

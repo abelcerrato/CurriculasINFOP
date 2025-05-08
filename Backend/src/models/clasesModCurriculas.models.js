@@ -69,55 +69,55 @@ export const getClasesModulosCurriculasM = async () => {
 export const getIdClasesModulosCurriculasM = async (id) => {
     try {
         const { rows } = await pool.query(`
-           SELECT
-    c.id AS idcurricula,
-    c.curricula,
-    c.sector,
-    c.duracionteorica,
-    c.duracionpractica,
-    c.duraciontotal,
-    c.nombresalida,
-    c.objetivo,
-    c.versioncurricula,
-    c.educaciontemprana,
-    c.idareaformacion,
+        SELECT
+            c.id AS idcurricula,
+            c.curricula,
+            c.sector,
+            c.duracionteorica,
+            c.duracionpractica,
+            c.duraciontotal,
+            c.nombresalida,
+            c.objetivo,
+            c.versioncurricula,
+            c.educaciontemprana,
+            c.idareaformacion,
 
-    (
-        SELECT json_agg(
-            json_build_object(
-                'idmodulo', m.id,
-                'modulo', m.modulo,
-                'duracionteorica', m.duracionteorica,
-                'duracionpractica', m.duracionpractia,
-                'duraciontotal', m.duraciontotal,
+            (
+                SELECT json_agg(
+                    json_build_object(
+                        'idmodulo', m.id,
+                        'modulo', m.modulo,
+                        'duracionteorica', m.duracionteorica,
+                        'duracionpractica', m.duracionpractia,
+                        'duraciontotal', m.duraciontotal,
 
-                'clases', (
-                    SELECT json_agg(
-                        json_build_object(
-                            'idclase', cc.id,
-                            'clase', cc.clase,
-                            'duracionteorica', cc.duracionteorica,
-                            'duracionpractica', cc.duracionpractica,
-                            'duraciontotal', cc.duraciontotal,
-                            'creadopor', ucp.nombre,
-                            'fechacreacion', cc.fechacreacion,
-                            'modificadopor', ump.nombre,
-                            'fechamodificacion', cc.fechamodificacion
+                        'clases', (
+                            SELECT json_agg(
+                                json_build_object(
+                                    'idclase', cc.id,
+                                    'clase', cc.clase,
+                                    'duracionteorica', cc.duracionteorica,
+                                    'duracionpractica', cc.duracionpractica,
+                                    'duraciontotal', cc.duraciontotal,
+                                    'creadopor', ucp.nombre,
+                                    'fechacreacion', cc.fechacreacion,
+                                    'modificadopor', ump.nombre,
+                                    'fechamodificacion', cc.fechamodificacion
+                                )
+                            )
+                            FROM clasescurriculas cc
+                            LEFT JOIN ms_usuarios ucp ON cc.creadopor = ucp.id
+                            LEFT JOIN ms_usuarios ump ON cc.modificadopor = ump.id
+                            WHERE cc.idmodulo = m.id
                         )
                     )
-                    FROM clasescurriculas cc
-                    LEFT JOIN ms_usuarios ucp ON cc.creadopor = ucp.id
-                    LEFT JOIN ms_usuarios ump ON cc.modificadopor = ump.id
-                    WHERE cc.idmodulo = m.id
                 )
-            )
-        )
-        FROM moduloscurriculas m
-        WHERE m.idcurricula = c.id
-    ) AS modulos
+                FROM moduloscurriculas m
+                WHERE m.idcurricula = c.id
+            ) AS modulos
 
-FROM curriculas c
-WHERE c.id = $1;
+        FROM curriculas c
+        WHERE c.id = $1;
 
             `, [id])
         console.log(rows);

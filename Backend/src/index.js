@@ -16,9 +16,7 @@ import instructoresRouter from "./routes/instructores.routes.js";
 import curriculasRoutes from "./routes/curriculas.routes.js";
 import modulosCurriculasRoutes from "./routes/modulosCurriculas.routes.js";
 import clasesModCurriculas from "./routes/clasesModCurriculas.routes.js";
-import cursosRoutes from "./routes/cursos.routes.js"
-import modulosCursosRoutes from "./routes/modulosCursos.routes.js"
-import clasesModCursos from './routes/clasesModCursos.routes.js'
+
 
 import ms_rolesRoutes from "./routes/ms_roles.routes.js";
 import ms_modulosRoutes from "./routes/ms_modulos.routes.js"
@@ -28,7 +26,6 @@ import ms_permisosRoutes from "./routes/ms_permisos.routes.js"
 import estudiantesExternos from "./routes/ApiExternaEstudiantes.routes.js"
 import programasRouter from './routes/programas.routes.js'
 import seguimientoRouter from './routes/seguimiento.routes.js'
-import matriculas from './routes/matriculas.routes.js'
 import calificaciones from './routes/calificaciones.routes.js'
 
 import cors from "cors"
@@ -60,9 +57,6 @@ app.use(instructoresRouter)
 app.use(curriculasRoutes)
 app.use(modulosCurriculasRoutes)
 app.use(clasesModCurriculas)
-app.use(cursosRoutes)
-app.use(modulosCursosRoutes)
-app.use(clasesModCursos)
 
 app.use(ms_rolesRoutes)
 app.use(ms_modulosRoutes)
@@ -73,7 +67,7 @@ app.use(estudiantesExternos)
 
 app.use(programasRouter)
 app.use(seguimientoRouter)
-app.use(matriculas)
+
 app.use(calificaciones)
 
 console.log("DB_USER:", process.env.DB_USER); // Prueba si se está cargando correctamente
