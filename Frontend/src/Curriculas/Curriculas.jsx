@@ -363,8 +363,22 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
     };
 
 
-    const removeClass = (moduleIndex, classIndex) => {
+    const removeClass = async (moduleIndex, classIndex) => {
         const updatedModules = [...modulosData];
+        const claseAEliminar = updatedModules[moduleIndex].clases[classIndex];
+
+        // Llama a la API solo si la clase tiene ID (es decir, ya está en la base de datos)
+        if (claseAEliminar?.id) {
+            try {
+                await axios.delete(`${process.env.REACT_APP_API_URL}/clases/${claseAEliminar.id}`);
+            } catch (error) {
+                console.error('Error al eliminar la clase:', error);
+                // Aquí puedes agregar una notificación al usuario o evitar continuar
+                return;
+            }
+        }
+
+        // Remover clase del estado local
         updatedModules[moduleIndex].clases = updatedModules[moduleIndex].clases.filter((_, i) => i !== classIndex);
 
         // Recalcular totales del módulo
@@ -598,10 +612,16 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                         clase: clase.clase || '',
                         horasTeoricas: normalizeDurationToHoursMinutes(clase.duracionteorica).horas,
                         minutosTeoricos: normalizeDurationToHoursMinutes(clase.duracionteorica).minutos,
+
+
                         horasPracticas: normalizeDurationToHoursMinutes(clase.duracionpractica).horas,
                         minutosPracticos: normalizeDurationToHoursMinutes(clase.duracionpractica).minutos,
+
+
                         duracionteoricaClase: normalizeDurationToMinutes(clase.duracionteorica),
+
                         duracionpracticaClase: normalizeDurationToMinutes(clase.duracionpractica),
+
                         duraciontotalClase: normalizeDurationToMinutes(clase.duraciontotal),
 
                     })) || []
@@ -704,12 +724,15 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                     `${process.env.REACT_APP_API_URL}/curriculasModulosClases/${editId}`,
                     payload
                 );
+                console.log('Respuesta de la API actualizar');
+                
             } else {
                 // Llamada para crear
                 response = await axios.post(
                     `${process.env.REACT_APP_API_URL}/curriculasModulosClases`,
                     payload
                 );
+                console.log('Respuesta de la API insertar');
             }
 
             Swal.fire({

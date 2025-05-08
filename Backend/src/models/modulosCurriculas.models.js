@@ -13,7 +13,7 @@ export const getModulosCurriculasM = async () => {
             left join ms_usuarios ucp on mc.creadopor = ucp.id 
             left join ms_usuarios ump on mc.modificadopor = ump.id 
             `)
-       // console.log(rows);
+        // console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -22,8 +22,8 @@ export const getModulosCurriculasM = async () => {
 
 
 //get de modulos por id modulo
-export const getModulosCurriculaIdM = async (id) => {
-    console.log('Modulo enviado:', id);
+export const getModulosCurriculaIdM = async (idmodulo) => {
+    console.log('Modulo enviado:', idmodulo);
     try {
         const { rows } = await pool.query(`
         SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractia, mc.duraciontotal, 
@@ -33,7 +33,7 @@ export const getModulosCurriculaIdM = async (id) => {
         left join curriculas c on mc.idcurricula =c.id 
         left join ms_usuarios ucp on mc.creadopor = ucp.id 
         left join ms_usuarios ump on mc.modificadopor = ump.id 
-        where mc.id=$1`, [id]);
+        where mc.id=$1`, [idmodulo]);
         //console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;
     } catch (error) {
@@ -80,13 +80,13 @@ export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpra
 }
 
 
-export const putModulosCurriculaM = async (modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, id) => {
+export const putModulosCurriculaM = async (modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, idmodulo) => {
     try {
         const { rows } = await pool.query(`
             UPDATE moduloscurriculas SET
                     modulo=$1, duracionteorica=$2, duracionpractia=$3, duraciontotal=$4, idcurricula=$5, fechamodificacion=CURRENT_TIMESTAMP, modificadopor=$6
             WHERE id=$7 RETURNING *`,
-            [modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, id]);
+            [modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, idmodulo]);
         return rows;
     } catch (error) {
         throw error;

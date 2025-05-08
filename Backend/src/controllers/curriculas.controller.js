@@ -150,8 +150,6 @@ export const postCurriculaModulosClasesC = async (req, res) => {
 
 //##########################################################################################################################################
 
-
-
 export const putCurriculaModulosClasesC = async (req, res) => {
     const { curriculaId } = req.params;
     const { curriculaData, modulosData } = req.body;
@@ -176,65 +174,83 @@ export const putCurriculaModulosClasesC = async (req, res) => {
 
         for (const moduloData of modulosData) {
             const {
-                id: moduloId, modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                id: idmodulo, modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
                 modificadopor, clases
             } = moduloData;
 
             let savedModulo;
-            //if (moduloId) {
-            // const existsModulo = await getModulosCurriculaIdM(moduloId);
-            if (moduloId === undefined || null) {
-                savedModulo = await postModulosCurriculaM(
-                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
-                    curriculaId, creadopor
-                );
+            if (idmodulo) {
+                // Verificar si el módulo ya existe
+                const existsModulo = await getModulosCurriculaIdM(idmodulo);
+                if (existsModulo.length > 0) {
+                    // Si el módulo existe, actualizar
+                    savedModulo = await putModulosCurriculaM(
+                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        curriculaId, modificadopor, idmodulo
+                    );
+                } else {
+                    // Si no existe, insertar con el idmodulo proporcionado
+                    // (esto podría ser un error en los datos, ya que se proporcionó un ID pero no existe)
+                    savedModulo = await postModulosCurriculaM(
+                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        curriculaId, creadopor
+                    );
+                }
             } else {
-                savedModulo = await putModulosCurriculaM(
-                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
-                    curriculaId, modificadopor, moduloId
-                );
-
-            }
-            /* } else {
+                // Si no hay idmodulo, insertar como nuevo módulo
                 savedModulo = await postModulosCurriculaM(
                     modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
                     curriculaId, creadopor
                 );
-            } */
-
+            }
 
             updatedModules.push(savedModulo);
-            const moduloIdFinal = savedModulo.id; //retorna el ID insertado o actualizado
 
+            if (!savedModulo || !savedModulo.id) {
+                throw new Error('No se pudo guardar el módulo correctamente');
+            }
+
+            const moduloIdFinal = savedModulo.id || savedModulo[0]?.id; // Manejar ambos casos de retorno
+
+            // Procesar las clases de este módulo
             for (const claseData of clases) {
                 const {
-                    id: claseId, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor
+                    id: idclase, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor: claseModificadopor
                 } = claseData;
 
                 let savedClase;
-                //if (claseId) {
-                //const existsClase = await getIdClasesM(claseId); // 
-                if (claseId === undefined || null) {
+                if (idclase) {
+                    // Verificar si la clase ya existe
+                    const existsClase = await getIdClasesM(idclase);
+                    if (existsClase.length > 0) {
+                        // Si la clase existe, actualizar
+                        savedClase = await putClasesModulosCurriculasM(
+                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                            curriculaId, moduloIdFinal, claseModificadopor, idclase
+                        );
+                    } else {
+                        // Si no existe, insertar
+                        savedClase = await postClasesModulosCurriculasM(
+                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                            curriculaId, moduloIdFinal, claseModificadopor
+                        );
+                    }
+                } else {
+                    // Si no hay idclase, insertar como nueva clase
                     savedClase = await postClasesModulosCurriculasM(
                         clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                        curriculaId, moduloIdFinal, modificadopor
-                    );
-                } else {
-                    savedClase = await putClasesModulosCurriculasM(
-                        clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                        curriculaId, moduloIdFinal, modificadopor, claseId
+                        curriculaId, moduloIdFinal, creadopor
                     );
                 }
-                //}
 
-                updatedClasses.push(savedClase[0]);
+                updatedClasses.push(savedClase);
             }
         }
 
         res.json({
             message: 'Currícula, módulos y clases actualizados o insertados exitosamente',
             data: {
-                curricula: updatedCurricula[0],
+                curricula: updatedCurricula,
                 modulos: updatedModules,
                 clases: updatedClasses
             }
@@ -245,7 +261,6 @@ export const putCurriculaModulosClasesC = async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
-
 
 
 
