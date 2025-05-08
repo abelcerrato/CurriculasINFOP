@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { getCurriculaIdC, getCurriculasC, postCurriculaC, postCurriculaModulosClasesC, putCurriculaC, putCurriculaModulosClasesC } from "../controllers/curriculas.controller.js";
+import { deleteCurriculaModuloClaseC, getCurriculaIdC, getCurriculasC, postCurriculaC, postCurriculaModulosClasesC, putCurriculaC, putCurriculaModulosClasesC } from "../controllers/curriculas.controller.js";
 
 const router=Router();
 
@@ -11,7 +11,9 @@ router.put('/curriculas/:id', putCurriculaC)
 
 
 router.post('/curriculasModulosClases', postCurriculaModulosClasesC)
-router.put('/curriculasModulosClases', putCurriculaModulosClasesC)
+router.put('/curriculasModulosClases/:id', putCurriculaModulosClasesC)
+
+router.delete('/curriculasModulosClases/:id', deleteCurriculaModuloClaseC);
 
 
 export default router;

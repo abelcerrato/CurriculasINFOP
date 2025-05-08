@@ -1,4 +1,4 @@
-import { getClasesIdModulosCurriculasM, getClasesModulosCurriculasM, getClasesModulosIdCurriculasM, getIdClasesModulosCurriculasM, postClasesModulosCurriculasM, putClasesModulosCurriculasM } from "../models/clasesModCurriculas.models.js"
+import { deleteClaseM, getClasesIdModulosCurriculasM, getClasesModulosCurriculasM, getClasesModulosIdCurriculasM, getIdClasesModulosCurriculasM, postClasesModulosCurriculasM, putClasesModulosCurriculasM } from "../models/clasesModCurriculas.models.js"
 
 
 export const getClasesModulosCurriculasC = async (req, res) => {
@@ -90,4 +90,15 @@ export const putClasesModulosCurriculasC = async (req, res) => {
 }
 
 
+export const deleteClasesC = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const Clases = await deleteClaseM(id)
+
+        res.json({ message: "Clase eliminada", Clase: Clases });
+    } catch (error) {
+        console.error('Error al insertar', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
 

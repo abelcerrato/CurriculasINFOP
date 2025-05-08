@@ -92,3 +92,39 @@ export const putModulosCurriculaM = async (modulo, duracionteorica, duracionprac
         throw error;
     }
 }
+
+
+export const deleteModulosCurriculaM = async (id) => {
+    try {
+        const { rows } = await pool.query(`
+            DELETE FROM moduloscurriculas WHERE id=$1 RETURNING *`, [id]);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export const deleteModuloM = async (id) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Eliminar clases del módulo
+        await client.query(`DELETE FROM clasescurriculas WHERE idmodulo = $1`, [id]);
+
+        // 2. Eliminar el módulo
+        const { rows } = await client.query(
+            `DELETE FROM moduloscurriculas WHERE id = $1 RETURNING *`,
+            [id]
+        );
+
+        await client.query('COMMIT');
+        return rows[0];
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+};

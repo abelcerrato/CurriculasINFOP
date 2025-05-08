@@ -1,6 +1,6 @@
-import { postClasesModulosCurriculasM, putClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
-import { getCurriculaIdM, getCurriculasM, postCurriculaM, putCurriculaM } from '../models/curriculas.models.js';
-import { postModulosCurriculaM, putModulosCurriculaM } from '../models/modulosCurriculas.models.js';
+import { deleteClaseM, postClasesModulosCurriculasM, putClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
+import { deleteCurriculaM, getCurriculaIdM, getCurriculasM, postCurriculaM, putCurriculaM } from '../models/curriculas.models.js';
+import { deleteModuloM, postModulosCurriculaM, putModulosCurriculaM } from '../models/modulosCurriculas.models.js';
 
 export const getCurriculasC = async (req, res) => {
     try {
@@ -212,6 +212,41 @@ export const putCurriculaModulosClasesC = async (req, res) => {
 
     } catch (error) {
         console.error('Error al actualizar curricula, módulos o clases:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+
+
+
+export const deleteCurriculaModuloClaseC = async (req, res) => {
+    const { type, id } = req.params;
+
+    try {
+        let deleted;
+
+        switch (type) {
+            case 'curricula':
+                deleted = await deleteCurriculaM(id);
+                break;
+            case 'modulo':
+                deleted = await deleteModuloM(id);
+                break;
+            case 'clase':
+                deleted = await deleteClaseM(id);
+                break;
+            default:
+                return res.status(400).json({ error: 'Tipo de eliminación no válido' });
+        }
+
+        if (!deleted) {
+            return res.status(404).json({ error: 'No se encontró el recurso para eliminar' });
+        }
+
+        res.json({ message: `${type} eliminado correctamente`, deleted });
+
+    } catch (error) {
+        console.error('Error al eliminar:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };

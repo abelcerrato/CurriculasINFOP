@@ -205,4 +205,18 @@ export const putClasesModulosCurriculasM = async (clase, duracionteorica, duraci
     } catch (error) {
         throw error;
     }
+    
 }
+
+
+export const deleteClaseM = async (id) => {
+    try {
+        const { rows } = await pool.query(
+            `DELETE FROM clasescurriculas WHERE id = $1 RETURNING *`,
+            [id]
+        );
+        return rows[0]; 
+    } catch (error) {
+        throw error;
+    }
+};
