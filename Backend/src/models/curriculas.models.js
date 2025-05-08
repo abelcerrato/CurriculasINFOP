@@ -11,7 +11,7 @@ export const getCurriculasM = async () => {
             left join ms_usuarios ucp on c.creadopor = ucp.id 
             left join ms_usuarios ump on c.modificadopor = ump.id 
         `)
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -31,7 +31,7 @@ export const getCurriculaIdM = async (id) => {
             left join ms_usuarios ucp on c.creadopor = ucp.id 
             left join ms_usuarios ump on c.modificadopor = ump.id 
             WHERE c.id=$1`, [id]);
-        console.log('Resultado de la consulta de la Curricula:', rows);
+        //console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;
     } catch (error) {
         console.error('Error al obtener la Curricula:', error);

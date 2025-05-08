@@ -57,7 +57,7 @@ export const getClasesModulosCurriculasM = async () => {
             FROM curriculas c;
 
             `)
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -120,7 +120,7 @@ export const getIdClasesModulosCurriculasM = async (id) => {
         WHERE c.id = $1;
 
             `, [id])
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -144,7 +144,7 @@ export const getClasesIdModulosCurriculasM = async (id) => {
             left join ms_usuarios ump on cc.modificadopor = ump.id  
             where m.id=$1
             `, [id])
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -169,7 +169,7 @@ export const getClasesModulosIdCurriculasM = async (id) => {
             left join ms_usuarios ump on cc.modificadopor = ump.id  
             where c.id=$1
             `, [id])
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;

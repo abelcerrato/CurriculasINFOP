@@ -77,6 +77,7 @@ export const putModulosCurriculaC = async (req, res) => {
 
 export const deleteModuloC = async (req, res) => {
     const { id } = req.params;
+    console.log('id', req.params);
 
     try {
         const deletedModulo = await deleteModuloM(id);

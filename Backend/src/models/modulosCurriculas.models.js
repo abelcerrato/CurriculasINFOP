@@ -13,7 +13,7 @@ export const getModulosCurriculasM = async () => {
             left join ms_usuarios ucp on mc.creadopor = ucp.id 
             left join ms_usuarios ump on mc.modificadopor = ump.id 
             `)
-        console.log(rows);
+       // console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -34,7 +34,7 @@ export const getModulosCurriculaIdM = async (id) => {
         left join ms_usuarios ucp on mc.creadopor = ucp.id 
         left join ms_usuarios ump on mc.modificadopor = ump.id 
         where mc.id=$1`, [id]);
-        console.log('Resultado de la consulta de la Curricula:', rows);
+        //console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;
     } catch (error) {
         console.error('Error al obtener la Curricula:', error);
@@ -56,7 +56,7 @@ export const getModulosIdCurriculaM = async (id) => {
         left join ms_usuarios ucp on mc.creadopor = ucp.id 
         left join ms_usuarios ump on mc.modificadopor = ump.id 
         where c.id=$1`, [id]);
-        console.log('Resultado de la consulta de la Curricula:', rows);
+        //console.log('Resultado de la consulta de la Curricula:', rows);
         return rows;
     } catch (error) {
         console.error('Error al obtener la Curricula:', error);
