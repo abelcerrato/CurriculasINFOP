@@ -347,7 +347,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
             console.log('editId:', editId, 'idmodulo:', moduleToRemove.idmodulo);
 
             try {
-                await axios.delete(`/moduloscurriculas/${moduleToRemove.idmodulo}`);
+                await axios.delete(`${process.env.REACT_APP_API_URL}/moduloscurriculas/${moduleToRemove.idmodulo}`);
                 Swal.fire('Eliminado', 'El módulo ha sido eliminado.', 'success');
             } catch (error) {
                 console.error('Error al eliminar el módulo:', error);
@@ -661,33 +661,36 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
             const payload = {
                 curriculaData: {
                     ...curriculaData,
-                    idcurricula: editId,
+                    idcurricula: editId || null,
                     duracionteoricaCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duracionteoricaCurricula)),
                     duracionpracticaCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duracionpracticaCurricula)),
                     duraciontotalCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duraciontotalCurricula)),
                     idareaformacion: curriculaData.idareaformacion || null,
-                    ...(editId
-                        ? { modificadopor: user.id }
-                        : { creadopor: user.id }),
+                    modificadopor: user.id,
+                    creadopor: user.id,
                 },
                 modulosData: modulosData.map(module => ({
-                    idmodulo: module.idmodulo,
+                    idmodulo: module.idmodulo || null,
                     modulo: module.modulo,
                     duracionteoricaModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duracionteoricaModulo)),
                     duracionpracticaModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duracionpracticaModulo)),
                     duraciontotalModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duraciontotalModulo)),
-                    ...(editId
+                    /* ...(editId
                         ? { modificadopor: user.id }
-                        : { creadopor: user.id }),
+                        : { creadopor: user.id }), */
+                    modificadopor: user.id,
+                    creadopor: user.id,
                     clases: module.clases.map(cls => ({
-                        idclase: cls.idclase,
+                        idclase: cls.idclase || null,
                         clase: cls.clase,
                         duracionteoricaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionteoricaClase)),
                         duracionpracticaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionpracticaClase)),
                         duraciontotalClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duraciontotalClase)),
-                        ...(editId
-                            ? { modificadopor: user.id }
-                            : { creadopor: user.id }),
+                        /*  ...(editId
+                             ? { modificadopor: user.id }
+                             : { creadopor: user.id }), */
+                        modificadopor: user.id,
+                        creadopor: user.id,
                     }))
                 }))
             };

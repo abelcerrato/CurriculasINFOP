@@ -4,7 +4,7 @@ import { pool } from '../db.js'
 export const getAreasFormacionM = async () => {
     try {
         const { rows } = await pool.query('SELECT * from areasformacion')
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -26,7 +26,7 @@ export const getAreaFormacionIdM = async (id) => {
 
 export const postAreasFormacionM = async (areaformacion) => {
     try {
-        const {rows} = await pool.query(`INSERT INTO areasformacion (areaformacion, fechacreacion, fechamodificacion) VALUES ($1, CURRENT_TIMESTAMP, null) RETURNING *`, [areaformacion]);
+        const { rows } = await pool.query(`INSERT INTO areasformacion (areaformacion, fechacreacion, fechamodificacion) VALUES ($1, CURRENT_TIMESTAMP, null) RETURNING *`, [areaformacion]);
         return rows;
     } catch (error) {
         throw error;
@@ -36,7 +36,7 @@ export const postAreasFormacionM = async (areaformacion) => {
 
 export const putAreaFormacionM = async (areaformacion, id) => {
     try {
-        const {rows} = await pool.query(`UPDATE areasformacion SET areaformacion=$1, fechamodificacion=CURRENT_TIMESTAMP WHERE id=$2 RETURNING *`, [areaformacion, id]);
+        const { rows } = await pool.query(`UPDATE areasformacion SET areaformacion=$1, fechamodificacion=CURRENT_TIMESTAMP WHERE id=$2 RETURNING *`, [areaformacion, id]);
         return rows;
     } catch (error) {
         throw error;

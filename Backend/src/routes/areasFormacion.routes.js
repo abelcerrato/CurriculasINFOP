@@ -1,7 +1,7 @@
-import {Router} from "express";
+import { Router } from "express";
 import { getAreasFormacionC, getAreasFormacionIdC, postAreasFormacionC, putAreaFormacionC } from "../controllers/areasFormacion.controller.js";
 
-const router=Router();
+const router = Router();
 
 router.get('/areasFormacion', getAreasFormacionC)
 router.get('/areasFormacion/:id', getAreasFormacionIdC)

@@ -182,7 +182,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
 
             let savedModulo;
             //if (moduloId) {
-           // const existsModulo = await getModulosCurriculaIdM(moduloId);
+            // const existsModulo = await getModulosCurriculaIdM(moduloId);
             if (moduloId === undefined || null) {
                 savedModulo = await postModulosCurriculaM(
                     modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
@@ -202,8 +202,9 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                 );
             } */
 
-            const moduloIdFinal = savedModulo[0].id; //retorna el ID insertado o actualizado
-            updatedModules.push(savedModulo[0]);
+
+            updatedModules.push(savedModulo);
+            const moduloIdFinal = savedModulo.id; //retorna el ID insertado o actualizado
 
             for (const claseData of clases) {
                 const {
