@@ -1,6 +1,7 @@
-import { deleteClaseM, postClasesModulosCurriculasM, putClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
+import { deleteClaseM, getClasesModulosCurriculasM, getIdClasesM, getIdClasesModulosCurriculasM, postClasesModulosCurriculasM, putClasesModulosCurriculasM } from '../models/clasesModCurriculas.models.js';
 import { deleteCurriculaM, getCurriculaIdM, getCurriculasM, postCurriculaM, putCurriculaM } from '../models/curriculas.models.js';
-import { deleteModuloM, postModulosCurriculaM, putModulosCurriculaM } from '../models/modulosCurriculas.models.js';
+import { deleteModuloM, getModulosCurriculaIdM, postModulosCurriculaM, putModulosCurriculaM } from '../models/modulosCurriculas.models.js';
+import { postClasesModulosCurriculasC } from './clasesModCurriculas.controller.js';
 
 export const getCurriculasC = async (req, res) => {
     try {
@@ -152,19 +153,15 @@ export const postCurriculaModulosClasesC = async (req, res) => {
 
 
 export const putCurriculaModulosClasesC = async (req, res) => {
-    const {curriculaId}= req.params; // viene de /:id
-    const {
-        curriculaData,    // Datos para la curricula
-        modulosData       // Cada módulo debe incluir su ID y sus clases con ID
-    } = req.body;
+    const { curriculaId } = req.params;
+    const { curriculaData, modulosData } = req.body;
 
     try {
-        //---------------------------------------------------------------------------------------------------------------------------------
-        // 1. Editar la Curricula
+        // 1. Actualizar Currícula
         const {
             curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
             nombresalida, objetivo, versioncurricula, educaciontemprana,
-            idareaformacion, modificadopor
+            idareaformacion, modificadopor, creadopor
         } = curriculaData;
 
         const updatedCurricula = await putCurriculaM(
@@ -173,8 +170,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
             idareaformacion, modificadopor, curriculaId
         );
 
-        //---------------------------------------------------------------------------------------------------------------------------------
-        // 2. Editar los módulos y sus clases
+        // 2. Actualizar o insertar módulos y clases
         const updatedModules = [];
         const updatedClasses = [];
 
@@ -184,26 +180,62 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                 modificadopor, clases
             } = moduloData;
 
-            const updatedModulo = await putModulosCurriculaM(
-                modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo, curriculaId, modificadopor, moduloId
-            );
-            updatedModules.push(updatedModulo[0]);
+            let savedModulo;
+            if (moduloId) {
+                const existsModulo = await getModulosCurriculaIdM(moduloId);
+                if (existsModulo) {
+                    savedModulo = await putModulosCurriculaM(
+                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        curriculaId, modificadopor, moduloId
+                    );
+                } else {
+                    savedModulo = await postModulosCurriculaM(
+                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        curriculaId, creadopor
+                    );
+                }
+            } else {
+                savedModulo = await postModulosCurriculaM(
+                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                    curriculaId, creadopor
+                );
+            }
 
-            //-----------------------------------------------------------------------------------------------------------------------------
+            const moduloIdFinal = savedModulo[0].id; //retorna el ID insertado o actualizado
+            updatedModules.push(savedModulo[0]);
+
             for (const claseData of clases) {
                 const {
                     id: claseId, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor
                 } = claseData;
 
-                const updatedClase = await putClasesModulosCurriculasM(
-                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, curriculaId, moduloId, modificadopor, claseId
-                );
-                updatedClasses.push(updatedClase[0]);
+                let savedClase;
+                if (claseId) {
+                    const existsClase = await getIdClasesM(claseId); // 
+                    if (existsClase) {
+                        savedClase = await putClasesModulosCurriculasM(
+                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                            curriculaId, moduloIdFinal, modificadopor, claseId
+                        );
+                    } else {
+                        savedClase = await postClasesModulosCurriculasM(
+                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                            curriculaId, moduloIdFinal, modificadopor
+                        );
+                    }
+                } else {
+                    savedClase = await postClasesModulosCurriculasM(
+                        clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                        curriculaId, moduloIdFinal, modificadopor
+                    );
+                }
+
+                updatedClasses.push(savedClase[0]);
             }
         }
 
         res.json({
-            message: 'Curricula, módulos y clases actualizados exitosamente',
+            message: 'Currícula, módulos y clases actualizados o insertados exitosamente',
             data: {
                 curricula: updatedCurricula[0],
                 modulos: updatedModules,
@@ -212,7 +244,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error al actualizar curricula, módulos o clases:', error);
+        console.error('Error al actualizar/insertar currícula, módulos o clases:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };

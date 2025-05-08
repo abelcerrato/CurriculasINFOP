@@ -127,6 +127,30 @@ export const getIdClasesModulosCurriculasM = async (id) => {
     }
 }
 
+//get de las clases por medio del id del modulo
+export const getIdClasesM = async (id) => {
+    try {
+        const { rows } = await pool.query(`
+            SELECT  cc.clase, cc.duracionteorica, cc.duracionpractica, cc.duraciontotal, 
+                    cc.idcurricula, c.curricula,
+                    cc.idmodulo, m.modulo,
+                    ucp.nombre as creadopor, cc.fechacreacion,  
+                    ump.nombre as modificadopor, cc.fechamodificacion
+            FROM clasescurriculas cc
+            left join curriculas c on cc.idcurricula = c.id 
+            left join moduloscurriculas m on cc.idmodulo = m.id 
+            left join ms_usuarios ucp on cc.creadopor = ucp.id 
+            left join ms_usuarios ump on cc.modificadopor = ump.id  
+            where cc.id=$1
+            `, [id])
+        //console.log(rows);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 //get de las clases por medio del id del modulo
 export const getClasesIdModulosCurriculasM = async (id) => {
