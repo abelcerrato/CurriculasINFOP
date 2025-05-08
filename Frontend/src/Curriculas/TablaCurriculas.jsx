@@ -34,6 +34,7 @@ import CurriculumCreator from './Curriculas';
 export default function TablaActividad() {
     const [modalOpen, setModalOpen] = useState(false);
     const [currentEditId, setCurrentEditId] = useState(null);
+    const [currentEditData, setCurrentEditData] = useState(null);
     const navigate = useNavigate();
     const [paginationModel, setPaginationModel] = useState({
         pageSize: 10,
@@ -46,11 +47,13 @@ export default function TablaActividad() {
 
     useEffect(() => {
         axios
-            .get(`${process.env.REACT_APP_API_URL}/curriculas`) // Cambia esta URL a la de tu API
+            .get(`${process.env.REACT_APP_API_URL}/clasesModCurriculas`)
             .then((response) => {
-                setRows(response.data); // Suponiendo que los datos se encuentran en response.data
-                console.log(response.data);
-
+                const transformedData = response.data.map(item => ({
+                    ...item,
+                    id: item.idcurricula // Renombrar idcurricula a id
+                }));
+                setRows(transformedData);
             })
             .catch((error) => {
                 console.error("Hubo un error al obtener los datos:", error);
@@ -59,19 +62,25 @@ export default function TablaActividad() {
 
 
 
-
     const handleEditClick = async (id) => {
-        setCurrentEditId(id);
-        setModalOpen(true);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/clasesMC/${id}`);
+            setCurrentEditData(response.data); // Guardar los datos completos
+            setCurrentEditId(id);
+            setModalOpen(true);
+        } catch (error) {
+            console.error("Error al obtener los datos para editar:", error);
+            Swal.fire({
+                title: "Error",
+                text: "No se pudieron cargar los datos para editar",
+                icon: "error",
+            });
+        }
     };
-
     const handleAddClick = () => {
         setModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setModalOpen(false);
-    };
 
     const columns = [
         {
@@ -81,19 +90,16 @@ export default function TablaActividad() {
                 <>
                     <Tooltip title="Editar" arrow>
                         <IconButton
-                            onClick={() => handleEditClick(params.id)}
+                            onClick={() => handleEditClick(params.row.idcurricula)}
                             sx={{ color: color.azul }}
                         >
                             <EditOutlinedIcon />
                         </IconButton>
                     </Tooltip>
-
-
                 </>
-
             ),
         },
-        { field: "id", headerName: "ID", width: 90 },
+        { field: "idcurricula", headerName: "ID", width: 90 },
         { field: "curricula", headerName: "Currícula ", width: 230 },
         { field: "sector", headerName: "Sector ", width: 200 },
 
@@ -107,8 +113,8 @@ export default function TablaActividad() {
 
             }
         },
-        { field: "objetivo", headerName: "Objetivo", width: 320 },
-        { field: "versioncurricula", headerName: "Versión Currícula", width: 120 },
+        { field: "objetivo", headerName: "Objetivo", width: 350 },
+        { field: "versioncurricula", headerName: "Versión Currícula", width: 190 },
         // { field: "areaformacion", headerName: "Área Formación", width: 120 },
     ];
 
@@ -141,8 +147,10 @@ export default function TablaActividad() {
                         onClose={() => {
                             setModalOpen(false);
                             setCurrentEditId(null);
+                            setCurrentEditData(null);
                         }}
                         editId={currentEditId}
+                        editData={currentEditData} // Pasar los datos a editar
                     />
                     <DataGrid
                         rows={rows}
@@ -151,6 +159,7 @@ export default function TablaActividad() {
                         paginationModel={paginationModel}
                         onPaginationModelChange={setPaginationModel}
                         autoHeight
+                        getRowId={(row) => row.idcurricula} // Especificar qué campo usar como id
                     />
                 </Paper>
 

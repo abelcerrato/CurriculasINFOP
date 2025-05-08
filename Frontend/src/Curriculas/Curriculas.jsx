@@ -34,7 +34,7 @@ import { color } from '../Components/style/Color';
 import { useUser } from "../Components/UserContext";
 import Swal from 'sweetalert2';
 
-const CurriculumCreator = ({ open, onClose }) => {
+const CurriculumCreator = ({ open, onClose, editId, editData }) => {
     const { user } = useUser();
 
     const [validationErrors, setValidationErrors] = useState({
@@ -141,11 +141,11 @@ const CurriculumCreator = ({ open, onClose }) => {
             [name]: value
         }));
     };
+
     const handleModuleInputChange = (e) => {
         const { name, value } = e.target;
         setNewModule(prev => ({ ...prev, [name]: value }));
     };
-
 
     const handleClassInputChange = (e) => {
         const { name, value } = e.target;
@@ -191,7 +191,6 @@ const CurriculumCreator = ({ open, onClose }) => {
                 : value
         }));
     };
-
 
     const addModule = () => {
         // Validar que el módulo tenga nombre
@@ -449,6 +448,137 @@ const CurriculumCreator = ({ open, onClose }) => {
     };
 
 
+    const normalizeDurationToMinutes = (duration) => {
+        if (!duration) return 0;
+        
+        // Si es string (HH:MM:SS)
+        if (typeof duration === 'string') {
+            const [hours, minutes] = duration.split(':').map(Number);
+            return (hours * 60) + (minutes || 0);
+        }
+        // Si es objeto {hours, minutes}
+        else if (typeof duration === 'object') {
+            return (duration.hours || 0) * 60 + (duration.minutes || 0);
+        }
+        // Si ya es número
+        else if (typeof duration === 'number') {
+            return duration;
+        }
+        
+        return 0;
+    };
+    
+    // Función para normalizar cualquier formato a objeto {horas, minutos}
+    const normalizeDurationToHoursMinutes = (duration) => {
+        if (!duration) return { horas: 0, minutos: 0 };
+        
+        // Si es string (HH:MM:SS)
+        if (typeof duration === 'string') {
+            const [hours, minutes] = duration.split(':').map(Number);
+            return { horas: hours || 0, minutos: minutes || 0 };
+        }
+        // Si es objeto {hours, minutes}
+        else if (typeof duration === 'object') {
+            return { horas: duration.hours || 0, minutos: duration.minutes || 0 };
+        }
+        
+        return { horas: 0, minutos: 0 };
+    };
+
+    useEffect(() => {
+        if (editData) {
+            // Transformar los datos de la API al formato que espera el componente
+            const apiData = Array.isArray(editData) ? editData[0] : editData;
+    
+            console.log("Datos recibidos de la API:", apiData); // Para depuración
+    
+            // Datos básicos de la currícula (que usa formato objeto)
+            setcurriculaData({
+                curricula: apiData.curricula || '',
+                versioncurricula: apiData.versioncurricula || '',
+                sector: apiData.sector || '',
+                nombresalida: apiData.nombresalida || '',
+                objetivo: apiData.objetivo || '',
+                duracionteoricaCurricula: minutesToHHMMSS(normalizeDurationToMinutes(apiData.duracionteorica)),
+                duracionpracticaCurricula: minutesToHHMMSS(normalizeDurationToMinutes(apiData.duracionpractica)),
+                duraciontotalCurricula: minutesToHHMMSS(normalizeDurationToMinutes(apiData.duraciontotal)),
+                idareaformacion: apiData.idareaformacion || null,
+                creadopor: user.id,
+            });
+    
+            // Si hay módulos, transformarlos al formato esperado (que usa formato string HH:MM:SS)
+            if (apiData.modulos && apiData.modulos.length > 0) {
+                const transformedModules = apiData.modulos.map(modulo => {
+                    // Transformar las clases del módulo
+                    const transformedClases = modulo.clases?.map(clase => {
+                        const teorica = normalizeDurationToHoursMinutes(clase.duracionteorica);
+                        const practica = normalizeDurationToHoursMinutes(clase.duracionpractica);
+                        
+                        return {
+                            clase: clase.clase || '',
+                            horasTeoricas: teorica.horas,
+                            minutosTeoricos: teorica.minutos,
+                            horasPracticas: practica.horas,
+                            minutosPracticos: practica.minutos,
+                            duracionteoricaClase: normalizeDurationToMinutes(clase.duracionteorica),
+                            duracionpracticaClase: normalizeDurationToMinutes(clase.duracionpractica),
+                            duraciontotalClase: normalizeDurationToMinutes(clase.duraciontotal)
+                        };
+                    }) || [];
+    
+                    return {
+                        modulo: modulo.modulo || '',
+                        duracionteoricaModulo: normalizeDurationToMinutes(modulo.duracionteorica),
+                        duracionpracticaModulo: normalizeDurationToMinutes(modulo.duracionpractica),
+                        duraciontotalModulo: normalizeDurationToMinutes(modulo.duraciontotal),
+                        clases: transformedClases
+                    };
+                });
+    
+                console.log("Módulos transformados:", transformedModules); // Para depuración
+                setModulosData(transformedModules);
+            } else {
+                console.log("No hay módulos en la respuesta"); // Para depuración
+                setModulosData([]);
+            }
+    
+            // Resetear los formularios de nuevo módulo y nueva clase
+            setNewModule({
+                modulo: '',
+                duracionteoricaModulo: 0,
+                duracionpracticaModulo: 0,
+                duraciontotalModulo: 0,
+                clases: []
+            });
+    
+            setNewClass({
+                clase: '',
+                horasTeoricas: 0,
+                minutosTeoricos: 0,
+                horasPracticas: 0,
+                minutosPracticos: 0,
+                duracionteoricaClase: 0,
+                duracionpracticaClase: 0,
+                duraciontotalClase: 0
+            });
+        } else {
+            // Si no hay datos de edición, resetear todo
+            setcurriculaData({
+                curricula: '',
+                versioncurricula: '',
+                sector: '',
+                nombresalida: '',
+                objetivo: '',
+                duracionteoricaCurricula: '00:00:00',
+                duracionpracticaCurricula: '00:00:00',
+                duraciontotalCurricula: '00:00:00',
+                idareaformacion: null,
+                creadopor: user.id,
+            });
+            setModulosData([]);
+        }
+    }, [editData, user.id]);
+
     const handleSave = async () => {
         try {
 
@@ -463,6 +593,7 @@ const CurriculumCreator = ({ open, onClose }) => {
                     duracionpracticaCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duracionpracticaCurricula)),
                     duraciontotalCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duraciontotalCurricula)),
                     creadopor: user.id,
+                    modificadopor: user.id,
                 },
                 modulosData: modulosData.map(module => ({
                     modulo: module.modulo,
@@ -470,35 +601,42 @@ const CurriculumCreator = ({ open, onClose }) => {
                     duracionpracticaModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duracionpracticaModulo)),
                     duraciontotalModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duraciontotalModulo)),
                     creadopor: user.id,
+                    modificadopor: user.id,
                     clases: module.clases.map(cls => ({
                         clase: cls.clase,
                         duracionteoricaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionteoricaClase)),
                         duracionpracticaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionpracticaClase)),
                         duraciontotalClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duraciontotalClase)),
                         creadopor: user.id,
+                        modificadopor: user.id,
                     }))
                 }))
             };
 
             console.log('Sending data:', payload);
 
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_URL}/curriculasModulosClases`,
-                payload,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-
-                    }
-                }
-            );
+            let response;
+            if (editId) {
+                // Llamada para actualizar
+                response = await axios.put(
+                    `${process.env.REACT_APP_API_URL}/curriculas/${editId}`,
+                    payload
+                );
+            } else {
+                // Llamada para crear
+                response = await axios.post(
+                    `${process.env.REACT_APP_API_URL}/curriculasModulosClases`,
+                    payload
+                );
+            }
 
             Swal.fire({
-                title: "Registro Creado",
-                text: "La currícula ha sido creada exitosamente.",
+                title: editId ? "Registro Actualizado" : "Registro Creado",
+                text: `La currícula ha sido ${editId ? 'actualizada' : 'creada'} exitosamente.`,
                 icon: "success",
                 timer: 6000,
             });
+
             resetAllFields();
             onClose();
 
@@ -537,7 +675,7 @@ const CurriculumCreator = ({ open, onClose }) => {
             }}
         >
             <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
-                Nueva Currícula
+                {editId ? 'Actualizar Currícula' : 'Nueva Currícula'}
             </DialogTitle>
 
             {/* Sección de Información Básica */}
