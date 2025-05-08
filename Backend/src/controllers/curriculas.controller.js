@@ -152,6 +152,7 @@ export const postCurriculaModulosClasesC = async (req, res) => {
 
 
 export const putCurriculaModulosClasesC = async (req, res) => {
+    const {curriculaId}= req.params; // viene de /:id
     const {
         curriculaData,    // Datos para la curricula
         modulosData       // Cada módulo debe incluir su ID y sus clases con ID
@@ -161,7 +162,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
         //---------------------------------------------------------------------------------------------------------------------------------
         // 1. Editar la Curricula
         const {
-            id, curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
+            curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
             nombresalida, objetivo, versioncurricula, educaciontemprana,
             idareaformacion, modificadopor
         } = curriculaData;
@@ -169,7 +170,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
         const updatedCurricula = await putCurriculaM(
             curricula, sector, duracionteoricaCurricula, duracionpracticaCurricula, duraciontotalCurricula,
             nombresalida, objetivo, versioncurricula, educaciontemprana,
-            idareaformacion, modificadopor, id
+            idareaformacion, modificadopor, curriculaId
         );
 
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -184,7 +185,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
             } = moduloData;
 
             const updatedModulo = await putModulosCurriculaM(
-                modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,id, modificadopor, moduloId
+                modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo, curriculaId, modificadopor, moduloId
             );
             updatedModules.push(updatedModulo[0]);
 
@@ -195,7 +196,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                 } = claseData;
 
                 const updatedClase = await putClasesModulosCurriculasM(
-                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, id, moduloId, modificadopor, claseId
+                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, curriculaId, moduloId, modificadopor, claseId
                 );
                 updatedClasses.push(updatedClase[0]);
             }

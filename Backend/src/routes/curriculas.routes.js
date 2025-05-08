@@ -11,7 +11,7 @@ router.put('/curriculas/:id', putCurriculaC)
 
 
 router.post('/curriculasModulosClases', postCurriculaModulosClasesC)
-router.put('/curriculasModulosClases/:id', putCurriculaModulosClasesC)
+router.put('/curriculasModulosClases/:curriculaId', putCurriculaModulosClasesC)
 
 router.delete('/curriculasModulosClases/:id', deleteCurriculaModuloClaseC);
 

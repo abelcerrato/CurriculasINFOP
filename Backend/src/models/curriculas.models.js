@@ -59,7 +59,7 @@ export const postCurriculaM = async (curricula, sector, duracionteorica, duracio
 
 
 export const putCurriculaM = async (curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida, objetivo, 
-                                    versioncurricula, educaciontemprana, idareaformacion, modificadopor, id) => {
+                                    versioncurricula, educaciontemprana, idareaformacion, modificadopor, curriculaId) => {
     try {
         const { rows } = await pool.query(`
             UPDATE curriculas SET
@@ -67,7 +67,7 @@ export const putCurriculaM = async (curricula, sector, duracionteorica, duracion
                 versioncurricula=$8, educaciontemprana=$9, idareaformacion=$10, fechamodificacion=CURRENT_TIMESTAMP, modificadopor=$11
             WHERE id=$12 RETURNING *`, 
             [curricula, sector, duracionteorica, duracionpractica, duraciontotal, nombresalida, objetivo, 
-            versioncurricula, educaciontemprana, idareaformacion, modificadopor, id]);
+            versioncurricula, educaciontemprana, idareaformacion, modificadopor, curriculaId]);
         return rows;
     } catch (error) {
         throw error;
