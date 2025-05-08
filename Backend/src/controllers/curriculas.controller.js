@@ -118,7 +118,7 @@ export const postCurriculaModulosClasesC = async (req, res) => {
                 const { clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, creadopor } = claseData;
 
                 const newClase = await postClasesModulosCurriculasM(
-                    clase, duracionteoricaClase, duracionpracticaClase,duraciontotalClase, curriculaId, moduloId, creadopor
+                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, curriculaId, moduloId, creadopor
                 );
 
                 const claseId = newClase.id;
@@ -181,25 +181,26 @@ export const putCurriculaModulosClasesC = async (req, res) => {
             } = moduloData;
 
             let savedModulo;
-            if (moduloId) {
-                const existsModulo = await getModulosCurriculaIdM(moduloId);
-                if (existsModulo) {
-                    savedModulo = await putModulosCurriculaM(
-                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
-                        curriculaId, modificadopor, moduloId
-                    );
-                } else {
-                    savedModulo = await postModulosCurriculaM(
-                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
-                        curriculaId, creadopor
-                    );
-                }
-            } else {
+            //if (moduloId) {
+           // const existsModulo = await getModulosCurriculaIdM(moduloId);
+            if (moduloId === undefined || null) {
                 savedModulo = await postModulosCurriculaM(
                     modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
                     curriculaId, creadopor
                 );
+            } else {
+                savedModulo = await putModulosCurriculaM(
+                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                    curriculaId, modificadopor, moduloId
+                );
+
             }
+            /* } else {
+                savedModulo = await postModulosCurriculaM(
+                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                    curriculaId, creadopor
+                );
+            } */
 
             const moduloIdFinal = savedModulo[0].id; //retorna el ID insertado o actualizado
             updatedModules.push(savedModulo[0]);
@@ -210,25 +211,20 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                 } = claseData;
 
                 let savedClase;
-                if (claseId) {
-                    const existsClase = await getIdClasesM(claseId); // 
-                    if (existsClase) {
-                        savedClase = await putClasesModulosCurriculasM(
-                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                            curriculaId, moduloIdFinal, modificadopor, claseId
-                        );
-                    } else {
-                        savedClase = await postClasesModulosCurriculasM(
-                            clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                            curriculaId, moduloIdFinal, modificadopor
-                        );
-                    }
-                } else {
+                //if (claseId) {
+                //const existsClase = await getIdClasesM(claseId); // 
+                if (claseId === undefined || null) {
                     savedClase = await postClasesModulosCurriculasM(
                         clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
                         curriculaId, moduloIdFinal, modificadopor
                     );
+                } else {
+                    savedClase = await putClasesModulosCurriculasM(
+                        clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                        curriculaId, moduloIdFinal, modificadopor, claseId
+                    );
                 }
+                //}
 
                 updatedClasses.push(savedClase[0]);
             }
