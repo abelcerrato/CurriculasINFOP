@@ -42,6 +42,7 @@ import Swal from 'sweetalert2';
 const CurriculumCreator = ({ open, onClose, editId, editData }) => {
     const { user } = useUser();
     const [areasF, setAreasF] = useState([]);
+    const [editingModule, setEditingModule] = useState(null);
     const [validationErrors, setValidationErrors] = useState({
         curricula: '',
         versioncurricula: '',
@@ -362,6 +363,12 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
         updateCurriculumTotals(updatedModules);
     };
 
+    const handleModuleNameChange = (index, newName) => {
+        // Actualiza el nombre del módulo en tu estado principal
+        const updatedModules = [...module];
+        updatedModules[index].modulo = newName;
+        //setModules(updatedModules);
+    };
 
     const removeClass = async (moduleIndex, classIndex) => {
         const updatedModules = [...modulosData];
@@ -681,7 +688,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
             const payload = {
                 curriculaData: {
                     ...curriculaData,
-                    idcurricula: editId || null,
+                    id: editId || null,
                     duracionteoricaCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duracionteoricaCurricula)),
                     duracionpracticaCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duracionpracticaCurricula)),
                     duraciontotalCurricula: minutesToHHMMSS(HHMMSSToMinutes(curriculaData.duraciontotalCurricula)),
@@ -690,7 +697,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                     creadopor: user.id,
                 },
                 modulosData: modulosData.map(module => ({
-                    idmodulo: module.idmodulo || null,
+                    id: module.idmodulo || null,
                     modulo: module.modulo,
                     duracionteoricaModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duracionteoricaModulo)),
                     duracionpracticaModulo: minutesToHHMMSS(HHMMSSToMinutes(module.duracionpracticaModulo)),
@@ -701,7 +708,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                     modificadopor: user.id,
                     creadopor: user.id,
                     clases: module.clases.map(cls => ({
-                        idclase: cls.idclase || null,
+                        id: cls.idclase || null,
                         clase: cls.clase,
                         duracionteoricaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionteoricaClase)),
                         duracionpracticaClase: minutesToHHMMSS(HHMMSSToMinutes(cls.duracionpracticaClase)),
@@ -725,7 +732,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                     payload
                 );
                 console.log('Respuesta de la API actualizar');
-                
+
             } else {
                 // Llamada para crear
                 response = await axios.post(
@@ -871,11 +878,7 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                 <Typography variant="h6" gutterBottom>
                     <strong>Módulos</strong>
                 </Typography>
-                {validationErrors.modules && (
-                    <Typography color="error" variant="body2" sx={{ mb: 1 }}>
-                        {validationErrors.modules}
-                    </Typography>
-                )}
+
                 {/*   <Typography variant="body2" gutterBottom sx={{ mb: 2 }}>
                     Para guardar la currícula, es necesario ingresar módulos.
                 </Typography> */}
@@ -899,7 +902,13 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                             name="modulo"
                             value={newModule.modulo}
                             onChange={handleModuleInputChange}
+                            error={validationErrors.modules}
                         />
+                        {validationErrors.modules && (
+                            <Typography color="error" variant="body2" sx={{ mb: 1 }}>
+                                {validationErrors.modules}
+                            </Typography>
+                        )}
                     </Grid>
                 </Grid>
 
@@ -909,7 +918,6 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                         {modulosData.map((module, index) => (
                             <React.Fragment key={index}>
                                 <ListItem
-
                                     secondaryAction={
                                         <IconButton edge="end" onClick={() => removeModule(index)} sx={{ color: color.rojo }}>
                                             <Tooltip title="Eliminar Módulo" arrow>
@@ -925,7 +933,24 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
                                     <ListItemText
                                         primary={
                                             <Box>
-                                                {module.modulo}
+                                                {editingModule === index ? (
+                                                    <TextField
+                                                        value={module.modulo}
+                                                        onChange={(e) => handleModuleNameChange(index, e.target.value)}
+                                                        onBlur={() => setEditingModule(null)}
+                                                        autoFocus
+                                                        fullWidth
+                                                        variant="standard"
+                                                        size="small"
+                                                    />
+                                                ) : (
+                                                    <Typography
+                                                        onClick={() => setEditingModule(index)}
+                                                        sx={{ '&:hover': { cursor: 'text' } }}
+                                                    >
+                                                        {module.modulo}
+                                                    </Typography>
+                                                )}
                                                 {validationErrors.moduleClasses[index] && (
                                                     <Typography color="error" variant="body2">
                                                         {validationErrors.moduleClasses[index]}
