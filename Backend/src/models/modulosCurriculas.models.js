@@ -5,7 +5,7 @@ import { pool } from '../db.js'
 export const getModulosCurriculasM = async () => {
     try {
         const { rows } = await pool.query(`
-            SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractia, mc.duraciontotal, 
+            SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractica, mc.duraciontotal, 
                     mc.idcurricula, c.curricula, ucp.nombre as creadopor, mc.fechacreacion,   
                     ump.nombre as modificadopor, mc.fechamodificacion
             FROM moduloscurriculas as mc
@@ -26,7 +26,7 @@ export const getModulosCurriculaIdM = async (idmodulo) => {
     console.log('Modulo enviado:', idmodulo);
     try {
         const { rows } = await pool.query(`
-        SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractia, mc.duraciontotal, 
+        SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractica, mc.duraciontotal, 
                 mc.idcurricula, c.curricula, ucp.nombre as creadopor, mc.fechacreacion,   
                 ump.nombre as modificadopor, mc.fechamodificacion
         FROM moduloscurriculas as mc
@@ -48,7 +48,7 @@ export const getModulosIdCurriculaM = async (id) => {
     console.log('Curricula enviada:', id);
     try {
         const { rows } = await pool.query(`
-        SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractia, mc.duraciontotal,
+        SELECT mc.id, mc.modulo, mc.duracionteorica, mc.duracionpractica, mc.duraciontotal,
                 mc.idcurricula, c.curricula, ucp.nombre as creadopor, mc.fechacreacion,   
                 ump.nombre as modificadopor, mc.fechamodificacion
         FROM moduloscurriculas as mc
@@ -66,13 +66,13 @@ export const getModulosIdCurriculaM = async (id) => {
 
 
 
-export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, creadopor) => {
+export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor) => {
     try {
         const { rows } = await pool.query(`
             INSERT INTO moduloscurriculas 
-                (modulo, duracionteorica, duracionpractia, duraciontotal, idcurricula, fechacreacion, creadopor, fechamodificacion, modificadopor) 
+                (modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, fechacreacion, creadopor, fechamodificacion, modificadopor) 
             VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6, null , null) RETURNING id`,
-            [modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, creadopor]);
+            [modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor]);
         return rows[0];
     } catch (error) {
         throw error;
@@ -80,13 +80,13 @@ export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpra
 }
 
 
-export const putModulosCurriculaM = async (modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, idmodulo) => {
+export const putModulosCurriculaM = async (modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, modificadopor, idmodulo) => {
     try {
         const { rows } = await pool.query(`
             UPDATE moduloscurriculas SET
-                    modulo=$1, duracionteorica=$2, duracionpractia=$3, duraciontotal=$4, idcurricula=$5, fechamodificacion=CURRENT_TIMESTAMP, modificadopor=$6
+                    modulo=$1, duracionteorica=$2, duracionpractica=$3, duraciontotal=$4, idcurricula=$5, fechamodificacion=CURRENT_TIMESTAMP, modificadopor=$6
             WHERE id=$7 RETURNING *`,
-            [modulo, duracionteorica, duracionpractia, duraciontotal, curriculaId, modificadopor, idmodulo]);
+            [modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, modificadopor, idmodulo]);
         return rows;
     } catch (error) {
         throw error;

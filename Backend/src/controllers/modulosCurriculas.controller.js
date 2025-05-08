@@ -49,9 +49,9 @@ export const getModulosIdCurriculaC = async (req, res) => {
 
 export const postModulosCurriculaC = async (req, res) => {
     try {
-        const { modulo, duracionteorica, duracionpractia, duraciontotal, idcurricula, creadopor } = req.body
+        const { modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, creadopor } = req.body
         console.log(req.body);
-        const modulosCurricula = await postModulosCurriculaM(modulo, duracionteorica, duracionpractia, duraciontotal, idcurricula, creadopor);
+        const modulosCurricula = await postModulosCurriculaM(modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, creadopor);
         res.json({ message: "Modulo agregado", modulosCurriculas: modulosCurricula });
     } catch (error) {
         console.error('Error al obtener modulosCurriculas:', error);
@@ -64,9 +64,9 @@ export const postModulosCurriculaC = async (req, res) => {
 export const putModulosCurriculaC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { modulo, duracionteorica, duracionpractia, duraciontotal, idcurricula, modificadopor } = req.body
+        const { modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, modificadopor } = req.body
         console.log(req.body);
-        const modulosCurricula = await putModulosCurriculaM(modulo, duracionteorica, duracionpractia, duraciontotal, idcurricula, modificadopor, id);
+        const modulosCurricula = await putModulosCurriculaM(modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, modificadopor, id);
         res.json({ message: "ModulosCurricula actualizado", modulosCurriculas: modulosCurricula });
     } catch (error) {
         console.error('Error al obtener modulosCurriculas:', error);

@@ -174,7 +174,7 @@ export const putCurriculaModulosClasesC = async (req, res) => {
 
         for (const moduloData of modulosData) {
             const {
-                id: idmodulo, modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                id: idmodulo, modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
                 modificadopor, clases
             } = moduloData;
 
@@ -185,21 +185,21 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                 if (existsModulo.length > 0) {
                     // Si el módulo existe, actualizar
                     savedModulo = await putModulosCurriculaM(
-                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
                         curriculaId, modificadopor, idmodulo
                     );
                 } else {
                     // Si no existe, insertar con el idmodulo proporcionado
                     // (esto podría ser un error en los datos, ya que se proporcionó un ID pero no existe)
                     savedModulo = await postModulosCurriculaM(
-                        modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                        modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
                         curriculaId, creadopor
                     );
                 }
             } else {
                 // Si no hay idmodulo, insertar como nuevo módulo
                 savedModulo = await postModulosCurriculaM(
-                    modulo, duracionteoricaModulo, duracionpractiaModulo, duraciontotalModulo,
+                    modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
                     curriculaId, creadopor
                 );
             }

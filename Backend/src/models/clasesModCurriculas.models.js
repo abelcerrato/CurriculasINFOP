@@ -25,7 +25,7 @@ export const getClasesModulosCurriculasM = async () => {
                             'idmodulo', m.id,
                             'modulo', m.modulo,
                             'duracionteorica', m.duracionteorica,
-                            'duracionpractica', m.duracionpractia,
+                            'duracionpractica', m.duracionpractica,
                             'duraciontotal', m.duraciontotal,
 
                             --Subconsulta para clases dentro del módulo
@@ -88,7 +88,7 @@ export const getIdClasesModulosCurriculasM = async (id) => {
                         'idmodulo', m.id,
                         'modulo', m.modulo,
                         'duracionteorica', m.duracionteorica,
-                        'duracionpractica', m.duracionpractia,
+                        'duracionpractica', m.duracionpractica,
                         'duraciontotal', m.duraciontotal,
 
                         'clases', (
@@ -229,7 +229,7 @@ export const putClasesModulosCurriculasM = async (clase, duracionteorica, duraci
     } catch (error) {
         throw error;
     }
-    
+
 }
 
 
@@ -239,7 +239,7 @@ export const deleteClaseM = async (id) => {
             `DELETE FROM clasescurriculas WHERE id = $1 RETURNING *`,
             [id]
         );
-        return rows[0]; 
+        return rows[0];
     } catch (error) {
         throw error;
     }
