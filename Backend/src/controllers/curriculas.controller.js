@@ -193,27 +193,26 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                     // (esto podría ser un error en los datos, ya que se proporcionó un ID pero no existe)
                     savedModulo = await postModulosCurriculaM(
                         modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
-                        curriculaId, creadopor
+                        curriculaId, creadopor, modificadopor
                     );
                 }
             } else {
                 // Si no hay idmodulo, insertar como nuevo módulo
                 savedModulo = await postModulosCurriculaM(
                     modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
-                    curriculaId, creadopor
+                    curriculaId, creadopor, modificadopor
                 );
             }
 
             updatedModules.push(savedModulo);
 
-           
 
             const moduloIdFinal = savedModulo.id || savedModulo[0]?.id; // Manejar ambos casos de retorno
 
             // Procesar las clases de este módulo
             for (const claseData of clases) {
                 const {
-                    id: idclase, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor: claseModificadopor
+                    id: idclase, clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase, modificadopor
                 } = claseData;
 
                 let savedClase;
@@ -224,20 +223,20 @@ export const putCurriculaModulosClasesC = async (req, res) => {
                         // Si la clase existe, actualizar
                         savedClase = await putClasesModulosCurriculasM(
                             clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                            curriculaId, moduloIdFinal, claseModificadopor, idclase
+                            curriculaId, moduloIdFinal, modificadopor, idclase
                         );
                     } else {
                         // Si no existe, insertar
                         savedClase = await postClasesModulosCurriculasM(
                             clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                            curriculaId, moduloIdFinal, claseModificadopor
+                            curriculaId, moduloIdFinal, creadopor, modificadopor
                         );
                     }
                 } else {
                     // Si no hay idclase, insertar como nueva clase
                     savedClase = await postClasesModulosCurriculasM(
                         clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
-                        curriculaId, moduloIdFinal, creadopor
+                        curriculaId, moduloIdFinal, creadopor, modificadopor
                     );
                 }
 

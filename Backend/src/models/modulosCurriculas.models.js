@@ -66,13 +66,13 @@ export const getModulosIdCurriculaM = async (id) => {
 
 
 
-export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor) => {
+export const postModulosCurriculaM = async (modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor, modificadopor) => {
     try {
         const { rows } = await pool.query(`
             INSERT INTO moduloscurriculas 
                 (modulo, duracionteorica, duracionpractica, duraciontotal, idcurricula, fechacreacion, creadopor, fechamodificacion, modificadopor) 
-            VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6, null , null) RETURNING id`,
-            [modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor]);
+            VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, $6, null ,$7) RETURNING id`,
+            [modulo, duracionteorica, duracionpractica, duraciontotal, curriculaId, creadopor, modificadopor]);
         return rows[0];
     } catch (error) {
         throw error;
