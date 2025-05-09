@@ -30,6 +30,7 @@ import calificaciones from './routes/calificaciones.routes.js'
 
 
 import accionFormativaRoutes from './routes/accionformativa.routes.js'
+import ClassModCurrAFRoutes from './routes/clasesmodcursocurraccform.routes.js'
 
 
 
@@ -75,6 +76,8 @@ app.use(seguimientoRouter)
 
 app.use(calificaciones)
 app.use(accionFormativaRoutes)
+app.use(ClassModCurrAFRoutes)
+
 
 console.log("DB_USER:", process.env.DB_USER); // Prueba si se está cargando correctamente
 
