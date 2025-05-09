@@ -32,20 +32,49 @@ export const getClasModCurrAccFormIdC = async (req, res) => {
 
 export const postClasModCurrAccFormC = async (req, res) => {
     try {
-        const { idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor } = req.body;
-        console.log(req.body);
-        // if (!accionformatica || !horastotales || !fechainicio || !fechafinal) {
-        //     console.log("Faltan datos en la solicitud");
-        //     return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        // }
-        const newClasModCurrAccForm = await postClasModCurrAccFormM(idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor);
-        res.json({ message: "Clase, Modulo y Curricula de la Acción Formativa agregada exitosamente: ", newClasModCurrAccForm });
-    }
-    catch (error) {
-        console.error('Error al insertar la Clase, Modulo y Curricula de la Acción Formativa:', error);
+        const registros = req.body;
+
+        if (!Array.isArray(registros)) {
+            return res.status(400).json({ error: 'Se esperaba un arreglo de registros.' });
+        }
+
+        const resultados = [];
+
+        for (const registro of registros) {
+            const {
+                idaccionformativa,
+                idcurriculas,
+                idmoduloscurriculas,
+                idclasescurriculas,
+                duracionteorica,
+                duracionpractica,
+                duraciontotal,
+                creadopor
+            } = registro;
+
+            const nuevoRegistro = await postClasModCurrAccFormM(
+                idaccionformativa,
+                idcurriculas,
+                idmoduloscurriculas,
+                idclasescurriculas,
+                duracionteorica,
+                duracionpractica,
+                duraciontotal,
+                creadopor
+            );
+
+            resultados.push(nuevoRegistro);
+        }
+
+        res.json({
+            message: "Registros agregados exitosamente.",
+            registros: resultados
+        });
+    } catch (error) {
+        console.error('Error al insertar los registros:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
-}
+};
 
 
 export const putClasModCurrAccFormC = async (req, res) => {

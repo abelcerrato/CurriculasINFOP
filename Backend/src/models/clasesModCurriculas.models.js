@@ -202,13 +202,13 @@ export const getClasesModulosIdCurriculasM = async (id) => {
 
 
 
-export const postClasesModulosCurriculasM = async (clase, duracionteorica, duracionpractica, duraciontotal, curriculaId, moduloId, creadopor, modificadopor) => {
+export const postClasesModulosCurriculasM = async (clase, duracionteorica, duracionpractica, duraciontotal, curriculaId, moduloId, creadopor) => {
     try {
         const { rows } = await pool.query(`
             INSERT INTO clasescurriculas 
-                        (clase, duracionteorica, duracionpractica, duraciontotal, idcurricula, idmodulo, fechacreacion, creadopor, fechamodificacion, modificadopor) 
-            VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, null, $8) RETURNING id`,
-            [clase, duracionteorica, duracionpractica, duraciontotal, curriculaId, moduloId, creadopor, modificadopor]);
+                        (clase, duracionteorica, duracionpractica, duraciontotal, idcurricula, idmodulo, fechacreacion, creadopor, fechamodificacion) 
+            VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, null) RETURNING id`,
+            [clase, duracionteorica, duracionpractica, duraciontotal, curriculaId, moduloId, creadopor]);
         return rows[0];
     } catch (error) {
         throw error;
