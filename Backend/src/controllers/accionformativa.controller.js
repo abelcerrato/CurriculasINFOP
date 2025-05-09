@@ -1,4 +1,4 @@
-import { getAccionFormativaM, postAccionFormativaM } from "../models/accionformativa.models";
+import { getAccionFormativaM, postAccionFormativaM } from "../models/accionformativa.models.js";
 
 export const getAccionFormativaC = async (req, res) => {
     try {

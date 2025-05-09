@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { getAccionFormativaC, getAccionFormativaIdC, postAccionFormativaC, putAccionFormativaC } from "../controllers/accionformativa.controller";
+import { getAccionFormativaC, getAccionFormativaIdC, postAccionFormativaC, putAccionFormativaC } from "../controllers/accionformativa.controller.js";
 
 
 
