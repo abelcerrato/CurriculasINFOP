@@ -4,13 +4,17 @@ export const getSeguimientoM = async () => {
     try {
         const { rows } = await pool.query(`
             SELECT 
-                s.id, s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
+                s.id, s.idaccionformativa, a.accionformatica,
+                s.idestudiante, e.identificacion, e.nombre,
+                s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
                 s.hasidoempleado, s.tipoempleo, s.trabajacampoestudio, 
                 muc.creadopor, s.fechacreacion,  mum.modificadopor, s.fechamodificacion
             FROM seguimiento as s
-            inner join ms_usuarios muc on s.creadopor = muc.id 
-            inner join ms_usuarios mum on s.modificadopor = mum.id 
-            ORDER BY s.id ASC;
+            left join ms_usuarios muc on s.creadopor = muc.id 
+            left join ms_usuarios mum on s.modificadopor = mum.id 
+            left join accionformativa a on s.idaccionformativa = a.id 
+            left join estudiantes e on s.idestudiante = e.id 
+            ORDER BY s.id ASC;    
             `);  
         return rows;
     } catch (error) {
@@ -23,12 +27,18 @@ export const getSegumientoIdM = async (id) => {
     console.log('Segumiento enviado:', id);
     try {
         const { rows } = await pool.query(`
-            SELECT  s.id, s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
+            SELECT 
+                s.idaccionformativa, a.accionformatica,
+                s.idestudiante, e.identificacion, e.nombre,
+                s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
                 s.hasidoempleado, s.tipoempleo, s.trabajacampoestudio, 
                 muc.creadopor, s.fechacreacion,  mum.modificadopor, s.fechamodificacion
             FROM seguimiento as s
-            inner join ms_usuarios muc on s.creadopor = muc.id 
-            inner join ms_usuarios mum on s.modificadopor = mum.id 
+            left join ms_usuarios muc on s.creadopor = muc.id 
+            left join ms_usuarios mum on s.modificadopor = mum.id 
+            left join accionformativa a on s.idaccionformativa = a.id 
+            left join estudiantes e on s.idestudiante = e.id 
+            ORDER BY s.id ASC;    
             WHERE s.id =$1`, [id]);
         return rows;
     } catch (error) {

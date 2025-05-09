@@ -3,18 +3,20 @@ import { pool } from '../db.js'
 export const getCalificacionesM = async () => {
     try {
         const { rows } = await pool.query(`
-            SELECT c.id, 
-                    c.idclasecurricula, c3.clase as clasecurricula,
-                    c.calificacionteorica, c.duracionteorica, 
-                    c.calificacionpractica, c.duracionpractica, 
-                    c.duraciontotal, 
-                    c.idmatricula, 
+            SELECT  c. id, c.idestudiante, e.identificacion as dniEstudiante, e.nombre,
+                    c.idclassmodcurraccform, cmc.idclasescurriculas, c2.clase,
+                    c.calificacionteorica,c.calificacionpractica, 
+                    c.duracionteorica, c.duracionpractica, c.duraciontotal, 
+                    c.idmaestro, m.identificacion as dniMaestro, m.nombre,
                     muc.nombre as creadopor, c.fechacreacion, 
                     mum.nombre as modificadopor, c.fechamodificacion 
             FROM calificaciones c
-            left join clasescurriculas c3 on c.idclasecurricula = c3.id
             left join ms_usuarios muc on c.creadopor = muc.id 
-            left join ms_usuarios mum on c.modificadopor = mum.id 
+            left join ms_usuarios mum on c.modificadopor = mum.id
+            left join clasesmodcursocurraccform cmc on cmc.id = c.idclassmodcurraccform
+            left join clasescurriculas c2 on cmc.idclasescurriculas = c2.id
+            left join estudiantes e on c.idestudiante = e.id 
+            left join maestros m on c.idmaestro = m.id 
             ORDER BY c.id ASC;
             `);  
         return rows;
@@ -28,18 +30,20 @@ export const getCalificacionesIdM = async (id) => {
     console.log('IdCalificacion enviada:', id);
     try {
         const { rows } = await pool.query(`
-            SELECT 
-                    c.idclasecurricula, c3.clase as clasecurricula,
-                    c.calificacionteorica, c.duracionteorica, 
-                    c.calificacionpractica, c.duracionpractica, 
-                    c.duraciontotal, 
-                    c.idmatricula, 
+            SELECT c.idestudiante, e.identificacion as dniEstudiante, e.nombre,
+                    c.idclassmodcurraccform, cmc.idclasescurriculas, c2.clase,
+                    c.calificacionteorica,c.calificacionpractica, 
+                    c.duracionteorica, c.duracionpractica, c.duraciontotal, 
+                    c.idmaestro, m.identificacion as dniMaestro, m.nombre,
                     muc.nombre as creadopor, c.fechacreacion, 
                     mum.nombre as modificadopor, c.fechamodificacion 
             FROM calificaciones c
-            left join clasescurriculas c3 on c.idclasecurricula = c3.id
             left join ms_usuarios muc on c.creadopor = muc.id 
             left join ms_usuarios mum on c.modificadopor = mum.id
+            left join clasesmodcursocurraccform cmc on cmc.id = c.idclassmodcurraccform
+            left join clasescurriculas c2 on cmc.idclasescurriculas = c2.id
+            left join estudiantes e on c.idestudiante = e.id 
+            left join maestros m on c.idmaestro = m.id 
             where c.id=$1`, [id]);
         return rows;
     } catch (error) {
