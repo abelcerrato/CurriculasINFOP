@@ -28,6 +28,11 @@ import programasRouter from './routes/programas.routes.js'
 import seguimientoRouter from './routes/seguimiento.routes.js'
 import calificaciones from './routes/calificaciones.routes.js'
 
+
+import accionFormativaRoutes from './routes/accionformativa.routes.js'
+
+
+
 import cors from "cors"
 
 
@@ -69,6 +74,7 @@ app.use(programasRouter)
 app.use(seguimientoRouter)
 
 app.use(calificaciones)
+app.use(accionFormativaRoutes)
 
 console.log("DB_USER:", process.env.DB_USER); // Prueba si se está cargando correctamente
 

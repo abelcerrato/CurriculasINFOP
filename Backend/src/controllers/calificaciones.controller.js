@@ -33,12 +33,12 @@ export const getCalificacionesIdC = async (req, res) => {
 
 export const postCalificacionesC = async (req, res) => {
     try {
-        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor } = req.body;
+        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro,  creadopor } = req.body;
         console.log(req.body);
 
 
     
-        const newCalificacion = await postCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor);
+        const newCalificacion = await postCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro,  creadopor);
         res.json({ message: "Calificacion agregada exitosamente: ", newCalificacion });
 
     } catch (error) {
@@ -51,9 +51,9 @@ export const postCalificacionesC = async (req, res) => {
 export const putCalificacionesC = async (req, res) => {
     try {
         const { id } = req.params;
-        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor } = req.body;
+        const { idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, modificadopor } = req.body;
 
-        const newCalificacion = await putCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor, id);
+        const newCalificacion = await putCalificacionesM(idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, modificadopor, id);
         res.json({ message: "Calificacion actualizada exitosamente: ", newCalificacion });
 
     } catch (error) {

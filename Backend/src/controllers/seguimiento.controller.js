@@ -31,7 +31,7 @@ export const getSegumientoIdC = async (req, res) => {
 
 export const postSeguimientoC = async (req, res) => {
     try {
-        const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, creadopor } = req.body;
+        const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor } = req.body;
         console.log(req.body);
 
 
@@ -40,7 +40,7 @@ export const postSeguimientoC = async (req, res) => {
             return res.status(400).json({ error: "Faltan datos en la solicitud" });
         }
 
-        const newSeguimiento = await postSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, creadopor);
+        const newSeguimiento = await postSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor);
         res.json({ message: "Seguimiento agregado exitosamente: ", newSeguimiento });
 
     } catch (error) {
@@ -54,14 +54,14 @@ export const postSeguimientoC = async (req, res) => {
 export const putSeguimientoC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, modificadopor } = req.body;
+        const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor } = req.body;
 
         if (!completocurso || !tipocertificacion ) {
             console.log("Faltan datos en la solicitud");
             return res.status(400).json({ error: "Faltan datos en la solicitud" });
         }
 
-        const newSeguimiento = await putSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, modificadopor, id);
+        const newSeguimiento = await putSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor, id);
         res.json({ message: "Seguimiento actualizado exitosamente: ", newSeguimiento });
 
     } catch (error) {

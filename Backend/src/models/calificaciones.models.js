@@ -50,15 +50,15 @@ export const getCalificacionesIdM = async (id) => {
 
 
 
-export const postCalificacionesM = async ( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor) =>{
+export const postCalificacionesM = async ( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro,  creadopor) =>{
     try {
         const { rows } = await pool.query(`
             INSERT INTO calificaciones 
                 ( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, 
-                duraciontotal, idmatricula, creadopor, fechacreacion, fechamodificacion) 
+                duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, creadopor, fechacreacion, fechamodificacion) 
             VALUES 
-                ($1,$2,$3,$4,$5,$6,$7,$8,CURRENT_TIMESTAMP, null) RETURNING *`, 
-            [ idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, creadopor]);
+                ($1,$2,$3,$4,$5,$6,$7,$8, $9, $10, CURRENT_TIMESTAMP, null) RETURNING *`, 
+            [ idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, creadopor]);
         return rows;
     } catch (error) {
         throw error;
@@ -66,14 +66,14 @@ export const postCalificacionesM = async ( idclasecurricula, calificacionteorica
 }
 
 
-export const putCalificacionesM = async ( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor, id) => {
+export const putCalificacionesM = async ( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, modificadopor, id) => {
     try {
         const { rows } = await pool.query(`
             UPDATE 
                 calificaciones SET idclasecurricula=$1, calificacionteorica=$2, duracionteorica=$3, 
-                calificacionpractica=$4, duracionpractica=$5, duraciontotal=$5, idmatricula=$7, modificadopor=$8, fechamodificacion=CURRENT_TIMESTAMP 
-            WHERE id=$9 RETURNING *`, 
-            [ idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idmatricula, modificadopor, id]);
+                calificacionpractica=$4, duracionpractica=$5, duraciontotal=$5, idclassmodcurraccform=$7, idestudiante=$8, idmaestro=$9, modificadopor=$10, fechamodificacion=CURRENT_TIMESTAMP 
+            WHERE id=$11 RETURNING *`, 
+            [ idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro, modificadopor, id]);
         return rows;
     } catch (error) {
         throw error;

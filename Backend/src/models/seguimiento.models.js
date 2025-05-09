@@ -37,15 +37,15 @@ export const getSegumientoIdM = async (id) => {
     }
 }
 
-export const postSeguimientoM = async (completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, creadopor) =>{
+export const postSeguimientoM = async (completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor) =>{
     try {
         const { rows } = await pool.query(`
             INSERT INTO seguimiento 
                 (completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, 
-                trabajacampoestudio, creadopor, fechacreacion, modificadopor, fechamodificacion) 
+                trabajacampoestudio, idaccionformativa, idestudiante, creadopor, fechacreacion, modificadopor, fechamodificacion) 
             VALUES 
-                ($1,$2,$3,$4,$5,$6,$7,$8,CURRENT_TIMESTAMP, null, null) RETURNING *`, 
-            [completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, creadopor]);
+                ($1,$2,$3,$4,$5,$6,$7,$8, $9, $10, CURRENT_TIMESTAMP, null, null) RETURNING *`, 
+            [completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor]);
         return rows;
     } catch (error) {
         throw error;
@@ -53,14 +53,14 @@ export const postSeguimientoM = async (completocurso, fechaabandono, razonabando
 }
 
 
-export const putSeguimientoM = async ( completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, modificadopor, id) => {
+export const putSeguimientoM = async ( completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor, id) => {
     try {
         const { rows } = await pool.query(`
             UPDATE 
                 seguimiento SET completocurso=$1, fechaabandono=$2, razonabandono=$3, tipocertificacion=$4, 
-                hasidoempleado=$5, tipoempleo=$6, trabajacampoestudio=$7, modificadopor=$8, fechamodificacion=CURRENT_TIMESTAMP 
-            WHERE id=$9 RETURNING *`, 
-            [completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, modificadopor, id]);
+                hasidoempleado=$5, tipoempleo=$6, trabajacampoestudio=$7, idaccionformativa=$8, idestudiante=$9, modificadopor=$10, fechamodificacion=CURRENT_TIMESTAMP 
+            WHERE id=$11 RETURNING *`, 
+            [completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor, id]);
         return rows;
     } catch (error) {
         throw error;
