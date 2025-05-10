@@ -31,21 +31,58 @@ export const getCalificacionesIdC = async (req, res) => {
 }
 
 
+
 export const postCalificacionesC = async (req, res) => {
     try {
-        const {  idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro,  creadopor } = req.body;
-        console.log(req.body);
+        const calificaciones = req.body;
 
+        if (!Array.isArray(calificaciones)) {
+            return res.status(400).json({ error: 'Se esperaba un arreglo de calificaciones.' });
+        }
 
-    
-        const newCalificacion = await postCalificacionesM( idclasecurricula, calificacionteorica, duracionteorica, calificacionpractica, duracionpractica, duraciontotal, idclassmodcurraccform, idestudiante, idmaestro,  creadopor);
-        res.json({ message: "Calificacion agregada exitosamente: ", newCalificacion });
+        const resultados = [];
+
+        for (const calificacion of calificaciones) {
+            const {
+                idclasecurricula,
+                calificacionteorica,
+                duracionteorica,
+                calificacionpractica,
+                duracionpractica,
+                duraciontotal,
+                idclassmodcurraccform,
+                idestudiante,
+                idmaestro,
+                creadopor
+            } = calificacion;
+
+            const newCalificacion = await postCalificacionesM(
+                idclasecurricula,
+                calificacionteorica,
+                duracionteorica,
+                calificacionpractica,
+                duracionpractica,
+                duraciontotal,
+                idclassmodcurraccform,
+                idestudiante,
+                idmaestro,
+                creadopor
+            );
+
+            resultados.push(newCalificacion);
+        }
+
+        res.json({
+            message: "Calificaciones agregadas exitosamente.",
+            registros: resultados
+        });
 
     } catch (error) {
-        console.error('Error al insertar la calificacion:', error);
+        console.error('Error al insertar las calificaciones:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
+
 
 
 export const putCalificacionesC = async (req, res) => {

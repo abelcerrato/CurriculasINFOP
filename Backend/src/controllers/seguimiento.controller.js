@@ -31,20 +31,52 @@ export const getSegumientoIdC = async (req, res) => {
 
 export const postSeguimientoC = async (req, res) => {
     try {
-        const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor } = req.body;
-        console.log(req.body);
+        const seguimientos = req.body;
 
-
-        if (!completocurso || !tipocertificacion ) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
+        if (!Array.isArray(seguimientos)) {
+            return res.status(400).json({ error: 'Se esperaba un arreglo de seguimientos.' });
         }
 
-        const newSeguimiento = await postSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor);
-        res.json({ message: "Seguimiento agregado exitosamente: ", newSeguimiento });
+        const resultados = [];
+
+        for (const seguimiento of seguimientos) {
+            const {
+                completocurso,
+                fechaabandono,
+                razonabandono,
+                tipocertificacion,
+                hasidoempleado,
+                tipoempleo,
+                trabajacampoestudio,
+                idaccionformativa,
+                idestudiante,
+                creadopor
+            } = seguimiento;
+
+
+            const nuevoSeguimiento = await postSeguimientoM(
+                completocurso,
+                fechaabandono,
+                razonabandono,
+                tipocertificacion,
+                hasidoempleado,
+                tipoempleo,
+                trabajacampoestudio,
+                idaccionformativa,
+                idestudiante,
+                creadopor
+            );
+
+            resultados.push(nuevoSeguimiento);
+        }
+
+        res.json({
+            message: "Seguimientos agregados exitosamente.",
+            registros: resultados
+        });
 
     } catch (error) {
-        console.error('Error al insertar el seguimiento:', error);
+        console.error('Error al insertar los seguimientos:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
