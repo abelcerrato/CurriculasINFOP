@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useUser } from "../Components/UserContext";
@@ -28,7 +28,7 @@ const MenuProps = {
     },
 };
 
-const DataTable = () => {
+const Estudiantes = forwardRef(({ soloModal = false }, ref) => {
     const { user } = useUser();
     const [rows, setRows] = useState([]);
     const [editRowId, setEditRowId] = useState(null);
@@ -83,6 +83,28 @@ const DataTable = () => {
     const [etnia, setEtnia] = useState([]);
     const [nacionalidad, setNacionalidad] = useState([]);
     const [discapacidad, setDiscapacidad] = useState([]);
+
+    // Exponer funciones para controlar el modal desde fuera
+    useImperativeHandle(ref, () => ({
+        openAddModal: () => {
+            setEditRowData({
+                identificacion: '',
+                nombre: '',
+                // ... (todos los campos iniciales)
+            });
+            setIsAdding(true);
+            setOpenModal(true);
+        },
+        openEditModal: (id) => {
+            const rowToEdit = rows.find((row) => row.id === id);
+            setEditRowData({
+                // ... (todos los campos del estudiante a editar)
+            });
+            setIsAdding(false);
+            setOpenModal(true);
+        },
+        closeModal: () => setOpenModal(false)
+    }));
 
 
     // Obtener lista de departamentos para el Select
@@ -213,11 +235,11 @@ const DataTable = () => {
             console.error("Hubo un error al obtener los datos:", error);
         }
     };
-
-
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (!soloModal) {
+            fetchData();
+        }
+    }, [soloModal]);
 
     const handleAddClick = () => {
         setEditRowData({
@@ -404,7 +426,10 @@ const DataTable = () => {
                 timer: 6000,
             });
 
-            fetchData(); // Recarga los datos
+            if (!soloModal) {
+                fetchData();
+            }
+
             handleCloseModal(); // Cierra el modal
         } catch (error) {
             console.error("Error al guardar:", error);
@@ -575,6 +600,589 @@ const DataTable = () => {
         { field: 'miembrosalioynoregreso', headerName: '¿Algún miembro de su hogar salió de Honduras y no regreso?', width: 250 },
         { field: 'volveriaamigrar', headerName: 'Volvería a Migrar', width: 150 },
     ];
+    const renderModal = () => (
+
+        <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+            <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
+                {isAdding ? 'Nuevo Estudiante' : 'Actualizar Estudiante'}
+            </DialogTitle>
+            <DialogContent dividers>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pl: 5, pr: 5 }}>
+                    <TextField
+                        label="Nombre"
+                        name="nombre"
+                        value={editRowData.nombre || ''}
+                        onChange={handleEditRowChange}
+                        fullWidth
+                        variant="standard"
+                    />
+                    <TextField
+                        label="DNI"
+                        name="identificacion"
+                        value={editRowData.identificacion || ''}
+                        onChange={handleEditRowChange}
+                        fullWidth
+                        variant="standard"
+                    />
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <TextField
+                                label="Fecha de Nacimiento"
+                                name="fechanacimiento"
+                                value={editRowData.fechanacimiento || ''}
+                                onChange={handleEditRowChange}
+                                fullWidth
+                                variant="standard"
+                                type='date'
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+                        <Grid item size={6}>
+                            <TextField
+                                label="Edad"
+                                name="edad"
+                                value={editRowData.edad || ''}
+                                fullWidth
+                                variant="standard"
+                                type='number'
+                                InputProps={{ readOnly: true }}
+                            />
+                        </Grid>
+                        <Grid item size={6}>
+                            <TextField
+                                label="Teléfono"
+                                name="telefono"
+                                value={editRowData.telefono || ''}
+                                onChange={handleEditRowChange}
+                                fullWidth
+                                variant="standard"
+                            />
+                        </Grid>
+
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Estado Civil</InputLabel>
+                                <Select
+                                    name="estadocivil"
+                                    value={editRowData.estadocivil || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Estado Civil"
+                                >
+                                    <MenuItem value="">Seleccionar genero</MenuItem>
+                                    <MenuItem value="Soltero">Soltero</MenuItem>
+                                    <MenuItem value="Casado">Casado</MenuItem>
+                                    <MenuItem value="Viudo">Viudo</MenuItem>
+                                    <MenuItem value="Unión Libre">Unión Libre</MenuItem>
+                                    <MenuItem value="Divorciado">Divorciado</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                    </Grid>
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Genero</InputLabel>
+                                <Select
+                                    name="genero"
+                                    value={editRowData.genero || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Genero"
+                                >
+                                    <MenuItem value="">Seleccionar genero</MenuItem>
+                                    <MenuItem value="Femenino">Femenino</MenuItem>
+                                    <MenuItem value="Masculino">Masculino</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Nacionalidad</InputLabel>
+                                <Select
+                                    name="idnacionalidad"
+                                    value={editRowData.idnacionalidad || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Nivel Educativo"
+                                >
+                                    <MenuItem value="">Seleccionar nacionalidad</MenuItem>
+                                    {nacionalidad.map(niv => (
+                                        <MenuItem key={niv.id} value={niv.id}>
+                                            {niv.nacionalidad}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
+                                <Select
+                                    name="iddepartamento"
+                                    value={editRowData.iddepartamento || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Departamento"
+                                >
+                                    <MenuItem value="">Seleccionar departamento</MenuItem>
+                                    {departamentos.map(dep => (
+                                        <MenuItem key={dep.id} value={dep.id}>
+                                            {dep.departamento}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Municipio</InputLabel>
+                                <Select
+                                    name="idmunicipio"
+                                    value={editRowData.idmunicipio || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Municipio"
+                                    disabled={!municipios.length}
+                                >
+                                    <MenuItem value="">Seleccionar municipio</MenuItem>
+                                    {municipios.map(muni => (
+                                        <MenuItem key={muni.id} value={muni.id}>
+                                            {muni.municipio}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+
+
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Aldea</InputLabel>
+                                <Select
+                                    name="idaldea"
+                                    value={editRowData.idaldea || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Aldea"
+                                    disabled={!aldeas.length}
+                                >
+                                    <MenuItem value="">Seleccionar aldea</MenuItem>
+                                    {aldeas.map(a => (
+                                        <MenuItem key={a.id} value={a.id}>
+                                            {a.aldea}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item size={6}>
+                            <TextField
+                                label="Caserio de Residencia"
+                                name="caserio"
+                                value={editRowData.caserio || ''}
+                                onChange={handleEditRowChange}
+                                fullWidth
+                                variant="standard"
+                            />
+                        </Grid>
+                    </Grid>
+                    <FormControl fullWidth variant="standard">
+                        <FormLabel component="label">Dirección</FormLabel>
+                        <TextareaAutosize
+                            name="direccion"
+                            value={editRowData.direccion || ''}
+                            onChange={handleEditRowChange}
+                            aria-label="Dirección"
+                            minRows={3}
+                            style={{ padding: '8px' }}
+                        //placeholder="Escribe algo aquí..."
+                        />
+                    </FormControl>
+
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Nivel Educativo</InputLabel>
+                                <Select
+                                    name="idniveleducativo"
+                                    value={editRowData.idniveleducativo || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Nivel Educativo"
+                                >
+                                    <MenuItem value="">Seleccionar nivel educativo</MenuItem>
+                                    {niveles.map(niv => (
+                                        <MenuItem key={niv.id} value={niv.id}>
+                                            {niv.nivelacademico}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Grado Académicos</InputLabel>
+                                <Select
+                                    name="idgradoacademico"
+                                    value={editRowData.idgradoacademico || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Grado Académicos"
+                                    disabled={!grados.length}
+                                >
+                                    <MenuItem value="">Seleccionar grado académico</MenuItem>
+                                    {grados.map(gra => (
+                                        <MenuItem key={gra.id} value={gra.id}>
+                                            {gra.gradoacademico}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                    <FormControl fullWidth variant="standard">
+                        <InputLabel id="demo-simple-select-label">Etnia</InputLabel>
+                        <Select
+                            name="idetnia"
+                            value={editRowData.idetnia || ''}
+                            onChange={handleEditRowChange}
+                            label="Etnia"
+                        >
+                            <MenuItem value="">Seleccionar Etnia</MenuItem>
+                            {etnia.map(e => (
+                                <MenuItem key={e.id} value={e.id}>
+                                    {e.etnia}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Grid container spacing={5}>
+                        <Grid item size={6}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="estudianoformal"
+                                        checked={Boolean(editRowData.estudianoformal)}
+                                        onChange={handleEditRowChange}
+                                    />
+                                }
+                                label="Estudia en Educación No Formal"
+                            />
+                        </Grid>
+                        {editRowData.estudianoformal && (
+                            <Grid item size={6}>
+
+                                <FormControl fullWidth variant="standard">
+                                    <FormLabel component="label">Educación No Formal</FormLabel>
+
+                                    <TextareaAutosize
+                                        minRows={3}
+                                        style={{ padding: '8px', width: "95%" }}
+                                        name="educacionnoformal"
+                                        value={editRowData.educacionnoformal || ""}
+                                        onChange={handleEditRowChange}
+                                        placeholder="Ej: Curso de inglés, Taller de Excel"
+                                    />
+                                </FormControl>
+
+
+                            </Grid>)}
+                        <Grid item size={6}>
+                            <FormControlLabel
+                                label="Trabaja Actualmente"
+                                control={
+                                    <Checkbox
+                                        name="trabajaactualmente"
+                                        checked={Boolean(editRowData.trabajaactualmente)}
+                                        onChange={handleEditRowChange}
+                                    />}
+                            />
+                        </Grid>
+
+                        <Grid item size={editRowData.iddiscapacidad === 1 ? 6 : 12}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Discapacidad</InputLabel>
+                                <Select
+                                    name="iddiscapacidad"
+                                    value={editRowData.iddiscapacidad || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Discapacidad"
+                                >
+                                    <MenuItem value="">Seleccionar discapacidad</MenuItem>
+                                    {discapacidad.map(e => (
+                                        <MenuItem key={e.id} value={e.id}>
+                                            {e.discapacidad}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        {editRowData.iddiscapacidad === 1 && (
+                            <Grid item size={6}>
+                                <TextField
+                                    label="Detalle de discapacidad"
+                                    name="detallediscapacidad"
+                                    value={editRowData.detallediscapacidad || ''}
+                                    onChange={handleEditRowChange}
+                                    fullWidth
+                                    variant="standard"
+                                />
+                            </Grid>
+                        )}
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Sabe Computación</InputLabel>
+                                <Select
+                                    name="sabecomputacion"
+                                    value={editRowData.sabecomputacion || ''}
+                                    onChange={handleEditRowChange}
+                                    label="Sabe Computación"
+                                >
+                                    <MenuItem value="Básico">Básico </MenuItem>
+                                    <MenuItem value="Intermedio">Intermedio</MenuItem>
+                                    <MenuItem value="Avanzado">Avanzado</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <FormLabel component="label">Manejo de Programas</FormLabel>
+                                <TextareaAutosize
+                                    name="manejaprogramas"
+                                    value={editRowData.manejaprogramas || ''}
+                                    onChange={handleEditRowChange}
+                                    aria-label="Manejo de Programas"
+                                    minRows={3}
+                                    style={{ padding: '8px' }}
+                                //placeholder="Escribe algo aquí..."
+                                />
+                            </FormControl>
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControl fullWidth variant="standard">
+                                <InputLabel id="demo-simple-select-label">Dispositivos Tecnológicos</InputLabel>
+                                <Select
+                                    value={
+                                        typeof editRowData.dispositivostecnologicos === 'string'
+                                            ? editRowData.dispositivostecnologicos
+                                                .split(',')
+                                                .map(v => v.trim())
+                                                .filter(v => v !== '')
+                                            : editRowData.dispositivostecnologicos || []
+                                    }
+                                    name="dispositivostecnologicos"
+                                    onChange={handleEditRowChange}
+                                    labelId="demo-multiple-chip-label"
+                                    id="demo-multiple-chip"
+                                    multiple
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {selected.map((value) => (
+                                                <Chip key={value} label={value} />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    MenuProps={MenuProps}
+                                >
+                                    <MenuItem value="Teléfono inteligente">Teléfono inteligente</MenuItem>
+                                    <MenuItem value="Computadora">Computadora</MenuItem>
+                                    <MenuItem value="Tablet">Tablet</MenuItem>
+                                    <MenuItem value="Smartwatch">Smartwatch</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item size={6}>
+
+                            <FormControl fullWidth variant="standard" >
+                                <InputLabel id="demo-multiple-chip-label">Plataformas Virtuales</InputLabel>
+                                <Select
+                                    name="plataformasvirtuales"
+                                    value={
+                                        typeof editRowData.plataformasvirtuales === 'string'
+                                            ? editRowData.plataformasvirtuales
+                                                .split(',')
+                                                .map(v => v.trim())
+                                                .filter(v => v !== '')
+                                            : editRowData.plataformasvirtuales || []
+                                    }
+
+                                    onChange={handleEditRowChange}
+                                    label="Plataformas Virtuales"
+                                    labelId="demo-multiple-chip-label"
+                                    id="demo-multiple-chip"
+                                    multiple
+                                    renderValue={(selected) => (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {selected.map((value) => (
+                                                <Chip key={value} label={value} />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    MenuProps={MenuProps}
+                                >
+                                    <MenuItem value="Whatsapp">Whatsapp</MenuItem>
+                                    <MenuItem value="Facebook">Facebook</MenuItem>
+                                    <MenuItem value="Instagram">Instagram</MenuItem>
+                                    <MenuItem value="X">X</MenuItem>
+                                    <MenuItem value="Correo Eletrónico">Correo Eletrónico</MenuItem>
+                                    <MenuItem value="Zoom">Zoom</MenuItem>
+                                    <MenuItem value="Microsoft Teams">Microsoft Teams</MenuItem>
+                                    <MenuItem value="Google Meets">Google Meets</MenuItem>
+                                </Select>
+
+                            </FormControl>
+
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="estudioencasa"
+                                        checked={Boolean(editRowData.estudioencasa)}
+                                        onChange={handleEditRowChange}
+                                    />}
+                                label="Estudia en Casa"
+                            />
+                        </Grid>
+                        <Grid item size={6}>
+                            <FormControlLabel
+                                label="Puede Recibir Clases Sin Distraciones en Casa"
+                                control={
+                                    <Checkbox
+                                        name="pasarsindistraccion"
+                                        checked={Boolean(editRowData.pasarsindistraccion)}
+                                        onChange={handleEditRowChange}
+                                    />}
+                            />
+                        </Grid>
+
+
+                        <Grid item size={6}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="migranteretornado"
+                                        checked={Boolean(editRowData.migranteretornado)}
+                                        onChange={handleEditRowChange}
+                                    />}
+                                label="¿Es migrante retornado?"
+                            />
+                        </Grid>
+                        {editRowData.migranteretornado && (
+                            <Grid item size={6}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="demo-simple-select-label">¿Qué le motivó a migrar de su país?</InputLabel>
+                                    <Select
+                                        name="motivomigracion"
+                                        value={editRowData.motivomigracion || ''}
+                                        onChange={handleEditRowChange}
+                                    >
+                                        <MenuItem value="Falta de empleo">Falta de empleo</MenuItem>
+                                        <MenuItem value="Inseguridad">Inseguridad</MenuItem>
+                                        <MenuItem value="Falta de acceso a educación">Falta de acceso a educación</MenuItem>
+                                        <MenuItem value="Problemas de Salud">Problemas de Salud</MenuItem>
+                                        <MenuItem value="Otro">Otro</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+
+                        {editRowData.motivomigracion === "Otro" && (
+                            <Grid item size={6}>
+                                <TextField
+                                    label="Otro Motivo de Migración"
+                                    name="otromotivomigracion"
+                                    value={editRowData.otromotivomigracion || ''}
+                                    onChange={handleEditRowChange}
+                                    fullWidth
+                                    variant="standard"
+                                />
+                            </Grid>
+                        )}
+                        {editRowData.migranteretornado && (
+                            <Grid item size={6}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="demo-simple-select-label">En su experiencia migratoria, puede indicar si llegó a:</InputLabel>
+                                    <Select
+                                        name="llegousa"
+                                        value={editRowData.llegousa || ''}
+                                        onChange={handleEditRowChange}
+
+                                    >
+                                        <MenuItem value="LLegó a México">LLegó a México</MenuItem>
+                                        <MenuItem value="LLegó a Estados Unidos">LLegó a Estados Unidos</MenuItem>
+                                        <MenuItem value="Fue retornado(a) en Tránsito">Fue retornado(a) en Tránsito</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+                        {editRowData.migranteretornado && (
+                            <Grid item size={6}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="demo-simple-select-label">¿Tiene familiares que se identifican como migrantes retornados?</InputLabel>
+                                    <Select
+                                        name="familiaretornado"
+                                        value={editRowData.familiaretornado || ''}
+                                        onChange={handleEditRowChange}
+
+                                    >
+                                        <MenuItem value="Sí">Sí</MenuItem>
+                                        <MenuItem value="No">No</MenuItem>
+                                        <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+                        {editRowData.familiaretornado === "Sí" && (
+                            <Grid item size={6}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="demo-simple-select-label">¿Algún miembro de su hogar salió de Honduras y no regreso?</InputLabel>
+                                    <Select
+                                        name="miembrosalioynoregreso"
+                                        value={editRowData.miembrosalioynoregreso || ''}
+                                        onChange={handleEditRowChange}
+                                    >
+                                        <MenuItem value="Sí">Sí</MenuItem>
+                                        <MenuItem value="No">No</MenuItem>
+                                        <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+                        {editRowData.migranteretornado && (
+                            <Grid item size={6}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="demo-simple-select-label">Volvería a Migrar</InputLabel>
+                                    <Select
+                                        name="volveriaamigrar"
+                                        value={editRowData.volveriaamigrar || ''}
+                                        onChange={handleEditRowChange}
+                                    >
+                                        <MenuItem value="Sí">Sí</MenuItem>
+                                        <MenuItem value="No">No</MenuItem>
+                                        <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+                    </Grid>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseModal} color="error">
+                    Cancelar
+                </Button>
+                <Button onClick={handleSaveClick} sx={{ background: color.azul }} variant="contained">
+                    Guardar
+                </Button>
+            </DialogActions>
+        </Dialog >
+    );
+
+    if (soloModal) {
+        return renderModal();
+    }
 
 
     return (
@@ -609,586 +1217,10 @@ const DataTable = () => {
                     autoHeight
                 />
 
-                {/* Modal para edición/creación */}
-                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
-                        {isAdding ? 'Nuevo Estudiante' : 'Actualizar Estudiante'}
-                    </DialogTitle>
-                    <DialogContent dividers>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pl: 5, pr: 5 }}>
-                            <TextField
-                                label="Nombre"
-                                name="nombre"
-                                value={editRowData.nombre || ''}
-                                onChange={handleEditRowChange}
-                                fullWidth
-                                variant="standard"
-                            />
-                            <TextField
-                                label="DNI"
-                                name="identificacion"
-                                value={editRowData.identificacion || ''}
-                                onChange={handleEditRowChange}
-                                fullWidth
-                                variant="standard"
-                            />
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <TextField
-                                        label="Fecha de Nacimiento"
-                                        name="fechanacimiento"
-                                        value={editRowData.fechanacimiento || ''}
-                                        onChange={handleEditRowChange}
-                                        fullWidth
-                                        variant="standard"
-                                        type='date'
-                                        InputLabelProps={{ shrink: true }}
-                                    />
-                                </Grid>
-                                <Grid item size={6}>
-                                    <TextField
-                                        label="Edad"
-                                        name="edad"
-                                        value={editRowData.edad || ''}
-                                        fullWidth
-                                        variant="standard"
-                                        type='number'
-                                        InputProps={{ readOnly: true }}
-                                    />
-                                </Grid>
-                                <Grid item size={6}>
-                                    <TextField
-                                        label="Teléfono"
-                                        name="telefono"
-                                        value={editRowData.telefono || ''}
-                                        onChange={handleEditRowChange}
-                                        fullWidth
-                                        variant="standard"
-                                    />
-                                </Grid>
-
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Estado Civil</InputLabel>
-                                        <Select
-                                            name="estadocivil"
-                                            value={editRowData.estadocivil || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Estado Civil"
-                                        >
-                                            <MenuItem value="">Seleccionar genero</MenuItem>
-                                            <MenuItem value="Soltero">Soltero</MenuItem>
-                                            <MenuItem value="Casado">Casado</MenuItem>
-                                            <MenuItem value="Viudo">Viudo</MenuItem>
-                                            <MenuItem value="Unión Libre">Unión Libre</MenuItem>
-                                            <MenuItem value="Divorciado">Divorciado</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                            </Grid>
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Genero</InputLabel>
-                                        <Select
-                                            name="genero"
-                                            value={editRowData.genero || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Genero"
-                                        >
-                                            <MenuItem value="">Seleccionar genero</MenuItem>
-                                            <MenuItem value="Femenino">Femenino</MenuItem>
-                                            <MenuItem value="Masculino">Masculino</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Nacionalidad</InputLabel>
-                                        <Select
-                                            name="idnacionalidad"
-                                            value={editRowData.idnacionalidad || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Nivel Educativo"
-                                        >
-                                            <MenuItem value="">Seleccionar nacionalidad</MenuItem>
-                                            {nacionalidad.map(niv => (
-                                                <MenuItem key={niv.id} value={niv.id}>
-                                                    {niv.nacionalidad}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
-                                        <Select
-                                            name="iddepartamento"
-                                            value={editRowData.iddepartamento || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Departamento"
-                                        >
-                                            <MenuItem value="">Seleccionar departamento</MenuItem>
-                                            {departamentos.map(dep => (
-                                                <MenuItem key={dep.id} value={dep.id}>
-                                                    {dep.departamento}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Municipio</InputLabel>
-                                        <Select
-                                            name="idmunicipio"
-                                            value={editRowData.idmunicipio || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Municipio"
-                                            disabled={!municipios.length}
-                                        >
-                                            <MenuItem value="">Seleccionar municipio</MenuItem>
-                                            {municipios.map(muni => (
-                                                <MenuItem key={muni.id} value={muni.id}>
-                                                    {muni.municipio}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-
-
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Aldea</InputLabel>
-                                        <Select
-                                            name="idaldea"
-                                            value={editRowData.idaldea || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Aldea"
-                                            disabled={!aldeas.length}
-                                        >
-                                            <MenuItem value="">Seleccionar aldea</MenuItem>
-                                            {aldeas.map(a => (
-                                                <MenuItem key={a.id} value={a.id}>
-                                                    {a.aldea}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item size={6}>
-                                    <TextField
-                                        label="Caserio de Residencia"
-                                        name="caserio"
-                                        value={editRowData.caserio || ''}
-                                        onChange={handleEditRowChange}
-                                        fullWidth
-                                        variant="standard"
-                                    />
-                                </Grid>
-                            </Grid>
-                            <FormControl fullWidth variant="standard">
-                                <FormLabel component="label">Dirección</FormLabel>
-                                <TextareaAutosize
-                                    name="direccion"
-                                    value={editRowData.direccion || ''}
-                                    onChange={handleEditRowChange}
-                                    aria-label="Dirección"
-                                    minRows={3}
-                                    style={{ padding: '8px' }}
-                                //placeholder="Escribe algo aquí..."
-                                />
-                            </FormControl>
-
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Nivel Educativo</InputLabel>
-                                        <Select
-                                            name="idniveleducativo"
-                                            value={editRowData.idniveleducativo || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Nivel Educativo"
-                                        >
-                                            <MenuItem value="">Seleccionar nivel educativo</MenuItem>
-                                            {niveles.map(niv => (
-                                                <MenuItem key={niv.id} value={niv.id}>
-                                                    {niv.nivelacademico}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Grado Académicos</InputLabel>
-                                        <Select
-                                            name="idgradoacademico"
-                                            value={editRowData.idgradoacademico || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Grado Académicos"
-                                            disabled={!grados.length}
-                                        >
-                                            <MenuItem value="">Seleccionar grado académico</MenuItem>
-                                            {grados.map(gra => (
-                                                <MenuItem key={gra.id} value={gra.id}>
-                                                    {gra.gradoacademico}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                            <FormControl fullWidth variant="standard">
-                                <InputLabel id="demo-simple-select-label">Etnia</InputLabel>
-                                <Select
-                                    name="idetnia"
-                                    value={editRowData.idetnia || ''}
-                                    onChange={handleEditRowChange}
-                                    label="Etnia"
-                                >
-                                    <MenuItem value="">Seleccionar Etnia</MenuItem>
-                                    {etnia.map(e => (
-                                        <MenuItem key={e.id} value={e.id}>
-                                            {e.etnia}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <Grid container spacing={5}>
-                                <Grid item size={6}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="estudianoformal"
-                                                checked={Boolean(editRowData.estudianoformal)}
-                                                onChange={handleEditRowChange}
-                                            />
-                                        }
-                                        label="Estudia en Educación No Formal"
-                                    />
-                                </Grid>
-                                {editRowData.estudianoformal && (
-                                    <Grid item size={6}>
-
-                                        <FormControl fullWidth variant="standard">
-                                            <FormLabel component="label">Educación No Formal</FormLabel>
-
-                                            <TextareaAutosize
-                                                minRows={3}
-                                                style={{ padding: '8px', width: "95%" }}
-                                                name="educacionnoformal"
-                                                value={editRowData.educacionnoformal || ""}
-                                                onChange={handleEditRowChange}
-                                                placeholder="Ej: Curso de inglés, Taller de Excel"
-                                            />
-                                        </FormControl>
-
-
-                                    </Grid>)}
-                                <Grid item size={6}>
-                                    <FormControlLabel
-                                        label="Trabaja Actualmente"
-                                        control={
-                                            <Checkbox
-                                                name="trabajaactualmente"
-                                                checked={Boolean(editRowData.trabajaactualmente)}
-                                                onChange={handleEditRowChange}
-                                            />}
-                                    />
-                                </Grid>
-
-                                <Grid item size={editRowData.iddiscapacidad === 1 ? 6 : 12}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Discapacidad</InputLabel>
-                                        <Select
-                                            name="iddiscapacidad"
-                                            value={editRowData.iddiscapacidad || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Discapacidad"
-                                        >
-                                            <MenuItem value="">Seleccionar discapacidad</MenuItem>
-                                            {discapacidad.map(e => (
-                                                <MenuItem key={e.id} value={e.id}>
-                                                    {e.discapacidad}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                {editRowData.iddiscapacidad === 1 && (
-                                    <Grid item size={6}>
-                                        <TextField
-                                            label="Detalle de discapacidad"
-                                            name="detallediscapacidad"
-                                            value={editRowData.detallediscapacidad || ''}
-                                            onChange={handleEditRowChange}
-                                            fullWidth
-                                            variant="standard"
-                                        />
-                                    </Grid>
-                                )}
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Sabe Computación</InputLabel>
-                                        <Select
-                                            name="sabecomputacion"
-                                            value={editRowData.sabecomputacion || ''}
-                                            onChange={handleEditRowChange}
-                                            label="Sabe Computación"
-                                        >
-                                            <MenuItem value="Básico">Básico </MenuItem>
-                                            <MenuItem value="Intermedio">Intermedio</MenuItem>
-                                            <MenuItem value="Avanzado">Avanzado</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <FormLabel component="label">Manejo de Programas</FormLabel>
-                                        <TextareaAutosize
-                                            name="manejaprogramas"
-                                            value={editRowData.manejaprogramas || ''}
-                                            onChange={handleEditRowChange}
-                                            aria-label="Manejo de Programas"
-                                            minRows={3}
-                                            style={{ padding: '8px' }}
-                                        //placeholder="Escribe algo aquí..."
-                                        />
-                                    </FormControl>
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel id="demo-simple-select-label">Dispositivos Tecnológicos</InputLabel>
-                                        <Select
-                                            value={
-                                                typeof editRowData.dispositivostecnologicos === 'string'
-                                                    ? editRowData.dispositivostecnologicos
-                                                        .split(',')
-                                                        .map(v => v.trim())
-                                                        .filter(v => v !== '')
-                                                    : editRowData.dispositivostecnologicos || []
-                                            }
-                                            name="dispositivostecnologicos"
-                                            onChange={handleEditRowChange}
-                                            labelId="demo-multiple-chip-label"
-                                            id="demo-multiple-chip"
-                                            multiple
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                            MenuProps={MenuProps}
-                                        >
-                                            <MenuItem value="Teléfono inteligente">Teléfono inteligente</MenuItem>
-                                            <MenuItem value="Computadora">Computadora</MenuItem>
-                                            <MenuItem value="Tablet">Tablet</MenuItem>
-                                            <MenuItem value="Smartwatch">Smartwatch</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item size={6}>
-
-                                    <FormControl fullWidth variant="standard" >
-                                        <InputLabel id="demo-multiple-chip-label">Plataformas Virtuales</InputLabel>
-                                        <Select
-                                            name="plataformasvirtuales"
-                                            value={
-                                                typeof editRowData.plataformasvirtuales === 'string'
-                                                    ? editRowData.plataformasvirtuales
-                                                        .split(',')
-                                                        .map(v => v.trim())
-                                                        .filter(v => v !== '')
-                                                    : editRowData.plataformasvirtuales || []
-                                            }
-
-                                            onChange={handleEditRowChange}
-                                            label="Plataformas Virtuales"
-                                            labelId="demo-multiple-chip-label"
-                                            id="demo-multiple-chip"
-                                            multiple
-                                            renderValue={(selected) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                    {selected.map((value) => (
-                                                        <Chip key={value} label={value} />
-                                                    ))}
-                                                </Box>
-                                            )}
-                                            MenuProps={MenuProps}
-                                        >
-                                            <MenuItem value="Whatsapp">Whatsapp</MenuItem>
-                                            <MenuItem value="Facebook">Facebook</MenuItem>
-                                            <MenuItem value="Instagram">Instagram</MenuItem>
-                                            <MenuItem value="X">X</MenuItem>
-                                            <MenuItem value="Correo Eletrónico">Correo Eletrónico</MenuItem>
-                                            <MenuItem value="Zoom">Zoom</MenuItem>
-                                            <MenuItem value="Microsoft Teams">Microsoft Teams</MenuItem>
-                                            <MenuItem value="Google Meets">Google Meets</MenuItem>
-                                        </Select>
-
-                                    </FormControl>
-
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="estudioencasa"
-                                                checked={Boolean(editRowData.estudioencasa)}
-                                                onChange={handleEditRowChange}
-                                            />}
-                                        label="Estudia en Casa"
-                                    />
-                                </Grid>
-                                <Grid item size={6}>
-                                    <FormControlLabel
-                                        label="Puede Recibir Clases Sin Distraciones en Casa"
-                                        control={
-                                            <Checkbox
-                                                name="pasarsindistraccion"
-                                                checked={Boolean(editRowData.pasarsindistraccion)}
-                                                onChange={handleEditRowChange}
-                                            />}
-                                    />
-                                </Grid>
-
-
-                                <Grid item size={6}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                name="migranteretornado"
-                                                checked={Boolean(editRowData.migranteretornado)}
-                                                onChange={handleEditRowChange}
-                                            />}
-                                        label="¿Es migrante retornado?"
-                                    />
-                                </Grid>
-                                {editRowData.migranteretornado && (
-                                    <Grid item size={6}>
-                                        <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">¿Qué le motivó a migrar de su país?</InputLabel>
-                                            <Select
-                                                name="motivomigracion"
-                                                value={editRowData.motivomigracion || ''}
-                                                onChange={handleEditRowChange}
-                                            >
-                                                <MenuItem value="Falta de empleo">Falta de empleo</MenuItem>
-                                                <MenuItem value="Inseguridad">Inseguridad</MenuItem>
-                                                <MenuItem value="Falta de acceso a educación">Falta de acceso a educación</MenuItem>
-                                                <MenuItem value="Problemas de Salud">Problemas de Salud</MenuItem>
-                                                <MenuItem value="Otro">Otro</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                )}
-
-                                {editRowData.motivomigracion === "Otro" && (
-                                    <Grid item size={6}>
-                                        <TextField
-                                            label="Otro Motivo de Migración"
-                                            name="otromotivomigracion"
-                                            value={editRowData.otromotivomigracion || ''}
-                                            onChange={handleEditRowChange}
-                                            fullWidth
-                                            variant="standard"
-                                        />
-                                    </Grid>
-                                )}
-                                {editRowData.migranteretornado && (
-                                    <Grid item size={6}>
-                                        <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">En su experiencia migratoria, puede indicar si llegó a:</InputLabel>
-                                            <Select
-                                                name="llegousa"
-                                                value={editRowData.llegousa || ''}
-                                                onChange={handleEditRowChange}
-
-                                            >
-                                                <MenuItem value="LLegó a México">LLegó a México</MenuItem>
-                                                <MenuItem value="LLegó a Estados Unidos">LLegó a Estados Unidos</MenuItem>
-                                                <MenuItem value="Fue retornado(a) en Tránsito">Fue retornado(a) en Tránsito</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                )}
-                                {editRowData.migranteretornado && (
-                                    <Grid item size={6}>
-                                        <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">¿Tiene familiares que se identifican como migrantes retornados?</InputLabel>
-                                            <Select
-                                                name="familiaretornado"
-                                                value={editRowData.familiaretornado || ''}
-                                                onChange={handleEditRowChange}
-
-                                            >
-                                                <MenuItem value="Sí">Sí</MenuItem>
-                                                <MenuItem value="No">No</MenuItem>
-                                                <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                )}
-                                {editRowData.familiaretornado === "Sí" && (
-                                    <Grid item size={6}>
-                                        <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">¿Algún miembro de su hogar salió de Honduras y no regreso?</InputLabel>
-                                            <Select
-                                                name="miembrosalioynoregreso"
-                                                value={editRowData.miembrosalioynoregreso || ''}
-                                                onChange={handleEditRowChange}
-                                            >
-                                                <MenuItem value="Sí">Sí</MenuItem>
-                                                <MenuItem value="No">No</MenuItem>
-                                                <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                )}
-                                {editRowData.migranteretornado && (
-                                    <Grid item size={6}>
-                                        <FormControl fullWidth variant="standard">
-                                            <InputLabel id="demo-simple-select-label">Volvería a Migrar</InputLabel>
-                                            <Select
-                                                name="volveriaamigrar"
-                                                value={editRowData.volveriaamigrar || ''}
-                                                onChange={handleEditRowChange}
-                                            >
-                                                <MenuItem value="Sí">Sí</MenuItem>
-                                                <MenuItem value="No">No</MenuItem>
-                                                <MenuItem value="No Sabe / No Responde">No Sabe / No Responde</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                )}
-                            </Grid>
-                        </Box>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseModal} color="error">
-                            Cancelar
-                        </Button>
-                        <Button onClick={handleSaveClick} sx={{ background: color.azul }} variant="contained">
-                            Guardar
-                        </Button>
-                    </DialogActions>
-                </Dialog >
+                {renderModal()}
             </Box >
         </Dashboard >
     );
-};
+});
 
-export default DataTable;
+export default Estudiantes;

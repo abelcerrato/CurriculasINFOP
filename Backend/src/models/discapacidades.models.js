@@ -3,7 +3,7 @@ import { pool } from '../db.js'
 export const getDiscapacidadesM = async () => {
     try {
         const { rows } = await pool.query('SELECT * from discapacidades')
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;

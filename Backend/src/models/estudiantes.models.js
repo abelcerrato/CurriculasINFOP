@@ -35,7 +35,7 @@ export const getEstudiantesM = async (req, res) => {
                 d.discapacidad, depto.departamento, muni.municipio, ald.aldea,
                 muc.nombre, mum.nombre
             ORDER BY e.id DESC;`);
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;

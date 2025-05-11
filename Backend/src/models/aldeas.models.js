@@ -11,7 +11,7 @@ export const getAldeasM = async () => {
             FROM aldeas a  
             INNER JOIN municipios m ON a.idmunicipio = m.id
             ORDER BY a.id ASC;`)
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -20,10 +20,10 @@ export const getAldeasM = async () => {
 
 
 export const getAldeaIdM = async (id) => {
-    console.log('Aldea enviada:', id);
+   // console.log('Aldea enviada:', id);
     try {
         const { rows } = await pool.query('SELECT aldea, idmunicipio FROM aldeas WHERE idmunicipio=$1', [id]);
-        console.log('Resultado de la consulta de la Aldea:', rows); 
+      //  console.log('Resultado de la consulta de la Aldea:', rows); 
         return rows;
     } catch (error) {
         console.error('Error al obtener la Aldea:', error); 

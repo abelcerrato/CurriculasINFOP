@@ -32,7 +32,7 @@ export const getAccionFormativaIdC = async (req, res) => {
 
 export const postAccionFormativaC = async (req, res) => {
     try {
-        const { accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio, 
+        const { accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio,
             metodologia, modalidad, tipomaterial, localdesarrollo, programaeducativo, donantessocios, creadopor } = req.body;
         console.log(req.body);
         // if (!accionformatica || !horastotales || !fechainicio || !fechafinal) {
@@ -40,7 +40,12 @@ export const postAccionFormativaC = async (req, res) => {
         //     return res.status(400).json({ error: "Faltan datos en la solicitud" });
         // }s
         const newAccionFormativa = await postAccionFormativaM(accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio, metodologia, modalidad, tipomaterial, localdesarrollo, programaeducativo, donantessocios, creadopor);
-        res.json({ message: "Accion Formativa agregada exitosamente: ", newAccionFormativa });
+        console.log("Nuevo ID generado:", newAccionFormativa);
+        res.json({
+            message: "Acción Formativa agregada exitosamente",
+            idaccionformativa: newAccionFormativa
+        });
+
     }
     catch (error) {
         console.error('Error al insertar la Accion Formativa:', error);
@@ -53,7 +58,7 @@ export const postAccionFormativaC = async (req, res) => {
 export const putAccionFormativaC = async (req, res) => {
     try {
         const { id } = req.params;
-        const { accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio, 
+        const { accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio,
             metodologia, modalidad, tipomaterial, localdesarrollo, programaeducativo, donantessocios, modificadopor } = req.body;
 
         // if (!accionformatica || !horastotales || !fechainicio || !fechafinal) {

@@ -36,7 +36,7 @@ export const getPermisosM = async () => {
                 LEFT JOIN ms_usuarios muc ON p.creadopor = muc.id
                 GROUP BY mr.id, mr.rol, mr.estado, muc.nombre;
                 `)
-        console.log(rows);
+       // console.log(rows);
         return rows;
     } catch (error) {
         throw error;

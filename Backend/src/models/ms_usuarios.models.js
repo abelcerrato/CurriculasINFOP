@@ -24,7 +24,7 @@ export const getUserM = async () => {
             left  JOIN ms_roles r   ON u.idrol = r.id
             ORDER BY u.id ASC;
         `)
-        console.log(rows);
+      //  console.log(rows);
         return rows;
     } catch (error) {
         throw error;
@@ -101,7 +101,7 @@ export const postUserM = async (nombre, usuario, cecap, correo, idrol, iddeparta
                                             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, null, true) RETURNING *`,
             [nombre, usuario, cecap,  correo, idrol, iddepartamento, idmunicipio, contraseñaCifrada,  estado, creadopor])
 
-        console.log(rows);
+      //  console.log(rows);
         return rows[0]
     } catch (error) {
         throw error;

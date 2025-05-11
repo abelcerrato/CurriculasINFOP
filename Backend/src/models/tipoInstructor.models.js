@@ -5,7 +5,7 @@ import { pool } from '../db.js'
 export const getTipoEducadorM = async () => {
     try {
         const { rows } = await pool.query('SELECT * from tipoeducador')
-        console.log(rows);
+       // console.log(rows);
         return rows;
     } catch (error) {
         throw error;

@@ -19,7 +19,9 @@ import Usuarios from './Seguridad/Usuarios';
 import RolesyPermisos from './Seguridad/RolesyPermisos';
 import Instructores from './Maestros/Maestros';
 import Estudiantes from './Estudiantes/Estudiante';
-import Nacionalidad from './Mantenimientos/Nacionalidad'
+import Nacionalidad from './Mantenimientos/Nacionalidad';
+import TablaAccionFormativa from './AccionFormativa/TablaAccionFormativa';
+import AccionFormativa from './AccionFormativa/AccionFormativa';
 import { UserProvider } from './Components/UserContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -89,6 +91,13 @@ function App() {
           {/* Rutas protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+
+
+            {/* AccionFormativa */}
+            <Route path="/Acción-Formativa" element={<TablaAccionFormativa />} />
+            <Route path="/Acción-Formativa/Registro" element={<AccionFormativa />} />
+
+
             {/* Curriculas */}
             <Route path="/Currículas" element={<TablaCurriculas />} />
             <Route path="/Currículas/Registro" element={<Curriculas />} />

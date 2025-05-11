@@ -9,7 +9,7 @@ export const getRolesM = async () => {
         left join ms_usuarios muc on r.creadopor = muc.id 
         left join ms_usuarios mum on r.modificadopor = mum.id
         order by r.id asc`)
-        console.log(rows);
+      //  console.log(rows);
         return rows;
     } catch (error) {
         throw error;

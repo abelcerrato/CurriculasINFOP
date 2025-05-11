@@ -40,6 +40,11 @@ import ImportContactsOutlinedIcon from '@mui/icons-material/ImportContactsOutlin
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import EmojiFlagsOutlinedIcon from '@mui/icons-material/EmojiFlagsOutlined';
 
+
+import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
+
+
+
 import { useUser } from "../Components/UserContext";
 import { color } from "../Components/style/Color";
 import { styled } from '@mui/material/styles';
@@ -214,10 +219,27 @@ const ProjectDrawer = ({ open }) => {
           onClick={() => navigate("/dashboard")}
         />
       </List>
+
+
+      {open && <Divider />}
+      {/* Acción Formativa */}
+      <List>
+        <LightTooltip title="Acción Formativa" placement="right" disableHoverListener={open} >
+          <div>
+            <MenuItem
+              path="/Acción-Formativa"
+              icon={<HistoryEduOutlinedIcon />}
+              text="Acción Formativa"
+              onClick={() => navigate("/Acción-Formativa")}
+            />
+          </div>
+        </LightTooltip >
+      </List>
+
+
       {open && <Divider />}
       {/* Currículas */}
       <List>
-
         <LightTooltip title="Currículas" placement="right" disableHoverListener={open} >
           <div>
             <MenuItem
@@ -228,8 +250,8 @@ const ProjectDrawer = ({ open }) => {
             />
           </div>
         </LightTooltip >
-
       </List>
+
       {open && <Divider />}
       {/* Programas */}
       <List>

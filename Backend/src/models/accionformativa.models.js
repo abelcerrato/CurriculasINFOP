@@ -61,12 +61,12 @@ export const postAccionFormativaM = async (
                 iddepartamento, idmunicipio, metodologia, modalidad,tipomaterial, localdesarrollo, programaeducativo, donantessocios,
                 creadopor, fechacreacion) 
             VALUES 
-                ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, CURRENT_TIMESTAMP) RETURNING *`, 
+                ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, CURRENT_TIMESTAMP) RETURNING id`, 
             [ 
                 accionformatica, salida, horaspracticas, horasteoricas, horastotales, fechainicio, fechafinal, iddepartamento, idmunicipio, 
                 metodologia, modalidad, tipomaterial, localdesarrollo, programaeducativo, donantessocios, creadopor
             ]);
-        return rows;
+       return rows[0].id;
     } catch (error) {
         throw error;
     }
