@@ -38,14 +38,45 @@ export const getSegumientoIdM = async (id) => {
             left join ms_usuarios mum on s.modificadopor = mum.id 
             left join accionformativa a on s.idaccionformativa = a.id 
             left join estudiantes e on s.idestudiante = e.id 
-            ORDER BY s.id ASC;    
-            WHERE s.id =$1`, [id]);
+            WHERE s.id =$1
+            ORDER BY s.id ASC; `, [id]);
         return rows;
     } catch (error) {
         console.error('Error al obtener el Segumiento:', error); 
         throw error;
     }
 }
+
+
+
+export const getSegumientoIdAccFormM = async (id) => {
+    console.log('Id de Acción Formativa enviada:', id);
+    try {
+        const { rows } = await pool.query(`
+            SELECT 
+                s.idaccionformativa, a.accionformatica,
+                s.idestudiante, e.identificacion, e.nombre, 
+                e.iddepartamento, de.departamento, e.idmunicipio, m.municipio,
+                s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
+                s.hasidoempleado, s.tipoempleo, s.trabajacampoestudio, 
+                muc.creadopor, s.fechacreacion,  mum.modificadopor, s.fechamodificacion
+            FROM seguimiento as s
+            left join ms_usuarios muc on s.creadopor = muc.id 
+            left join ms_usuarios mum on s.modificadopor = mum.id 
+            left join accionformativa a on s.idaccionformativa = a.id 
+            left join estudiantes e on s.idestudiante = e.id
+            left join departamentos de on e.iddepartamento = de.id 
+            left join municipios m on e.idmunicipio = m.id 
+            WHERE s.idaccionformativa = $1
+            ORDER BY s.idaccionformativa ASC;`, [id]);
+        return rows;
+    } catch (error) {
+        console.error('Error al obtener el Segumiento:', error); 
+        throw error;
+    }
+}
+
+
 
 export const postSeguimientoM = async (completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, creadopor) =>{
     try {

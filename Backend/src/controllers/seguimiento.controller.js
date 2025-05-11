@@ -1,4 +1,4 @@
-import { getSeguimientoM, getSegumientoIdM, postSeguimientoM, putSeguimientoM } from "../models/seguimiento.models.js";
+import { getSeguimientoM, getSegumientoIdAccFormM, getSegumientoIdM, postSeguimientoM, putSeguimientoM } from "../models/seguimiento.models.js";
 
 export const getSegumientoC = async (req, res) => {
     try {
@@ -28,6 +28,26 @@ export const getSegumientoIdC = async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
+
+
+
+export const getSegumientoIdAccFormC = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const seguimiento = await getSegumientoIdAccFormM(id);
+
+        if (!seguimiento) {
+            return res.status(404).json({ message: "Seguimiento no encontrado" });
+        }
+
+        res.json(seguimiento)
+    } catch (error) {
+        console.error('Error al obtener el seguimiento:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
 
 export const postSeguimientoC = async (req, res) => {
     try {

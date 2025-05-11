@@ -1,12 +1,14 @@
 import { Router } from "express";
 
-import { getSegumientoC, getSegumientoIdC, postSeguimientoC, putSeguimientoC } from "../controllers/seguimiento.controller.js";
+import { getSegumientoC, getSegumientoIdAccFormC, getSegumientoIdC, postSeguimientoC, putSeguimientoC } from "../controllers/seguimiento.controller.js";
 
 const router = Router();
 
 router.get('/seguimientos', getSegumientoC);
 
 router.get('/seguimiento/:id', getSegumientoIdC);
+
+router.get('/seguimientoAccForm/:id', getSegumientoIdAccFormC);
 
 router.post('/seguimientos', postSeguimientoC );
 
