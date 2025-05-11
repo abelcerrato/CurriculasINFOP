@@ -108,3 +108,13 @@ export const putSeguimientoM = async ( completocurso, fechaabandono, razonabando
     }
 }
 
+
+export const deleteSeguimientoEstudianteM = async (idestudiante, idaccionformativa) => {
+    try {
+        const { rows } = await pool.query(`
+            DELETE FROM seguimiento WHERE idestudiante=$1 and idaccionformativa=$2 RETURNING *`, [idestudiante, idaccionformativa]);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}

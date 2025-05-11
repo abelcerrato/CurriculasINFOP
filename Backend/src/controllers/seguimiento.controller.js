@@ -1,4 +1,4 @@
-import { getSeguimientoM, getSegumientoIdAccFormM, getSegumientoIdM, postSeguimientoM, putSeguimientoM } from "../models/seguimiento.models.js";
+import { deleteSeguimientoEstudianteM, getSeguimientoM, getSegumientoIdAccFormM, getSegumientoIdM, postSeguimientoM, putSeguimientoM } from "../models/seguimiento.models.js";
 
 export const getSegumientoC = async (req, res) => {
     try {
@@ -119,6 +119,23 @@ export const putSeguimientoC = async (req, res) => {
 
     } catch (error) {
         console.error('Error al actualizar el seguimiento:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
+
+export const deleteSeguimientoEstudianteC = async (req, res) => {
+    try {
+        const { idestudiante, idaccionformativa } = req.params;
+        const seguimientoEliminado = await deleteSeguimientoEstudianteM(idestudiante, idaccionformativa);
+
+        if (!seguimientoEliminado) {
+            return res.status(404).json({ message: "Seguimiento no encontrado" });
+        }
+
+        res.json({ message: "Seguimiento del estudiante eliminado exitosamente" });
+    } catch (error) {
+        console.error('Error al eliminar el seguimiento:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
