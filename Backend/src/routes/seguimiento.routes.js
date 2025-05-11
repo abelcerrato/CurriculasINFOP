@@ -14,7 +14,7 @@ router.post('/seguimientos', postSeguimientoC );
 
 router.put('/seguimiento/:id', putSeguimientoC );
 
-router.delete('/seguimiento/:idestudiante/:idaccionformativa', deleteSeguimientoEstudianteC);
+router.delete('/seguimiento', deleteSeguimientoEstudianteC);
 
 
 
