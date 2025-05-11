@@ -39,7 +39,8 @@ import Dashboard from "../Dashboard/Dashboard";
 import { useUser } from "../Components/UserContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
+
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import InstructorModal from '../Maestros/Maestros';
 import { DataGrid } from '@mui/x-data-grid';
@@ -170,7 +171,7 @@ const AddEducationalProcess = () => {
         donantessocios: '',
 
         // Campos del paso 2 (Estudiantes)
-        idaccionformativa: '', // Se llenará con la respuesta del backend
+        idaccionformativa: '',
         completocurso: false,
         fechaabandono: '',
         razonabandono: '',
@@ -775,6 +776,17 @@ const AddEducationalProcess = () => {
     const [estudiantes, setEstudiantes] = useState([]);
     const estudiantesRef = useRef();
     const [selectionModel, setSelectionModel] = useState([]);
+    const [estudiantesIns, setEstudiantesIns] = useState([]);
+    const [selectionIns, setSelectionIns] = useState([]);
+
+    const handleSaveSuccess = async () => {
+        // Esta función se llamará cuando se guarde exitosamente un estudiante
+        await fetchEstudiantes(); // Actualiza la lista de estudiantes
+    };
+
+    const handleChangeTab = (event, newValue) => {
+        setValue(newValue);
+    };
 
     // Función para obtener estudiantes
     const fetchEstudiantes = async () => {
@@ -790,18 +802,57 @@ const AddEducationalProcess = () => {
         fetchEstudiantes();
     }, []);
 
+    // Función para obtener estudiantes ya inscritos
+    const fetchEstudiantesIns = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/seguimientoAccForm/${formData.idaccionformativa}`);
+            setEstudiantesIns(Array.isArray(response.data) ? response.data : []);
+            console.log("api", estudiantesIns);
+
+        } catch (error) {
+            console.error("Error al obtener estudiantes:", error);
+        }
+    };
+
+    const handleDeleteEstudiantes = async () => {
+        try {
+            // Verificar que hay selecciones y que idaccionformativa tiene valor
+            if (selectionIns.length === 0 || !formData.idaccionformativa) {
+                console.error("No hay estudiantes seleccionados o falta idaccionformativa");
+                return;
+            }
+
+            console.log("IDs seleccionados:", selectionIns); // Debug: ver qué hay en selectionIns
+            console.log("idaccionformativa:", formData.idaccionformativa); // Debug: ver el valor
+
+            // Formatear los datos - asegúrate que coincida con row.id del DataGrid
+            const dataToSend = selectionIns.map(idestudiante => ({
+                idestudiante: idestudiante, // o solo id si la API espera eso
+                idaccionformativa: formData.idaccionformativa
+            }));
+
+            console.log("Datos a enviar:", dataToSend); // Debug: ver qué se enviará
+
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/seguimiento`, {
+                data: dataToSend
+            });
+
+            console.log("Respuesta:", response.data);
+            fetchEstudiantesIns();
+        } catch (error) {
+            console.error("Error:", error.response?.data || error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchEstudiantesIns();
+    }, []);
+
     const handleAddEstudiante = async () => {
         estudiantesRef.current?.openAddModal();
     };
 
-    const handleSaveSuccess = async () => {
-        // Esta función se llamará cuando se guarde exitosamente un estudiante
-        await fetchEstudiantes(); // Actualiza la lista de estudiantes
-    };
 
-    const handleChangeTab = (event, newValue) => {
-        setValue(newValue);
-    };
 
 
 
@@ -863,6 +914,7 @@ const AddEducationalProcess = () => {
                     console.log("Datos a enviar:", estudiantesData);
 
                     await axios.post(`${process.env.REACT_APP_API_URL}/seguimientos`, estudiantesData);
+                    fetchEstudiantesIns();
                     break;
 
                 // ... otros cases
@@ -1259,7 +1311,7 @@ const AddEducationalProcess = () => {
                                                     }}
                                                 />
                                                 <IconButton color="error" onClick={() => handleDeleteClick('module', modulo.idmodulo)}>
-                                                    <DeleteIcon />
+                                                    <DeleteOutlinedIcon />
                                                 </IconButton>
                                             </Box>
 
@@ -1530,7 +1582,7 @@ const AddEducationalProcess = () => {
                                                                             color="error"
                                                                             onClick={() => handleDeleteClick('class', `${modulo.idmodulo}-${clase.idclase}`)}
                                                                         >
-                                                                            <DeleteIcon fontSize="small" />
+                                                                            <DeleteOutlinedIcon fontSize="small" />
                                                                         </IconButton>
 
                                                                         <TextField
@@ -1719,7 +1771,7 @@ const AddEducationalProcess = () => {
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <TabList onChange={handleChangeTab} aria-label="lab API tabs example">
                                         <Tab label="Participantes" value="1" />
-                                        <Tab label="Inscritos" value="2" />
+                                        <Tab label={`Inscritos (${estudiantesIns.length})`} value="2" />
                                     </TabList>
                                 </Box>
 
@@ -1744,8 +1796,8 @@ const AddEducationalProcess = () => {
                                         rows={estudiantes}
                                         columns={[
                                             { field: "id", headerName: "ID", width: 90 },
-                                            { field: 'nombre', headerName: 'Nombre', width: 300 },
                                             { field: 'identificacion', headerName: 'DNI', width: 200 },
+                                            { field: 'nombre', headerName: 'Nombre', width: 300 },
                                             { field: 'departamento', headerName: 'Departamento de Residencia', width: 300 },
                                             { field: 'municipio', headerName: 'Municipio de Residencia', width: 300 },
                                         ]}
@@ -1753,13 +1805,49 @@ const AddEducationalProcess = () => {
                                         checkboxSelection
                                         getRowId={(row) => row.id}
                                         autoHeight
-                                        selectionModel={selectionModel}
+                                        rowSelectionModel={selectionModel}
                                         onRowSelectionModelChange={(newSelection) => {
                                             setSelectionModel(newSelection);
                                         }}
                                     />
                                 </TabPanel>
-                                <TabPanel value="2">Item Two</TabPanel>
+                                <TabPanel value="2">
+
+                                    <Grid
+                                        container
+                                        size={{ xs: 12, md: 12 }}
+                                        display="flex"
+                                        justifyContent="flex-end"
+                                        gap={2}
+                                        mb={2}
+                                    >
+                                        <Button
+                                            variant="outlined"
+                                            startIcon={<DeleteOutlinedIcon />}
+                                            onClick={handleDeleteEstudiantes}
+                                        >
+                                            Eliminar estudiante
+                                        </Button>
+                                    </Grid>
+
+                                    <DataGrid
+                                        rows={estudiantesIns}
+                                        columns={[
+                                            { field: "idestudiante", headerName: "ID", width: 90 },
+                                            { field: 'identificacion', headerName: 'DNI', width: 200 },
+                                            { field: 'nombre', headerName: 'Nombre', width: 300 },
+                                            { field: 'departamento', headerName: 'Departamento de Residencia', width: 300 },
+                                            { field: 'municipio', headerName: 'Municipio de Residencia', width: 300 },
+                                        ]}
+                                        getRowId={(row) => row.idestudiante}
+                                        checkboxSelection
+                                        pageSize={5}
+                                        rowSelectionModel={selectionIns}  // Cambiado a rowSelectionModel
+                                        onRowSelectionModelChange={(newSelection) => {
+                                            setSelectionIns(newSelection);
+                                        }}
+                                    />
+                                </TabPanel>
                             </TabContext>
                         </Box>
                     )}

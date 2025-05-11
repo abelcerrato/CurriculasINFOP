@@ -16,7 +16,7 @@ export const getClasModCurrAccFormM = async () => {
                 c.duracionpractica,
                 c.duraciontotal,
                 muc.creadopor, c.fechacreacion,  mum.modificadopor, c.fechamodificacion
-            FROM ClassModCurrAF as c
+            FROM classmodcurraf as c
             left join accionformativa a2 on c.idaccionformativa = a2.id 
             left join curriculas curr on c.idcurriculas = curr.id 
             left join areasformacion a on curr.idareaformacion = a.id
@@ -25,7 +25,7 @@ export const getClasModCurrAccFormM = async () => {
             left join ms_usuarios muc on c.creadopor = muc.id 
             left join ms_usuarios mum on c.modificadopor = mum.id 
             order by c.id asc 
-            `);  
+            `);
         return rows;
     } catch (error) {
         throw error;
@@ -49,7 +49,7 @@ export const getClasModCurrAccFormIdM = async (id) => {
                 c.duracionpractica,
                 c.duraciontotal,
                 muc.creadopor, c.fechacreacion,  mum.modificadopor, c.fechamodificacion
-            FROM ClassModCurrAF as c
+            FROM classmodcurraf as c
             left join accionformativa a2 on c.idaccionformativa = a2.id 
             left join curriculas curr on c.idcurriculas = curr.id 
             left join areasformacion a on curr.idareaformacion = a.id
@@ -68,7 +68,7 @@ export const postClasModCurrAccFormM = async (
     idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor) => {
     try {
         const { rows } = await pool.query(`
-            INSERT INTO ClassModCurrAF 
+            INSERT INTO classmodcurraf 
                 (idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor)
             VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`, [idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor]);
         return rows;
@@ -82,7 +82,7 @@ export const putClasModCurrAccFormM = async (
     idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, modificadopor, id) => {
     try {
         const { rows } = await pool.query(`
-            UPDATE ClassModCurrAF 
+            UPDATE classmodcurraf 
                 SET idaccionformativa=$1, idcurriculas=$2, idmoduloscurriculas=$3, idclasescurriculas=$4,
                 duracionteorica=$5, duracionpractica=$6, duraciontotal=$7,
                 modificadopor=$8, fechamodificacion=CURRENT_TIMESTAMP

@@ -127,6 +127,7 @@ export const putSeguimientoC = async (req, res) => {
 export const deleteSeguimientoEstudianteC = async (req, res) => {
     try {
         const seguimientos = req.body;
+        console.log(req.body);
 
         if (!Array.isArray(seguimientos)) {
             return res.status(400).json({ error: 'Se esperaba un arreglo de seguimientos a eliminar.' });
