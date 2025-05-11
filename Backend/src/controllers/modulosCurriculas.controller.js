@@ -1,3 +1,4 @@
+import { postClasesModulosCurriculasM } from "../models/clasesModCurriculas.models.js";
 import { deleteModuloM, getModulosCurriculaIdM, getModulosCurriculasM, getModulosIdCurriculaM, postModulosCurriculaM, putModulosCurriculaM } from "../models/modulosCurriculas.models.js";
 
 
@@ -59,6 +60,60 @@ export const postModulosCurriculaC = async (req, res) => {
     }
 }
 
+
+//##########################################################################################################################################
+//INSERTA MODULOS Y CLASES
+export const postModulosClasesC = async (req, res) => {
+    const { curriculaId, modulosData } = req.body;
+
+    try {
+        const insertedModules = [];
+        const insertedClasses = [];
+
+        for (const moduloData of modulosData) {
+            const {
+                modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
+                creadopor, modificadopor, clases
+            } = moduloData;
+
+            const newModulo = await postModulosCurriculaM(
+                modulo, duracionteoricaModulo, duracionpracticaModulo, duraciontotalModulo,
+                curriculaId, creadopor, modificadopor
+            );
+
+            insertedModules.push(newModulo);
+
+            const moduloIdFinal = newModulo.id || newModulo[0]?.id;
+
+            for (const claseData of clases) {
+                const {
+                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase
+                } = claseData;
+
+                const newClase = await postClasesModulosCurriculasM(
+                    clase, duracionteoricaClase, duracionpracticaClase, duraciontotalClase,
+                    curriculaId, moduloIdFinal, creadopor
+                );
+
+                insertedClasses.push(newClase);
+            }
+        }
+
+        res.json({
+            message: 'Módulos y clases insertados exitosamente',
+            data: {
+                modulos: insertedModules,
+                clases: insertedClasses
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al insertar módulos o clases:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+//##########################################################################################################################################
 
 
 export const putModulosCurriculaC = async (req, res) => {

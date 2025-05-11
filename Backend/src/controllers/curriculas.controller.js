@@ -73,7 +73,7 @@ export const putCurriculaC = async (req, res) => {
 
 
 //##########################################################################################################################################
-
+//INSERTA CURRICULAS, MODULOS Y CLASES
 export const postCurriculaModulosClasesC = async (req, res) => {
     const {
         curriculaData,    // Datos para la curricula
@@ -145,6 +145,8 @@ export const postCurriculaModulosClasesC = async (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 };
+
+
 
 
 
