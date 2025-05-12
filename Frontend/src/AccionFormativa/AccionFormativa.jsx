@@ -888,7 +888,43 @@ const AddEducationalProcess = () => {
                     const id = response.data.idaccionformativa;
                     setFormData(prev => ({ ...prev, idaccionformativa: id }));
                     break;
+                case 1:
+                    // Preparar los datos para enviar
+                    const datosParaEnviar = curriculumData.modulos.flatMap(modulo => {
+                        return modulo.clases.map(clase => {
+                            // Convertir las duraciones al formato HH:MM:SS
+                            const formatTime = (hours, minutes) => {
+                                const hrs = parseInt(hours) || 0;
+                                const mins = parseInt(minutes) || 0;
+                                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:00`;
+                            };
 
+                            // Parsear las horas teóricas y prácticas
+                            const teorica = parseTimeString(clase.duracionteorica);
+                            const practica = parseTimeString(clase.duracionpractica);
+                            const total = parseTimeString(clase.duraciontotal);
+
+                            return {
+                                idaccionformativa: formData.idaccionformativa,
+                                idcurriculas: curriculumData.idcurricula,
+                                idmoduloscurriculas: modulo.idmodulo,
+                                idclasescurriculas: clase.idclase,
+                                duracionteorica: formatTime(teorica.hours, teorica.minutes),
+                                duracionpractica: formatTime(practica.hours, practica.minutes),
+                                duraciontotal: formatTime(total.hours, total.minutes),
+                                creadopor: user.id
+                            };
+                        });
+                    });
+
+                    // Enviar los datos a la API
+                    const CurrriModClassData = await axios.post(
+                        `${process.env.REACT_APP_API_URL}/ClassModCurrAF`,
+                        datosParaEnviar
+                    );
+
+                    console.log("Respuesta del servidor:", CurrriModClassData.data);
+                    break;
                 case 2: // Paso 3: Inscripción (Estudiantes)
                     if (!Array.isArray(selectionModel)) {
                         throw new Error("Error en la selección de estudiantes");
