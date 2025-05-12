@@ -63,7 +63,30 @@ export const getClasModCurrAccFormIdM = async (id) => {
         throw error;
     }
 }
-
+/*  SELECT 
+  m.id AS id_modulo,
+  m.modulo AS nombre_modulo,
+  json_agg(
+    json_build_object(
+      'id_clase', c.id,
+      'nombre_clase', c.clase,
+      'duracionteorica', c.duracionteorica,
+      'duracionpractica', c.duracionpractica,
+      'duraciontotal', c.duraciontotal,
+      'id_estudiante', e.id,
+      'nombre_estudiante', e.nombre
+    )
+    ORDER BY c.id
+  ) AS clases
+FROM seguimiento s
+JOIN estudiantes e ON e.id = s.idestudiante
+JOIN accionformativa af ON af.id = s.idaccionformativa
+JOIN classmodcurraf cmc ON cmc.idaccionformativa = af.id
+JOIN moduloscurriculas m ON m.id = cmc.idmoduloscurriculas
+JOIN clasescurriculas c ON c.id = cmc.idclasescurriculas
+WHERE af.id = $1
+GROUP BY m.id, m.modulo
+ORDER BY m.modulo; */
 export const postClasModCurrAccFormM = async (
     idaccionformativa, idcurriculas, idmoduloscurriculas, idclasescurriculas, duracionteorica, duracionpractica, duraciontotal, creadopor) => {
     try {

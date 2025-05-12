@@ -25,8 +25,22 @@ import {
     DialogActions,
     FormHelperText,
     List,
-    ListItem
+    ListItem,
+    Collapse,
+    CircularProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    Tooltip,
+    FormLabel,
 } from '@mui/material';
+import MovingOutlinedIcon from '@mui/icons-material/MovingOutlined';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
@@ -39,7 +53,7 @@ import Dashboard from "../Dashboard/Dashboard";
 import { useUser } from "../Components/UserContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import InstructorModal from '../Maestros/Maestros';
@@ -179,6 +193,9 @@ const AddEducationalProcess = () => {
         hasidoempleado: false,
         tipoempleo: '',
         trabajacampoestudio: false,
+
+
+
 
         creadopor: user.id
     });
@@ -813,6 +830,9 @@ const AddEducationalProcess = () => {
             console.error("Error al obtener estudiantes:", error);
         }
     };
+    useEffect(() => {
+        fetchEstudiantesIns();
+    }, []);
 
     const handleDeleteEstudiantes = async () => {
         try {
@@ -844,15 +864,77 @@ const AddEducationalProcess = () => {
         }
     };
 
-    useEffect(() => {
-        fetchEstudiantesIns();
-    }, []);
 
     const handleAddEstudiante = async () => {
         estudiantesRef.current?.openAddModal();
     };
 
 
+    /*------------------------------------------------------------------------------------------------------------------------------------------------------- */
+    /*--------------------------------------               STEP      03                                ------------------------------------------------------ */
+    /*------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+
+
+    /*------------------------------------------------------------------------------------------------------------------------------------------------------- */
+    /*--------------------------------------               STEP      04                                ------------------------------------------------------ */
+    /*------------------------------------------------------------------------------------------------------------------------------------------------------- */
+    const [openModal, setOpenModal] = useState(false);
+    const [seguimientos, setSeguimientos] = useState([]);
+    const [currentId, setCurrentId] = useState(null);
+    const handleCloseModal = () => {
+        setOpenModal(false);
+
+    };
+    const Seguimientos = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/seguimiento/${formData.idaccionformativa}`);
+            setSeguimientos(Array.isArray(response.data) ? response.data : []);
+            console.log("api", estudiantesIns);
+
+        } catch (error) {
+            console.error("Error al obtener estudiantes:", error);
+        }
+    };
+    useEffect(() => {
+        Seguimientos();
+    }, []);
+    const handleSubmit = async () => {
+        try {
+            // Preparamos el payload exactamente como lo requiere el backend
+            const payload = {
+                completocurso: Boolean(formData.completocurso),
+                fechaabandono: formData.completocurso ? null : formData.fechaabandono, // Solo si no completó
+                razonabandono: formData.completocurso ? null : formData.razonabandono, // Solo si no completó
+                tipocertificacion: formData.completocurso ? formData.tipocertificacion : null,
+                hasidoempleado: Boolean(formData.hasidoempleado),
+                tipoempleo: formData.tipoempleo || null,
+                trabajacampoestudio: Boolean(formData.trabajacampoestudio),
+                idaccionformativa: formData.idaccionformativa, // Asegúrate que esto viene de tu formData
+                idestudiante: formData.idestudiante, // Asegúrate que esto viene de tu formData
+                creadopor: 1 // O el ID del usuario actual
+            };
+
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/seguimiento/${currentId}`,
+                payload
+            );
+
+            // Cierra el modal y actualiza la tabla
+            handleCloseModal();
+            setSeguimientos(prev => prev.map(item =>
+                item.id === formData.id ? { ...item, ...response.data } : item
+            ));
+            Seguimientos();
+        } catch (error) {
+            console.error("Error al actualizar:", {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            // Puedes mostrar un mensaje de error al usuario aquí
+        }
+    };
 
 
 
@@ -925,7 +1007,7 @@ const AddEducationalProcess = () => {
 
                     console.log("Respuesta del servidor:", CurrriModClassData.data);
                     break;
-                case 2: // Paso 3: Inscripción (Estudiantes)
+                case 2:
                     if (!Array.isArray(selectionModel)) {
                         throw new Error("Error en la selección de estudiantes");
                     }
@@ -953,7 +1035,8 @@ const AddEducationalProcess = () => {
                     fetchEstudiantesIns();
                     break;
 
-                // ... otros cases
+                case 5:
+                    break;
             }
 
             handleComplete(step);
@@ -1803,6 +1886,17 @@ const AddEducationalProcess = () => {
 
                     {activeStep === 2 && (
                         <Box sx={{ width: '100%', typography: 'body1' }}>
+
+                            <Grid size={{ xs: 12, md: 12 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: color.grisClaro, p: 1, borderRadius: 3, }}>
+                                    <Typography variant="h5" sx={{ mr: 5, fontWeight: 'bold' }} gutterBottom>
+                                        {formData.accionformatica}
+                                    </Typography>
+                                    <Typography variant="subtitle1" gutterBottom>
+                                        Del {formData.fechainicio} al {formData.fechafinal} || {formData.horastotales && (formData.horastotales.split(':')[0])} horas y  {formData.horastotales && (formData.horastotales.split(':')[1])} minutos
+                                    </Typography>
+                                </Box>
+                            </Grid>
                             <TabContext value={value}>
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <TabList onChange={handleChangeTab} aria-label="lab API tabs example">
@@ -1827,6 +1921,18 @@ const AddEducationalProcess = () => {
                                         >
                                             Agregar Nuevo Estudiante
                                         </Button>
+
+                                        {activeStep === 2 && (
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleStepSubmit(activeStep)}
+                                                sx={{ backgroundColor: color.azul }}
+                                            >
+                                                Inscribir
+                                            </Button>
+                                        )}
+
+
                                     </Grid>
                                     <DataGrid
                                         rows={estudiantes}
@@ -1889,26 +1995,85 @@ const AddEducationalProcess = () => {
                     )}
 
                     {activeStep === 3 && (
-                        <Grid container spacing={3}>
-                            <Grid item md={6}>
-                                <TextField fullWidth label="Nombre de salida" />
-                            </Grid>
-                            <Grid item md={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Checkbox checked color="success" />
-                                <Typography>✔</Typography>
-                            </Grid>
-                        </Grid>
+                        <>
+                        </>
                     )}
 
                     {activeStep === 4 && (
                         <Grid container spacing={3}>
-                            <Grid item md={6}>
-                                <TextField fullWidth label="Horas totales" type="number" />
+
+                            <Grid size={{ xs: 12, md: 12 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: color.grisClaro, p: 1, borderRadius: 3, }}>
+                                    <Typography variant="h5" sx={{ mr: 5, fontWeight: 'bold' }} gutterBottom>
+                                        {formData.accionformatica}
+                                    </Typography>
+                                    <Typography variant="subtitle1" gutterBottom>
+                                        Del {formData.fechainicio} al {formData.fechafinal} || {formData.horastotales && (formData.horastotales.split(':')[0])} horas y  {formData.horastotales && (formData.horastotales.split(':')[1])} minutos
+                                    </Typography>
+                                </Box>
                             </Grid>
-                            <Grid item md={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Checkbox checked color="success" />
-                                <Typography>✔</Typography>
-                            </Grid>
+                            <DataGrid
+                                rows={seguimientos}
+                                columns={[
+                                    {
+                                        field: 'acciones',
+                                        headerName: 'Acciones',
+                                        width: 120,
+                                        renderCell: (params) => (
+
+                                            <Tooltip title="Seguimiento" arrow>
+                                                <IconButton
+                                                    onClick={() => {
+                                                        setFormData(params.row); // Datos del formulario
+                                                        setCurrentId(params.row.id); // Guardamos el ID por separado
+                                                        setOpenModal(true);
+                                                    }}
+                                                    sx={{ color: color.azul }}
+                                                >
+                                                    <MovingOutlinedIcon />
+                                                </IconButton>
+                                            </Tooltip>
+
+                                        ),
+                                    },
+                                    { field: "id", headerName: "ID", width: 90 },
+                                    { field: 'identificacion', headerName: 'DNI', width: 200 },
+                                    { field: 'nombre', headerName: 'Nombre', width: 300 },
+                                    {
+                                        field: 'completocurso',
+                                        headerName: 'Concluyó Formación',
+                                        width: 300,
+                                        type: 'boolean',
+
+
+                                    },
+                                    { field: 'tipocertificacion', headerName: 'Certificado', width: 300 },
+                                    {
+                                        field: 'hasidoempleado',
+                                        headerName: 'Trabaja actualmente',
+                                        width: 300,
+                                        type: 'boolean',
+                                        valueFormatter: (params) => params.value === true ? 'Sí' : 'No',
+                                        /* renderCell: (params) => (
+                                            <strong style={{ color: params.value ? '#4CAF50' : '#F44336' }}>
+                                                {params.value ? 'Sí' : 'No'}
+                                            </strong>
+                                        ) */
+                                    },
+                                    {
+                                        field: 'trabajacampoestudio',
+                                        headerName: 'Trabaja en campo de estudio',
+                                        width: 300,
+                                        type: 'boolean',
+                                        valueFormatter: (params) => params.value === true ? 'Sí' : 'No',
+
+                                    },
+                                    { field: 'fechaabandono', headerName: 'Fecha de Derserción', width: 300 },
+                                ]}
+                                pageSize={5}
+                                getRowId={(row) => row.id}
+                                autoHeight
+                            />
                         </Grid>
                     )}
                 </Box>
@@ -1922,15 +2087,15 @@ const AddEducationalProcess = () => {
                     >
                         Atrás
                     </Button>
-                    <Button
-                        variant="contained"
-
-                        onClick={() => handleStepSubmit(activeStep)}
-                        sx={{
-                            mr: 1, backgroundColor: color.azul
-                        }} >
-                        Guardar
-                    </Button>
+                    {![2, 4].includes(activeStep) && (
+                        <Button
+                            variant="contained"
+                            onClick={() => handleStepSubmit(activeStep)}
+                            sx={{ mr: 1, backgroundColor: color.azul }}
+                        >
+                            Guardar
+                        </Button>
+                    )}
                 </Box>
 
                 <InstructorModal
@@ -1943,6 +2108,173 @@ const AddEducationalProcess = () => {
                     soloModal={true}
                     onSaveSuccess={handleSaveSuccess} // Pasa el callback
                 />
+                <Dialog open={openModal} onClose={handleCloseModal} maxWidth="lg" fullWidth>
+                    <DialogTitle sx={{ backgroundColor: color.azul, color: 'white' }}>
+                        Seguimiento del Egresado
+                    </DialogTitle>
+                    <DialogContent dividers>
+                        <Grid container spacing={2}>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <TextField
+                                    label="Nombre"
+                                    name="nombre"
+                                    value={formData.nombre || ''}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    variant="standard"
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <TextField
+                                    label="DNI"
+                                    name="identificacion"
+                                    value={formData.identificacion || ''}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    variant="standard"
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 12 }}>
+                                <FormControl>
+                                    <FormLabel id="completo-curso-radio-group">¿Completó el curso?</FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="completo-curso-radio-group"
+                                        name="completocurso"
+                                        value={formData.completocurso.toString()} // Convertimos booleano a string
+                                        onChange={(event) => {
+                                            setFormData({
+                                                ...formData,
+                                                completocurso: event.target.value === 'true', // Convertimos string a booleano
+                                            });
+                                        }}
+                                    >
+                                        <FormControlLabel value="true" control={<Radio />} label="Sí" />
+                                        <FormControlLabel value="false" control={<Radio />} label="No" />
+                                    </RadioGroup>
+                                </FormControl>
+
+
+                            </Grid>
+                            {formData.completocurso === true && (
+                                <>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel id="demo-simple-select-label">Tipo de certificado/constancia</InputLabel>
+                                            <Select
+                                                name="tipocertificacion"
+                                                value={formData.tipocertificacion || ''}
+                                                onChange={handleChange}
+                                                label="Tipo de certificado/constancia"
+                                            >
+                                                <MenuItem value="">Seleccionar una opción</MenuItem>
+                                                <MenuItem value="De participación">De participación</MenuItem>
+                                                <MenuItem value="Por competencia">Por competencia</MenuItem>
+                                                <MenuItem value="De reconocimiento">De reconocimiento</MenuItem>
+                                                <MenuItem value="Constancia de asistencia">Constancia de asistencia</MenuItem>
+                                            </Select>
+                                        </FormControl>
+
+
+                                    </Grid>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel id="demo-simple-select-label">¿Se ha incorporado laboralmente?</InputLabel>
+                                            <Select
+                                                name="hasidoempleado"
+                                                value={formData.hasidoempleado || ''}
+                                                onChange={handleChange}
+                                                label="¿Se ha incorporado laboralmente?"
+                                            >
+                                                <MenuItem value="">Seleccionar una opción</MenuItem>
+                                                <MenuItem value={true}>SI</MenuItem>
+                                                <MenuItem value={false}>No</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel id="demo-simple-select-label">¿Trabaja en campo relacionado con estudios?</InputLabel>
+                                            <Select
+                                                name="trabajacampoestudio"
+                                                value={formData.trabajacampoestudio || ''}
+                                                onChange={handleChange}
+                                                label="¿Trabaja en campo relacionado con estudios?"
+                                            >
+                                                <MenuItem value="">Seleccionar una opción</MenuItem>
+                                                <MenuItem value={true}>SI</MenuItem>
+                                                <MenuItem value={false}>No</MenuItem>
+                                            </Select>
+                                        </FormControl>
+
+
+                                    </Grid>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel id="demo-simple-select-label">Tipo de Empleo</InputLabel>
+                                            <Select
+                                                name="tipoempleo"
+                                                value={formData.tipoempleo || ''}
+                                                onChange={handleChange}
+                                                label="Tipo de Empleo"
+                                            >
+
+                                                <MenuItem value="">Seleccionar una opción</MenuItem>
+                                                <MenuItem value="Empleado del sector público">Empleado del sector público</MenuItem>
+                                                <MenuItem value="Empleado del sector privado">Empleado del sector privado</MenuItem>
+                                                <MenuItem value="Emprendimiento">Emprendimiento</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                </>
+                            )}
+                            {formData.completocurso === false && (
+                                <>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <FormControl fullWidth variant="standard">
+                                            <FormLabel id="completo-curso-radio-group">Fecha de deserción</FormLabel>
+                                            <TextField
+
+                                                name="fechaabandono"
+                                                value={formData.fechaabandono || ''}
+                                                onChange={handleChange}
+                                                fullWidth
+                                                variant="standard"
+                                                type="date"
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <TextField
+                                            label="Motivó de salida"
+                                            name="razonabandono"
+                                            value={formData.razonabandono || ''}
+                                            onChange={handleChange}
+                                            fullWidth
+                                            variant="standard"
+                                        />
+                                    </Grid>
+                                </>
+
+
+                            )}
+                        </Grid>
+
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseModal} color="error">
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            sx={{ background: color.azul }}
+                            variant="contained"
+                        >
+                            Guardar
+                        </Button>
+                    </DialogActions>
+                </Dialog >
+
             </Paper >
         </Dashboard >
     );

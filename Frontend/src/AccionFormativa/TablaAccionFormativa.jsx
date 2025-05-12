@@ -84,8 +84,26 @@ export default function TablaActividad() {
         },
         { field: "id", headerName: "ID", width: 90 },
         { field: "accionformatica", headerName: "Acción Formativa ", width: 230 },
-        { field: "fechainicio", headerName: "Fecha Inicio ", width: 200 },
-        { field: "fechafinal", headerName: "Fecha Final", width: 350 },
+        {
+            field: "fechainicio",
+            headerName: "Fecha Inicio ",
+            width: 200,
+            renderCell: (params) => {
+                if (!params.value) return "";
+                const date = new Date(params.value);
+                return date.toLocaleDateString('es-ES');
+            },
+        },
+        {
+            field: "fechafinal",
+            headerName: "Fecha Final",
+            width: 350,
+            renderCell: (params) => {
+                if (!params.value) return ""; 
+                const date = new Date(params.value);
+                return date.toLocaleDateString('es-ES');
+            },
+        },
         { field: "departamento", headerName: "Departamento", width: 190 },
         { field: "municipio", headerName: "Municipio ", width: 120 },
     ];

@@ -28,7 +28,7 @@ export const getSegumientoIdM = async (id) => {
     try {
         const { rows } = await pool.query(`
             SELECT 
-                s.idaccionformativa, a.accionformatica,
+               s.id, s.idaccionformativa, a.accionformatica,
                 s.idestudiante, e.identificacion, e.nombre,
                 s.completocurso, s.fechaabandono, s.razonabandono, s.tipocertificacion, 
                 s.hasidoempleado, s.tipoempleo, s.trabajacampoestudio, 

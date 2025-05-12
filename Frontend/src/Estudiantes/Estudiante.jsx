@@ -887,7 +887,8 @@ const Estudiantes = forwardRef(({ soloModal = false }, ref) => {
                                 </FormControl>
 
 
-                            </Grid>)}
+                            </Grid>
+                        )}
                         <Grid item size={6}>
                             <FormControlLabel
                                 label="Trabaja Actualmente"

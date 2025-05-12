@@ -364,12 +364,13 @@ const CurriculumCreator = ({ open, onClose, editId, editData }) => {
     };
 
     const handleModuleNameChange = (index, newName) => {
-        // Actualiza el nombre del módulo en tu estado principal
-        const updatedModules = [...module];
-        updatedModules[index].modulo = newName;
-        //setModules(updatedModules);
+        const updatedModules = [...modulosData]; // Copia el array de módulos
+        updatedModules[index] = {
+            ...updatedModules[index], // Copia el módulo existente
+            modulo: newName // Actualiza solo el nombre
+        };
+        setModulosData(updatedModules); // Actualiza el estado
     };
-
     const removeClass = async (moduleIndex, classIndex) => {
         const updatedModules = [...modulosData];
         const claseAEliminar = updatedModules[moduleIndex].clases[classIndex];

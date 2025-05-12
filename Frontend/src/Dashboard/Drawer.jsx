@@ -656,7 +656,7 @@ const ProjectDrawer = ({ open }) => {
           }}
           PaperProps={{
             sx: {
-              marginTop: 59,
+              marginTop: 65,
               ml: 10,
               boxShadow: 3,
               minWidth: 200,

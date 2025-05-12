@@ -52,7 +52,6 @@ export const getSegumientoIdAccFormC = async (req, res) => {
 export const postSeguimientoC = async (req, res) => {
     try {
         const seguimientos = req.body;
-        console.log("Datos llegados al back", req.body);
 
         if (!Array.isArray(seguimientos)) {
             return res.status(400).json({ error: 'Se esperaba un arreglo de seguimientos.' });
@@ -108,11 +107,13 @@ export const putSeguimientoC = async (req, res) => {
     try {
         const { id } = req.params;
         const { completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor } = req.body;
-
-        if (!completocurso || !tipocertificacion) {
-            console.log("Faltan datos en la solicitud");
-            return res.status(400).json({ error: "Faltan datos en la solicitud" });
-        }
+        console.log(req.params);
+        console.log(req.body);
+        /* 
+                if (!completocurso || !tipocertificacion) {
+                    console.log("Faltan datos en la solicitud");
+                    return res.status(400).json({ error: "Faltan datos en la solicitud" });
+                } */
 
         const newSeguimiento = await putSeguimientoM(completocurso, fechaabandono, razonabandono, tipocertificacion, hasidoempleado, tipoempleo, trabajacampoestudio, idaccionformativa, idestudiante, modificadopor, id);
         res.json({ message: "Seguimiento actualizado exitosamente: ", newSeguimiento });
